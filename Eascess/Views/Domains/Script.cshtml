@@ -1,0 +1,105 @@
+@model Eascess.Models.DomainListItemViewModel
+@{
+    ViewData["Title"] = "Entegrasyon Scripti";
+}
+
+<div class="container mt-4" style="max-width:700px;">
+
+    <div class="mb-4">
+        <a asp-action="Index" class="text-muted text-decoration-none">← Web Sitelerime Dön</a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h4 class="mb-0">Entegrasyon Scripti</h4>
+                @if (Model.IsVerified)
+                {
+                    <span class="badge bg-success">Aktif</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark">Bekleniyor</span>
+                }
+            </div>
+            <p class="text-muted mb-4">
+                <strong>@Model.DomainUrl</strong> için oluşturulan script etiketi aşağıdadır.
+            </p>
+
+            <!-- Adım 1 -->
+            <div class="mb-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-primary rounded-pill">1</span>
+                    <span class="fw-semibold">Aşağıdaki kodu kopyalayın</span>
+                </div>
+                <div class="bg-dark rounded p-3 position-relative">
+                    <code class="text-success small" id="script-code">@Model.ScriptTag</code>
+                    <button class="btn btn-sm btn-outline-light position-absolute top-0 end-0 m-2"
+                            onclick="copyScript()" type="button" id="copy-btn">
+                        Kopyala
+                    </button>
+                </div>
+            </div>
+
+            <!-- Adım 2 -->
+            <div class="mb-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-primary rounded-pill">2</span>
+                    <span class="fw-semibold">Sitenizin <code>&lt;head&gt;</code> etiketleri arasına yapıştırın</span>
+                </div>
+                <div class="bg-dark rounded p-3">
+                    <pre class="text-muted small mb-0">&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Siteniz&lt;/title&gt;
+    <span class="text-warning">@Model.ScriptTag</span>
+  &lt;/head&gt;
+  &lt;body&gt;...&lt;/body&gt;
+&lt;/html&gt;</pre>
+                </div>
+            </div>
+
+            <!-- Adım 3 -->
+            <div class="mb-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-primary rounded-pill">3</span>
+                    <span class="fw-semibold">Sitenizi ziyaret edin</span>
+                </div>
+                <p class="text-muted small mb-0">
+                    Script yüklendikten sonra Eascess, lisans anahtarınızı doğrular ve
+                    erişilebilirlik widget'ı sitenizde otomatik olarak belirir.
+                </p>
+            </div>
+
+            <!-- License key bilgisi -->
+            <hr />
+            <div class="row small text-muted">
+                <div class="col-sm-4 fw-semibold">License Key:</div>
+                <div class="col-sm-8 font-monospace">@Model.LicenseKey</div>
+                <div class="col-sm-4 fw-semibold mt-1">Domain:</div>
+                <div class="col-sm-8 mt-1">@Model.DomainUrl</div>
+                <div class="col-sm-4 fw-semibold mt-1">Eklenme:</div>
+                <div class="col-sm-8 mt-1">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        function copyScript() {
+            const code = document.getElementById('script-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.getElementById('copy-btn');
+                btn.textContent = 'Kopyalandı ✓';
+                btn.classList.replace('btn-outline-light', 'btn-success');
+                setTimeout(() => {
+                    btn.textContent = 'Kopyala';
+                    btn.classList.replace('btn-success', 'btn-outline-light');
+                }, 2000);
+            });
+        }
+    </script>
+}

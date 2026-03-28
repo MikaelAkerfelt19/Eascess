@@ -1,0 +1,44 @@
+@*
+    _WavyHero.cshtml - Dalgalı arka planlı hero bölümü
+    Views/Shared/_WavyHero.cshtml
+
+    Kullanım (herhangi bir View içinde):
+    
+    @await Html.PartialAsync("_WavyHero", new ViewDataDictionary(ViewData) {
+        { "Title", "Hoş Geldiniz" },
+        { "Subtitle", "Harika bir deneyim sizi bekliyor" },
+        { "CtaText", "Keşfet" },
+        { "CtaUrl", "/Home/About" },
+        { "Speed", "fast" },
+        { "Blur", "10" }
+    })
+
+    Veya basitçe:
+    <partial name="_WavyHero" />
+*@
+
+@{
+    var title = ViewData["Title"]?.ToString() ?? "Hero waves are cool";
+    var subtitle = ViewData["Subtitle"]?.ToString() ?? "Leverage the power of canvas to create a beautiful hero section";
+    var ctaText = ViewData["CtaText"]?.ToString();
+    var ctaUrl = ViewData["CtaUrl"]?.ToString() ?? "#";
+    var speed = ViewData["Speed"]?.ToString() ?? "fast";
+    var blur = ViewData["Blur"]?.ToString() ?? "10";
+    var bgFill = ViewData["BgFill"]?.ToString() ?? "black";
+    var cssClass = ViewData["CssClass"]?.ToString() ?? "";
+}
+
+<section class="wavy-hero @cssClass"
+         data-wavy-bg
+         data-wavy-speed="@speed"
+         data-wavy-blur="@blur"
+         data-wavy-bg-fill="@bgFill">
+    <div class="wavy-hero__content">
+        <h1 class="wavy-hero__title">@title</h1>
+        <p class="wavy-hero__subtitle">@subtitle</p>
+        @if (!string.IsNullOrEmpty(ctaText))
+        {
+            <a href="@ctaUrl" class="wavy-hero__cta">@ctaText</a>
+        }
+    </div>
+</section>

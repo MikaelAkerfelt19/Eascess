@@ -5,11 +5,11 @@ VisualStudioVersion = 17.14.36623.8 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eascess_Web", "Eascess\Eascess_Web.csproj", "{F028991E-9C39-4158-B47B-B1DFDB2EF068}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eascess_Application", "Eascess. Application\Eascess_Application.csproj", "{4CF6DA3F-9E03-4613-B4C3-F72C2E8D9923}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eascess_Application", "Eascess_Application\Eascess_Application.csproj", "{4CF6DA3F-9E03-4613-B4C3-F72C2E8D9923}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eascess_Domain", "Eascess_Domain\Eascess_Domain.csproj", "{1938D6B1-0C4A-4F31-B218-319EA509BD5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easscess_Infrastructure", "Easscess_Infrastructure\Easscess_Infrastructure.csproj", "{74E822E7-BAFC-4258-A535-59BDA3BA4AF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eascess_Infrastructure", "Eascess_Infrastructure\Eascess_Infrastructure.csproj", "{74E822E7-BAFC-4258-A535-59BDA3BA4AF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

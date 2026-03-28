@@ -1,8 +1,94 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@*
+    Home/Index.cshtml - WavyBackground kullanım örnekleri
+    Views/Home/Index.cshtml
+*@
+@{
+     ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@* =============================================
+   KULLANIM 1: Partial View ile (Önerilen)
+   ============================================= *@
+@await Html.PartialAsync("_WavyHero", new ViewDataDictionary(ViewData) {
+    ["Title"] = "Projenize Dalga Katın",
+    ["Subtitle"] = "Canvas tabanlı animasyonlu arka plan ile etkileyici hero bölümleri oluşturun",
+    ["CtaText"] = "Daha Fazla",
+    ["CtaUrl"] = "/Home/About",
+    ["Speed"] = "fast",
+    ["Blur"] = "10"
+})
+
+
+@* =============================================
+   KULLANIM 2: Doğrudan HTML ile
+   ============================================= *@
+@*
+<section class="wavy-hero wavy-hero--half"
+         data-wavy-bg
+         data-wavy-speed="slow"
+         data-wavy-blur="14"
+         data-wavy-bg-fill="#0f172a">
+    <div class="wavy-hero__content">
+        <h1 class="wavy-hero__title">Özel Başlık</h1>
+        <p class="wavy-hero__subtitle">İstediğiniz HTML içeriğini buraya koyabilirsiniz.</p>
+    </div>
+</section>
+*@
+
+
+@* =============================================
+   KULLANIM 3: JavaScript ile programatik
+   ============================================= *@
+@*
+<section id="custom-hero" class="wavy-hero wavy-hero--banner">
+    <div class="wavy-hero__content">
+        <h2 class="wavy-hero__title">Programatik Kullanım</h2>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Sayfa yüklendikten sonra özel ayarlarla başlat
+        document.addEventListener('DOMContentLoaded', function () {
+            new WavyBackground('#custom-hero', {
+                colors: ['#f97316', '#ef4444', '#ec4899', '#8b5cf6'],
+                speed: 'slow',
+                blur: 14,
+                backgroundFill: '#1e293b',
+                waveOpacity: 0.6,
+                waveWidth: 60,
+                waveCount: 6
+            });
+        });
+    </script>
+}
+*@
+
+
+@* ===== Sayfanın geri kalan normal içeriği ===== *@
+<div style="padding: 4rem 2rem; max-width: 800px; margin: 0 auto;">
+    <h2>Sayfa İçeriği</h2>
+    <p>
+        Wavy background hero bölümünün altında normal sayfa içeriğiniz devam eder.
+        Bu bileşen sadece belirttiğiniz container içinde çalışır, sayfanın
+        geri kalanını etkilemez.
+    </p>
+
+    <h3>Özelleştirme Seçenekleri</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Parametre</th>
+                <th>Varsayılan</th>
+                <th>Açıklama</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>data-wavy-speed</td><td>fast</td><td>"slow" veya "fast"</td></tr>
+            <tr><td>data-wavy-blur</td><td>10</td><td>Bulanıklık (px)</td></tr>
+            <tr><td>data-wavy-opacity</td><td>0.5</td><td>Dalga opaklığı (0-1)</td></tr>
+            <tr><td>data-wavy-bg-fill</td><td>black</td><td>Arka plan rengi</td></tr>
+            <tr><td>data-wavy-colors</td><td>—</td><td>JSON renk dizisi</td></tr>
+        </tbody>
+    </table>
 </div>

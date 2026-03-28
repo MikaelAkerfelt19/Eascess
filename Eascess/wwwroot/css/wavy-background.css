@@ -1,0 +1,114 @@
+/* ============================================
+   WavyBackground - Stil Dosyası
+   wwwroot/css/wavy-background.css
+   ============================================ */
+
+/* Ana konteyner - tam ekran hero section */
+.wavy-hero {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Yarım yükseklik varyasyonu */
+.wavy-hero--half {
+    min-height: 50vh;
+}
+
+/* Küçük banner varyasyonu */
+.wavy-hero--banner {
+    min-height: 300px;
+}
+
+/* Canvas katmanı */
+.wavy-bg-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* İçerik katmanı (canvas'ın üstünde) */
+.wavy-hero__content {
+    position: relative;
+    z-index: 10;
+    max-width: 56rem; /* max-w-4xl */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+
+/* Başlık stilleri */
+.wavy-hero__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    margin: 0 0 1rem;
+}
+
+.wavy-hero__subtitle {
+    font-size: 1rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* CTA Buton */
+.wavy-hero__cta {
+    display: inline-block;
+    margin-top: 2rem;
+    padding: 0.75rem 2rem;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 9999px;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.wavy-hero__cta:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+/* ---- Responsive ---- */
+@media (min-width: 768px) {
+    .wavy-hero__title {
+        font-size: 2.5rem;
+    }
+    .wavy-hero__subtitle {
+        font-size: 1.125rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .wavy-hero__title {
+        font-size: 4rem;
+    }
+    .wavy-hero__subtitle {
+        font-size: 1.25rem;
+    }
+}
+
+/* Erişilebilirlik: Hareketi azalt */
+@media (prefers-reduced-motion: reduce) {
+    .wavy-bg-canvas {
+        display: none;
+    }
+    .wavy-hero {
+        background: #0f172a; /* fallback koyu arka plan */
+    }
+}

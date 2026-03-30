@@ -3,86 +3,94 @@
     ViewData["Title"] = "Entegrasyon Scripti";
 }
 
-<div class="container mt-4" style="max-width:700px;">
+<div class="ea-page ea-page--narrow">
 
-    <div class="mb-4">
-        <a asp-action="Index" class="text-muted text-decoration-none">← Web Sitelerime Dön</a>
+    <div class="ea-breadcrumb">
+        <a asp-action="Index">Web Sitelerim</a>
+        <span class="ea-breadcrumb__sep">/</span>
+        <span class="ea-breadcrumb__current">@Model.DomainUrl</span>
     </div>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
+    <div class="ea-card" style="padding:2rem;">
 
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <h4 class="mb-0">Entegrasyon Scripti</h4>
-                @if (Model.IsVerified)
-                {
-                    <span class="badge bg-success">Aktif</span>
-                }
-                else
-                {
-                    <span class="badge bg-warning text-dark">Bekleniyor</span>
-                }
+        <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.3rem;">
+            <h4 style="font-size:1.2rem;font-weight:700;color:#fff;margin:0;">Entegrasyon Scripti</h4>
+            @if (Model.IsVerified)
+            {
+                <span class="ea-badge ea-badge--success">Aktif</span>
+            }
+            else
+            {
+                <span class="ea-badge ea-badge--warning">Bekleniyor</span>
+            }
+        </div>
+        <p style="font-size:.83rem;color:var(--ea-muted);margin:0 0 2rem;">
+            <strong style="color:rgba(255,255,255,.7)">@Model.DomainUrl</strong> için oluşturulan entegrasyon scripti
+        </p>
+
+        <!-- Adım 1 -->
+        <div style="margin-bottom:1.75rem;">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;">
+                <span class="ea-step-num">1</span>
+                <span style="font-size:.88rem;font-weight:600;color:#fff;">Aşağıdaki kodu kopyalayın</span>
             </div>
-            <p class="text-muted mb-4">
-                <strong>@Model.DomainUrl</strong> için oluşturulan script etiketi aşağıdadır.
-            </p>
-
-            <!-- Adım 1 -->
-            <div class="mb-4">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge bg-primary rounded-pill">1</span>
-                    <span class="fw-semibold">Aşağıdaki kodu kopyalayın</span>
-                </div>
-                <div class="bg-dark rounded p-3 position-relative">
-                    <code class="text-success small" id="script-code">@Model.ScriptTag</code>
-                    <button class="btn btn-sm btn-outline-light position-absolute top-0 end-0 m-2"
-                            onclick="copyScript()" type="button" id="copy-btn">
-                        Kopyala
-                    </button>
-                </div>
+            <div class="ea-code-block" style="padding-right:7rem;position:relative;">
+                <code id="script-code" style="background:none;padding:0;color:#a5f3fc;word-break:break-all;">@Model.ScriptTag</code>
+                <button id="copy-btn" onclick="copyScript()" type="button"
+                        class="ea-btn ea-btn--ghost ea-btn--sm"
+                        style="position:absolute;top:.6rem;right:.6rem;">
+                    Kopyala
+                </button>
             </div>
+        </div>
 
-            <!-- Adım 2 -->
-            <div class="mb-4">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge bg-primary rounded-pill">2</span>
-                    <span class="fw-semibold">Sitenizin <code>&lt;head&gt;</code> etiketleri arasına yapıştırın</span>
-                </div>
-                <div class="bg-dark rounded p-3">
-                    <pre class="text-muted small mb-0">&lt;html&gt;
+        <!-- Adım 2 -->
+        <div style="margin-bottom:1.75rem;">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;">
+                <span class="ea-step-num">2</span>
+                <span style="font-size:.88rem;font-weight:600;color:#fff;">Sitenizin <code>&lt;head&gt;</code> etiketleri arasına yapıştırın</span>
+            </div>
+            <div class="ea-code-block">
+                <pre style="margin:0;font-size:.8rem;color:var(--ea-muted);font-family:inherit;">&lt;html&gt;
   &lt;head&gt;
     &lt;title&gt;Siteniz&lt;/title&gt;
-    <span class="text-warning">@Model.ScriptTag</span>
+    <span style="color:#fbbf24;">@Model.ScriptTag</span>
   &lt;/head&gt;
   &lt;body&gt;...&lt;/body&gt;
 &lt;/html&gt;</pre>
-                </div>
             </div>
-
-            <!-- Adım 3 -->
-            <div class="mb-4">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge bg-primary rounded-pill">3</span>
-                    <span class="fw-semibold">Sitenizi ziyaret edin</span>
-                </div>
-                <p class="text-muted small mb-0">
-                    Script yüklendikten sonra Eascess, lisans anahtarınızı doğrular ve
-                    erişilebilirlik widget'ı sitenizde otomatik olarak belirir.
-                </p>
-            </div>
-
-            <!-- License key bilgisi -->
-            <hr />
-            <div class="row small text-muted">
-                <div class="col-sm-4 fw-semibold">License Key:</div>
-                <div class="col-sm-8 font-monospace">@Model.LicenseKey</div>
-                <div class="col-sm-4 fw-semibold mt-1">Domain:</div>
-                <div class="col-sm-8 mt-1">@Model.DomainUrl</div>
-                <div class="col-sm-4 fw-semibold mt-1">Eklenme:</div>
-                <div class="col-sm-8 mt-1">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
-            </div>
-
         </div>
+
+        <!-- Adım 3 -->
+        <div style="margin-bottom:2rem;">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">
+                <span class="ea-step-num">3</span>
+                <span style="font-size:.88rem;font-weight:600;color:#fff;">Sitenizi ziyaret edin</span>
+            </div>
+            <p style="font-size:.83rem;color:var(--ea-muted);margin:0 0 0 2.1rem;line-height:1.6;">
+                Script yüklendikten sonra Eascess lisans anahtarınızı doğrular ve
+                erişilebilirlik widget'ı sitenizde otomatik olarak belirir.
+            </p>
+        </div>
+
+        <!-- Aksiyon butonları -->
+        <div style="display:flex;gap:.6rem;margin-bottom:1.5rem;">
+            <a asp-controller="WidgetSettings" asp-action="Index" asp-route-id="@Model.Id"
+               class="ea-btn ea-btn--primary ea-btn--sm">⚙️ Widget Ayarları</a>
+            <a asp-controller="Reports" asp-action="Domain" asp-route-id="@Model.Id"
+               class="ea-btn ea-btn--ghost ea-btn--sm">📊 Raporlar</a>
+        </div>
+
+        <!-- Meta bilgiler -->
+        <div style="border-top:1px solid var(--ea-border);padding-top:1.25rem;display:grid;grid-template-columns:auto 1fr;gap:.5rem 1rem;font-size:.78rem;">
+            <span style="color:var(--ea-muted);font-weight:600;">Lisans Anahtarı</span>
+            <span class="font-monospace" style="color:var(--ea-sky);">@Model.LicenseKey</span>
+            <span style="color:var(--ea-muted);font-weight:600;">Domain</span>
+            <span>@Model.DomainUrl</span>
+            <span style="color:var(--ea-muted);font-weight:600;">Eklenme</span>
+            <span>@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+        </div>
+
     </div>
 
 </div>
@@ -91,14 +99,16 @@
     <script>
         function copyScript() {
             const code = document.getElementById('script-code').textContent;
+            const btn = document.getElementById('copy-btn');
             navigator.clipboard.writeText(code).then(() => {
-                const btn = document.getElementById('copy-btn');
                 btn.textContent = 'Kopyalandı ✓';
-                btn.classList.replace('btn-outline-light', 'btn-success');
+                btn.style.color = '#4ade80';
+                btn.style.borderColor = 'rgba(74,222,128,.3)';
                 setTimeout(() => {
                     btn.textContent = 'Kopyala';
-                    btn.classList.replace('btn-success', 'btn-outline-light');
-                }, 2000);
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2500);
             });
         }
     </script>

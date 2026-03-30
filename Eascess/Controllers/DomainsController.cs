@@ -1,4 +1,5 @@
 using Eascess.Models;
+using Eascess_Application.Services;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -11,15 +12,18 @@ namespace Eascess.Controllers;
 public class DomainsController : Controller
 {
     private readonly IRepository<Domain> _domainRepo;
+    private readonly IWidgetSettingService _widgetSettingService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<AppUser> _userManager;
 
     public DomainsController(
         IRepository<Domain> domainRepo,
+        IWidgetSettingService widgetSettingService,
         IUnitOfWork unitOfWork,
         UserManager<AppUser> userManager)
     {
         _domainRepo = domainRepo;
+        _widgetSettingService = widgetSettingService;
         _unitOfWork = unitOfWork;
         _userManager = userManager;
     }
@@ -58,11 +62,8 @@ public class DomainsController : Controller
             return View(model);
 
         var userId = _userManager.GetUserId(User)!;
-
-        // URL'yi normalize et (scheme olmadan sakla)
         var normalizedUrl = NormalizeUrl(model.DomainUrl);
 
-        // Aynı domain zaten var mı?
         var existing = await _domainRepo.FirstOrDefaultAsync(
             d => d.DomainUrl == normalizedUrl && d.IsDeleted != true);
 
@@ -85,8 +86,11 @@ public class DomainsController : Controller
         await _domainRepo.AddAsync(domain);
         await _unitOfWork.SaveChangesAsync();
 
+        // Domain için varsayılan widget ayarlarını oluştur
+        await _widgetSettingService.CreateDefaultAsync(domain.Id);
+
         TempData["Success"] = $"{normalizedUrl} başarıyla eklendi. Script etiketini kopyalayıp sitenize yapıştırın.";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Script), new { id = domain.Id });
     }
 
     // ── Domain Sil ────────────────────────────────────────────────────────────
@@ -101,7 +105,6 @@ public class DomainsController : Controller
         if (domain is null || domain.UserId != userId)
             return NotFound();
 
-        // Soft delete
         domain.IsDeleted = true;
         domain.DeletedAt = DateTime.UtcNow;
         _domainRepo.Update(domain);

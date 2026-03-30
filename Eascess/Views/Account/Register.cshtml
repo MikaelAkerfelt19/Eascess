@@ -1,12 +1,11 @@
 @model Eascess.Models.RegisterViewModel
 @{
-    ViewData["Title"] = "Create Account";
+    ViewData["Title"] = "Hesap Oluştur";
     Layout = "_AuthLayout";
 }
 
 <div class="auth-card">
 
-    <!-- Brand -->
     <div class="auth-brand">
         <div class="auth-brand-icon">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -16,11 +15,9 @@
         <span class="auth-brand-name">Eascess</span>
     </div>
 
-    <!-- Heading -->
-    <h1 class="auth-heading">Create your account</h1>
-    <p class="auth-subheading">Start making the web accessible for everyone</p>
+    <h1 class="auth-heading">Hesabınızı oluşturun</h1>
+    <p class="auth-subheading">Web'i herkes için erişilebilir yapın</p>
 
-    <!-- Validation summary -->
     @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
     {
         <div class="alert-danger">
@@ -28,68 +25,52 @@
         </div>
     }
 
-    <!-- Form -->
     <form asp-action="Register" asp-controller="Account" method="post" novalidate>
         @Html.AntiForgeryToken()
 
         <div class="form-group">
-            <label class="form-label" asp-for="FullName">Full name</label>
-            <input class="form-control"
-                   asp-for="FullName"
-                   type="text"
-                   placeholder="John Doe"
-                   autocomplete="name"
-                   autofocus />
+            <label class="form-label" asp-for="FullName">Ad Soyad</label>
+            <input class="form-control" asp-for="FullName" type="text"
+                   placeholder="Ahmet Yılmaz" autocomplete="name" autofocus />
             <span asp-validation-for="FullName" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label class="form-label" asp-for="Email">Email address</label>
-            <input class="form-control"
-                   asp-for="Email"
-                   type="email"
-                   placeholder="you@company.com"
-                   autocomplete="email" />
+            <label class="form-label" asp-for="Email">E-posta adresi</label>
+            <input class="form-control" asp-for="Email" type="email"
+                   placeholder="siz@firma.com" autocomplete="email" />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label class="form-label" asp-for="Password">Password</label>
-            <input class="form-control"
-                   asp-for="Password"
-                   type="password"
-                   placeholder="Min. 8 characters"
-                   autocomplete="new-password" />
+            <label class="form-label" asp-for="Password">Şifre</label>
+            <input class="form-control" asp-for="Password" type="password"
+                   placeholder="En az 8 karakter" autocomplete="new-password" />
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
 
         <div class="form-group" style="margin-bottom:1.5rem;">
-            <label class="form-label" asp-for="ConfirmPassword">Confirm password</label>
-            <input class="form-control"
-                   asp-for="ConfirmPassword"
-                   type="password"
-                   placeholder="••••••••"
-                   autocomplete="new-password" />
+            <label class="form-label" asp-for="ConfirmPassword">Şifre tekrar</label>
+            <input class="form-control" asp-for="ConfirmPassword" type="password"
+                   placeholder="••••••••" autocomplete="new-password" />
             <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn-auth">Create account</button>
+        <button type="submit" class="btn-auth">Hesap Oluştur</button>
     </form>
 
     <div class="divider">
         <div class="divider-line"></div>
-        <span class="divider-text">Already have an account?</span>
+        <span class="divider-text">Zaten hesabınız var mı?</span>
         <div class="divider-line"></div>
     </div>
 
     <p class="auth-footer-text">
-        <a asp-action="Login" asp-controller="Account">Sign in instead</a>
+        <a asp-action="Login" asp-controller="Account">Giriş yapın</a>
     </p>
 
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

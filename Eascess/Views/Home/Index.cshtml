@@ -1,94 +1,96 @@
-@*
-    Home/Index.cshtml - WavyBackground kullanım örnekleri
-    Views/Home/Index.cshtml
-*@
 @{
-     ViewData["Title"] = "Ana Sayfa";
+    ViewData["Title"] = "Ana Sayfa";
 }
 
-@* =============================================
-   KULLANIM 1: Partial View ile (Önerilen)
-   ============================================= *@
-@await Html.PartialAsync("_WavyHero", new ViewDataDictionary(ViewData) {
-    ["Title"] = "Projenize Dalga Katın",
-    ["Subtitle"] = "Canvas tabanlı animasyonlu arka plan ile etkileyici hero bölümleri oluşturun",
-    ["CtaText"] = "Daha Fazla",
-    ["CtaUrl"] = "/Home/About",
-    ["Speed"] = "fast",
-    ["Blur"] = "10"
-})
-
-
-@* =============================================
-   KULLANIM 2: Doğrudan HTML ile
-   ============================================= *@
-@*
-<section class="wavy-hero wavy-hero--half"
-         data-wavy-bg
-         data-wavy-speed="slow"
-         data-wavy-blur="14"
-         data-wavy-bg-fill="#0f172a">
-    <div class="wavy-hero__content">
-        <h1 class="wavy-hero__title">Özel Başlık</h1>
-        <p class="wavy-hero__subtitle">İstediğiniz HTML içeriğini buraya koyabilirsiniz.</p>
-    </div>
-</section>
-*@
-
-
-@* =============================================
-   KULLANIM 3: JavaScript ile programatik
-   ============================================= *@
-@*
-<section id="custom-hero" class="wavy-hero wavy-hero--banner">
-    <div class="wavy-hero__content">
-        <h2 class="wavy-hero__title">Programatik Kullanım</h2>
+<!-- Hero -->
+<section class="ea-hero">
+    <div style="max-width:680px">
+        <div class="ea-hero__eyebrow">
+            ✦ WCAG 2.2 Uyumlu Erişilebilirlik Katmanı
+        </div>
+        <h1 class="ea-hero__title">
+            Web sitenizi<br><span>herkes için</span><br>erişilebilir yapın
+        </h1>
+        <p class="ea-hero__desc">
+            Tek satır kod. Sıfır geliştirici müdahalesi. Yapay zeka destekli erişilebilirlik widget'ı ile
+            sitenizi anında WCAG 2.2 standartlarına uyumlu hale getirin.
+        </p>
+        <div class="ea-hero__actions">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Dashboard" asp-action="Index" class="ea-btn ea-btn--primary ea-btn--lg">
+                    Panele Git →
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn--primary ea-btn--lg">
+                    Ücretsiz Başla →
+                </a>
+                <a asp-controller="Account" asp-action="Login" class="ea-btn ea-btn--ghost ea-btn--lg">
+                    Giriş Yap
+                </a>
+            }
+        </div>
     </div>
 </section>
 
-@section Scripts {
-    <script>
-        // Sayfa yüklendikten sonra özel ayarlarla başlat
-        document.addEventListener('DOMContentLoaded', function () {
-            new WavyBackground('#custom-hero', {
-                colors: ['#f97316', '#ef4444', '#ec4899', '#8b5cf6'],
-                speed: 'slow',
-                blur: 14,
-                backgroundFill: '#1e293b',
-                waveOpacity: 0.6,
-                waveWidth: 60,
-                waveCount: 6
-            });
-        });
-    </script>
-}
-*@
-
-
-@* ===== Sayfanın geri kalan normal içeriği ===== *@
-<div style="padding: 4rem 2rem; max-width: 800px; margin: 0 auto;">
-    <h2>Sayfa İçeriği</h2>
-    <p>
-        Wavy background hero bölümünün altında normal sayfa içeriğiniz devam eder.
-        Bu bileşen sadece belirttiğiniz container içinde çalışır, sayfanın
-        geri kalanını etkilemez.
-    </p>
-
-    <h3>Özelleştirme Seçenekleri</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Parametre</th>
-                <th>Varsayılan</th>
-                <th>Açıklama</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td>data-wavy-speed</td><td>fast</td><td>"slow" veya "fast"</td></tr>
-            <tr><td>data-wavy-blur</td><td>10</td><td>Bulanıklık (px)</td></tr>
-            <tr><td>data-wavy-opacity</td><td>0.5</td><td>Dalga opaklığı (0-1)</td></tr>
-            <tr><td>data-wavy-bg-fill</td><td>black</td><td>Arka plan rengi</td></tr>
-            <tr><td>data-wavy-colors</td><td>—</td><td>JSON renk dizisi</td></tr>
-        </tbody>
-    </table>
-</div>
+<!-- Feature strip -->
+<section class="ea-features">
+    <div style="text-align:center; margin-bottom:3rem;">
+        <p style="font-size:.8rem; font-weight:600; letter-spacing:.6px; color:var(--ea-sky); text-transform:uppercase; margin:0 0 .6rem;">Neden Eascess?</p>
+        <h2 style="font-size:clamp(1.5rem,4vw,2.4rem); font-weight:800; letter-spacing:-.5px; margin:0; color:#fff;">
+            Entegrasyon <span style="background:var(--ea-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">dakikalar içinde</span>
+        </h2>
+    </div>
+    <div class="ea-feature-grid">
+        <div class="ea-card ea-feature-card">
+            <div class="ea-feature-icon" style="background:rgba(56,189,248,.12)">⚡</div>
+            <h3 class="ea-feature-title">Tek Satır Entegrasyon</h3>
+            <p class="ea-feature-desc">
+                Sitenizin &lt;head&gt; bölümüne bir &lt;script&gt; etiketi yapıştırmanız yeterli.
+                Herhangi bir kod değişikliğine gerek yok.
+            </p>
+        </div>
+        <div class="ea-card ea-feature-card">
+            <div class="ea-feature-icon" style="background:rgba(192,132,252,.12)">🤖</div>
+            <h3 class="ea-feature-title">Yapay Zeka Desteği</h3>
+            <p class="ea-feature-desc">
+                Azure Computer Vision ile eksik alt metinler otomatik doldurulur.
+                Görme engelli kullanıcılar için eksiksiz deneyim.
+            </p>
+        </div>
+        <div class="ea-card ea-feature-card">
+            <div class="ea-feature-icon" style="background:rgba(34,211,238,.12)">📊</div>
+            <h3 class="ea-feature-title">Detaylı Raporlama</h3>
+            <p class="ea-feature-desc">
+                WCAG 2.2 uyumluluk skoru, hata dağılımı ve sayfa bazlı
+                erişilebilirlik sorunlarını takip edin.
+            </p>
+        </div>
+        <div class="ea-card ea-feature-card">
+            <div class="ea-feature-icon" style="background:rgba(232,121,249,.12)">🔒</div>
+            <h3 class="ea-feature-title">İzole & Güvenli</h3>
+            <p class="ea-feature-desc">
+                Shadow DOM ile sitenizin mevcut CSS'iyle çakışmaz.
+                Kullanıcı form verileri asla okunmaz veya kaydedilmez.
+            </p>
+        </div>
+        <div class="ea-card ea-feature-card">
+            <div class="ea-feature-icon" style="background:rgba(129,140,248,.12)">🌐</div>
+            <h3 class="ea-feature-title">Çoklu Domain</h3>
+            <p class="ea-feature-desc">
+                Birden fazla web sitenizi tek panelden yönetin.
+                Her site için benzersiz lisans anahtarı ve ayarlar.
+            </p>
+        </div>
+        <div class="ea-card ea-feature-card">
+            <div class="ea-feature-icon" style="background:rgba(56,189,248,.12)">⚙️</div>
+            <h3 class="ea-feature-title">Özelleştirilebilir Widget</h3>
+            <p class="ea-feature-desc">
+                Tema rengi, konum ve dil ayarları sitenize özel.
+                Marka kimliğinizle uyumlu erişilebilirlik deneyimi.
+            </p>
+        </div>
+    </div>
+</section>

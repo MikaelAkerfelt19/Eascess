@@ -1,0 +1,141 @@
+@using Eascess_Application.DTOs
+@model ScanReportDetailDto
+@{
+    ViewData["Title"] = "Rapor Detayı";
+    var scoreClass = Model.WcagScore >= 80 ? "ea-score--high" : Model.WcagScore >= 50 ? "ea-score--mid" : "ea-score--low";
+    var scoreColor = Model.WcagScore >= 80 ? "#4ade80" : Model.WcagScore >= 50 ? "#facc15" : "#f87171";
+}
+
+<div class="ea-page">
+
+    <div class="ea-breadcrumb">
+        <a asp-controller="Domains" asp-action="Index">Web Sitelerim</a>
+        <span class="ea-breadcrumb__sep">/</span>
+        <a asp-controller="Reports" asp-action="Domain" asp-route-id="@Model.DomainId">@Model.DomainUrl</a>
+        <span class="ea-breadcrumb__sep">/</span>
+        <span class="ea-breadcrumb__current">Rapor #@Model.Id</span>
+    </div>
+
+    <!-- Summary card -->
+    <div class="ea-card" style="padding:2rem;margin-bottom:1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1.5rem;">
+            <div>
+                <h3 style="font-size:1.1rem;font-weight:700;color:#fff;margin:0 0 .4rem;">@Model.DomainUrl</h3>
+                <p style="margin:0;font-size:.8rem;color:var(--ea-muted);">
+                    @Model.ScanDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                    &nbsp;·&nbsp;
+                    <span class="ea-badge ea-badge--muted">@Model.ScanType</span>
+                </p>
+            </div>
+            <div style="text-align:center;padding:.75rem 1.5rem;background:rgba(255,255,255,.04);border:1px solid var(--ea-border);border-radius:12px;">
+                <div style="font-size:2.5rem;font-weight:800;color:@scoreColor;line-height:1;">@Model.WcagScore</div>
+                <div style="font-size:.72rem;color:var(--ea-muted);margin-top:.2rem;font-weight:500;">/ 100 WCAG Skoru</div>
+            </div>
+        </div>
+
+        <!-- Mini stats -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--ea-border);">
+            <div style="text-align:center;padding:.75rem;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.15);border-radius:10px;">
+                <div style="font-size:1.3rem;font-weight:700;color:#f87171;">@Model.ErrorCount</div>
+                <div style="font-size:.72rem;color:var(--ea-muted);">Toplam Hata</div>
+            </div>
+            <div style="text-align:center;padding:.75rem;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.15);border-radius:10px;">
+                <div style="font-size:1.3rem;font-weight:700;color:#fb923c;">@Model.Issues.Count(i => i.Severity == "Critical")</div>
+                <div style="font-size:.72rem;color:var(--ea-muted);">Kritik</div>
+            </div>
+            <div style="text-align:center;padding:.75rem;background:rgba(234,179,8,.07);border:1px solid rgba(234,179,8,.15);border-radius:10px;">
+                <div style="font-size:1.3rem;font-weight:700;color:#facc15;">@Model.Issues.Count(i => i.Severity == "Warning")</div>
+                <div style="font-size:.72rem;color:var(--ea-muted);">Uyarı</div>
+            </div>
+            <div style="text-align:center;padding:.75rem;background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.15);border-radius:10px;">
+                <div style="font-size:1.3rem;font-weight:700;color:var(--ea-sky);">@Model.Issues.Select(i => i.PageUrl).Distinct().Count()</div>
+                <div style="font-size:.72rem;color:var(--ea-muted);">Etkilenen Sayfa</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WCAG Level breakdown -->
+    @if (Model.Issues.Any())
+    {
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem;">
+            @foreach (var g in Model.Issues.GroupBy(i => i.WcagLevel).OrderBy(g => g.Key))
+            {
+                <div class="ea-card" style="padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;">
+                    <span class="ea-badge ea-badge--indigo">WCAG @g.Key</span>
+                    <span style="font-size:.85rem;font-weight:600;color:#fff;">@g.Count() sorun</span>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Issues -->
+    <div class="ea-card" style="padding:1.5rem;">
+        <p style="font-size:.95rem;font-weight:600;color:#fff;margin:0 0 1.25rem;">
+            Tespit Edilen Sorunlar
+            <span style="font-size:.8rem;font-weight:400;color:var(--ea-muted);margin-left:.4rem;">(@Model.Issues.Count)</span>
+        </p>
+
+        @if (!Model.Issues.Any())
+        {
+            <div class="ea-empty" style="padding:2.5rem 1rem;">
+                <div class="ea-empty__icon">✅</div>
+                <p class="ea-empty__title">Sorun tespit edilmedi</p>
+                <p class="ea-empty__desc">Bu taramada erişilebilirlik sorunu bulunmadı.</p>
+            </div>
+        }
+        else
+        {
+            <div id="issues-list">
+                @for (int i = 0; i < Model.Issues.Count; i++)
+                {
+                    var issue = Model.Issues[i];
+                    var sevColor = issue.Severity == "Critical" ? "#fb923c" :
+                                   issue.Severity == "Warning"  ? "#facc15" : "var(--ea-muted)";
+                    var sevBadge = issue.Severity == "Critical" ? "ea-badge--danger" :
+                                   issue.Severity == "Warning"  ? "ea-badge--warning" : "ea-badge--muted";
+                    var itemId = $"issue-{i}";
+
+                    <div class="ea-accordion-item">
+                        <button class="ea-accordion-trigger" onclick="toggleIssue('@itemId', this)">
+                            <span class="ea-badge @sevBadge">@(issue.Severity ?? "Info")</span>
+                            <span class="ea-badge ea-badge--sky" style="font-size:.66rem;">@issue.WcagLevel</span>
+                            <span style="font-weight:600;color:#fff;flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                @issue.ErrorCode
+                            </span>
+                            <span style="font-size:.75rem;color:var(--ea-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;">
+                                @issue.PageUrl
+                            </span>
+                            <span style="color:var(--ea-muted);margin-left:.5rem;font-size:.8rem;" id="arr-@itemId">▸</span>
+                        </button>
+                        <div class="ea-accordion-body" id="@itemId">
+                            <dl style="display:grid;grid-template-columns:140px 1fr;gap:.4rem .75rem;margin:0;">
+                                <dt style="color:var(--ea-muted);font-size:.78rem;font-weight:600;">Sayfa</dt>
+                                <dd style="color:var(--ea-text);font-size:.82rem;word-break:break-all;margin:0;">@issue.PageUrl</dd>
+                                <dt style="color:var(--ea-muted);font-size:.78rem;font-weight:600;">Element</dt>
+                                <dd style="margin:0;"><code>@(issue.ElementSelector ?? "—")</code></dd>
+                                <dt style="color:var(--ea-muted);font-size:.78rem;font-weight:600;">Hata Kodu</dt>
+                                <dd style="margin:0;"><code>@(issue.ErrorCode ?? "—")</code></dd>
+                                <dt style="color:var(--ea-muted);font-size:.78rem;font-weight:600;">Açıklama</dt>
+                                <dd style="color:var(--ea-text);font-size:.82rem;line-height:1.5;margin:0;">@(issue.ErrorDescription ?? "—")</dd>
+                                <dt style="color:var(--ea-muted);font-size:.78rem;font-weight:600;">WCAG Seviyesi</dt>
+                                <dd style="margin:0;"><span class="ea-badge ea-badge--indigo">@(issue.WcagLevel ?? "—")</span></dd>
+                            </dl>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        function toggleIssue(id, btn) {
+            const body = document.getElementById(id);
+            const arr  = document.getElementById('arr-' + id);
+            const open = body.classList.toggle('open');
+            arr.textContent = open ? '▾' : '▸';
+        }
+    </script>
+}

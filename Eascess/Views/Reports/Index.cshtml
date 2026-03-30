@@ -1,0 +1,120 @@
+@using Eascess_Application.DTOs
+@model IEnumerable<ScanReportListItemDto>
+@{
+    ViewData["Title"] = "Tarama Raporları";
+    var list = Model.ToList();
+    var avg = list.Any() ? (int)list.Average(r => r.WcagScore) : 0;
+    var avgClass = avg >= 80 ? "ea-score--high" : avg >= 50 ? "ea-score--mid" : "ea-score--low";
+}
+
+<div class="ea-page">
+
+    <div style="margin-bottom:2rem;">
+        <h2 style="font-size:1.5rem;font-weight:700;margin:0 0 .3rem;color:#fff;">Tarama Raporları</h2>
+        <p style="margin:0;color:var(--ea-muted);font-size:.875rem;">Tüm sitelerinize ait WCAG erişilebilirlik taramaları</p>
+    </div>
+
+    @if (!list.Any())
+    {
+        <div class="ea-card">
+            <div class="ea-empty">
+                <div class="ea-empty__icon">📊</div>
+                <p class="ea-empty__title">Henüz tarama raporu yok</p>
+                <p class="ea-empty__desc">Widget sitelerinize kurulduktan sonra otomatik taramalar başlayacak.</p>
+                <a asp-controller="Domains" asp-action="Index" class="ea-btn ea-btn--primary">Web Sitelerini Yönet</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Stats -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;">
+            <div class="ea-card">
+                <div class="ea-stat">
+                    <div class="ea-stat__icon ea-stat__icon--sky">📋</div>
+                    <div>
+                        <div class="ea-stat__value">@list.Count</div>
+                        <div class="ea-stat__label">Toplam Tarama</div>
+                    </div>
+                </div>
+            </div>
+            <div class="ea-card">
+                <div class="ea-stat">
+                    <div class="ea-stat__icon ea-stat__icon--indigo">⭐</div>
+                    <div>
+                        <div class="ea-stat__value ea-score @avgClass">@avg</div>
+                        <div class="ea-stat__label">Ort. WCAG Skoru</div>
+                    </div>
+                </div>
+            </div>
+            <div class="ea-card">
+                <div class="ea-stat">
+                    <div class="ea-stat__icon ea-stat__icon--purple">⚠️</div>
+                    <div>
+                        <div class="ea-stat__value" style="color:#f87171;">@list.Sum(r => r.ErrorCount)</div>
+                        <div class="ea-stat__label">Toplam Hata</div>
+                    </div>
+                </div>
+            </div>
+            <div class="ea-card">
+                <div class="ea-stat">
+                    <div class="ea-stat__icon ea-stat__icon--cyan">🌐</div>
+                    <div>
+                        <div class="ea-stat__value">@list.Select(r => r.DomainId).Distinct().Count()</div>
+                        <div class="ea-stat__label">Taranan Site</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="ea-card">
+            <table class="ea-table">
+                <thead>
+                    <tr>
+                        <th>Site</th>
+                        <th>Tarih</th>
+                        <th>Tür</th>
+                        <th>WCAG Skoru</th>
+                        <th>Hata</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in list)
+                    {
+                        var sc = r.WcagScore >= 80 ? "ea-score--high" : r.WcagScore >= 50 ? "ea-score--mid" : "ea-score--low";
+                        <tr>
+                            <td>
+                                <a asp-controller="Reports" asp-action="Domain" asp-route-id="@r.DomainId"
+                                   style="font-weight:600;color:#fff;text-decoration:none;">
+                                    @r.DomainUrl
+                                </a>
+                            </td>
+                            <td style="color:var(--ea-muted);font-size:.8rem;">@r.ScanDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td><span class="ea-badge ea-badge--muted">@r.ScanType</span></td>
+                            <td>
+                                <span class="ea-score @sc">@r.WcagScore<span style="font-size:.7rem;font-weight:400;opacity:.6;">/100</span></span>
+                            </td>
+                            <td>
+                                @if (r.ErrorCount > 0)
+                                {
+                                    <span style="color:#f87171;font-weight:600;">@r.ErrorCount</span>
+                                }
+                                else
+                                {
+                                    <span style="color:#4ade80;">0</span>
+                                }
+                            </td>
+                            <td style="text-align:right;">
+                                <a asp-controller="Reports" asp-action="Detail" asp-route-id="@r.Id"
+                                   class="ea-btn ea-btn--ghost ea-btn--sm">Detay →</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>

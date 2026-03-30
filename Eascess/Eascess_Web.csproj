@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Eascess_Application\Eascess_Application.csproj" />
     <ProjectReference Include="..\Eascess_Infrastructure\Eascess_Infrastructure.csproj" />
   </ItemGroup>
 

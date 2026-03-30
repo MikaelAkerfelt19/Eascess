@@ -1,4 +1,5 @@
 using Eascess.Models;
+using Eascess_Application.Services;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -11,11 +12,16 @@ namespace Eascess.Controllers;
 public class DashboardController : Controller
 {
     private readonly IRepository<Domain> _domainRepo;
+    private readonly IScanReportService _scanReportService;
     private readonly UserManager<AppUser> _userManager;
 
-    public DashboardController(IRepository<Domain> domainRepo, UserManager<AppUser> userManager)
+    public DashboardController(
+        IRepository<Domain> domainRepo,
+        IScanReportService scanReportService,
+        UserManager<AppUser> userManager)
     {
         _domainRepo = domainRepo;
+        _scanReportService = scanReportService;
         _userManager = userManager;
     }
 
@@ -34,7 +40,7 @@ public class DashboardController : Controller
             CreatedAt = d.CreatedAt,
         }).ToList();
 
-        ViewBag.DomainCount = vm.Count;
+        ViewBag.TotalReportCount = await _scanReportService.GetTotalReportCountAsync(userId);
         return View(vm);
     }
 }

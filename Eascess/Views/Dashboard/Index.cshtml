@@ -4,117 +4,116 @@
     var domainList = Model.ToList();
 }
 
-<div class="container mt-4">
+<div class="ea-page">
 
-    <div class="mb-4">
-        <h2 class="mb-1">Hoş geldiniz</h2>
-        <p class="text-muted">Eascess erişilebilirlik panelinize hoş geldiniz.</p>
+    <div style="margin-bottom:2rem;">
+        <h2 style="font-size:1.5rem;font-weight:700;margin:0 0 .3rem;color:#fff;">Hoş geldiniz</h2>
+        <p style="margin:0;color:var(--ea-muted);font-size:.875rem;">Eascess erişilebilirlik panelinize hoş geldiniz.</p>
     </div>
 
-    <!-- Özet kartlar -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="fs-2">🌐</div>
-                        <div>
-                            <div class="fs-4 fw-bold">@domainList.Count</div>
-                            <div class="text-muted small">Kayıtlı Site</div>
-                        </div>
-                    </div>
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem;">
+        <div class="ea-card">
+            <div class="ea-stat">
+                <div class="ea-stat__icon ea-stat__icon--sky">🌐</div>
+                <div>
+                    <div class="ea-stat__value">@domainList.Count</div>
+                    <div class="ea-stat__label">Kayıtlı Site</div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="fs-2">✅</div>
-                        <div>
-                            <div class="fs-4 fw-bold">@domainList.Count(d => d.IsVerified)</div>
-                            <div class="text-muted small">Aktif Widget</div>
-                        </div>
-                    </div>
+        <div class="ea-card">
+            <div class="ea-stat">
+                <div class="ea-stat__icon ea-stat__icon--indigo">✅</div>
+                <div>
+                    <div class="ea-stat__value">@domainList.Count(d => d.IsVerified)</div>
+                    <div class="ea-stat__label">Aktif Widget</div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="fs-2">📊</div>
-                        <div>
-                            <div class="fs-4 fw-bold">0</div>
-                            <div class="text-muted small">Tarama Raporu</div>
-                        </div>
-                    </div>
+        <div class="ea-card">
+            <div class="ea-stat">
+                <div class="ea-stat__icon ea-stat__icon--purple">📊</div>
+                <div>
+                    <div class="ea-stat__value">@ViewBag.TotalReportCount</div>
+                    <div class="ea-stat__label">Tarama Raporu</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Son siteler -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Web Sitelerim</h5>
-                <a asp-controller="Domains" asp-action="Add" class="btn btn-primary btn-sm">+ Site Ekle</a>
+    <!-- Domain list -->
+    <div class="ea-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:1.25rem 1.5rem;border-bottom:1px solid var(--ea-border);">
+            <div>
+                <p class="ea-section-title">Web Sitelerim</p>
             </div>
+            <a asp-controller="Domains" asp-action="Add" class="ea-btn ea-btn--primary ea-btn--sm">+ Site Ekle</a>
         </div>
-        <div class="card-body p-4">
-            @if (!domainList.Any())
-            {
-                <div class="text-center py-4">
-                    <div class="fs-1">🌐</div>
-                    <p class="text-muted mt-2 mb-3">Henüz site eklenmedi.</p>
-                    <a asp-controller="Domains" asp-action="Add" class="btn btn-primary">İlk Siteyi Ekle</a>
-                </div>
-            }
-            else
-            {
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
+
+        @if (!domainList.Any())
+        {
+            <div class="ea-empty">
+                <div class="ea-empty__icon">🌐</div>
+                <p class="ea-empty__title">Henüz site eklenmedi</p>
+                <p class="ea-empty__desc">İlk web sitenizi ekleyerek erişilebilirlik entegrasyonuna başlayın.</p>
+                <a asp-controller="Domains" asp-action="Add" class="ea-btn ea-btn--primary">İlk Siteyi Ekle</a>
+            </div>
+        }
+        else
+        {
+            <table class="ea-table">
+                <thead>
+                    <tr>
+                        <th>Domain</th>
+                        <th>Durum</th>
+                        <th>Eklenme</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var d in domainList)
+                    {
                         <tr>
-                            <th>Domain</th>
-                            <th>Durum</th>
-                            <th>Eklenme</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var d in domainList)
-                        {
-                            <tr>
-                                <td class="fw-semibold align-middle">@d.DomainUrl</td>
-                                <td class="align-middle">
-                                    @if (d.IsVerified)
-                                    {
-                                        <span class="badge bg-success">Aktif</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning text-dark">Script Bekleniyor</span>
-                                    }
-                                </td>
-                                <td class="text-muted align-middle">
-                                    @d.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")
-                                </td>
-                                <td class="text-end align-middle">
+                            <td style="font-weight:600;">@d.DomainUrl</td>
+                            <td>
+                                @if (d.IsVerified)
+                                {
+                                    <span class="ea-badge ea-badge--success">Aktif</span>
+                                }
+                                else
+                                {
+                                    <span class="ea-badge ea-badge--warning">Script Bekleniyor</span>
+                                }
+                            </td>
+                            <td style="color:var(--ea-muted);font-size:.8rem;">
+                                @d.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")
+                            </td>
+                            <td style="text-align:right;">
+                                <div style="display:flex;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;">
+                                    <form asp-controller="Scan" asp-action="Start" asp-route-id="@d.Id" method="post" style="display:inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="ea-btn ea-btn--ghost ea-btn--sm"
+                                                onclick="this.disabled=true;this.textContent='…';this.form.submit();">
+                                            🔍 Tara
+                                        </button>
+                                    </form>
+                                    <a asp-controller="Reports" asp-action="Domain" asp-route-id="@d.Id"
+                                       class="ea-btn ea-btn--ghost ea-btn--sm">📊 Raporlar</a>
                                     <a asp-controller="Domains" asp-action="Script" asp-route-id="@d.Id"
-                                       class="btn btn-outline-primary btn-sm">&lt;/&gt; Script</a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                <div class="mt-3">
-                    <a asp-controller="Domains" asp-action="Index" class="text-muted small">
-                        Tüm siteleri gör →
-                    </a>
-                </div>
-            }
-        </div>
+                                       class="ea-btn ea-btn--ghost ea-btn--sm">&lt;/&gt; Script</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div style="padding:.85rem 1.5rem;border-top:1px solid var(--ea-border);">
+                <a asp-controller="Domains" asp-action="Index" style="font-size:.8rem;color:var(--ea-sky);text-decoration:none;">
+                    Tüm siteleri yönet →
+                </a>
+            </div>
+        }
     </div>
 
 </div>

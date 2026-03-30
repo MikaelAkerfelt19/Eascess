@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eascess Widget — Test Sayfası</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      margin: 0;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .container { max-width: 800px; margin: 0 auto; }
+
+    h1 { font-size: 1.75rem; font-weight: 700; color: #f8fafc; margin-bottom: .5rem; }
+    .subtitle { color: #94a3b8; font-size: .9rem; margin-bottom: 2rem; }
+
+    .card {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 { font-size: 1rem; font-weight: 600; color: #f1f5f9; margin-bottom: 1rem; }
+
+    /* Test key input */
+    .input-row { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+    input[type="text"] {
+      flex: 1;
+      min-width: 260px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      color: #f1f5f9;
+      font-size: .9rem;
+      padding: .55rem .85rem;
+      outline: none;
+    }
+    input[type="text"]:focus { border-color: #38bdf8; }
+    button.btn {
+      background: #38bdf8;
+      color: #0f172a;
+      border: none;
+      border-radius: 8px;
+      font-size: .875rem;
+      font-weight: 600;
+      padding: .55rem 1.1rem;
+      cursor: pointer;
+      transition: background .15s;
+      white-space: nowrap;
+    }
+    button.btn:hover { background: #7dd3fc; }
+    button.btn.danger { background: #f43f5e; color: #fff; }
+    button.btn.danger:hover { background: #fb7185; }
+
+    /* Sample page content */
+    .sample-content { line-height: 1.7; color: #cbd5e1; }
+    .sample-content h3 { color: #f1f5f9; margin: 1rem 0 .5rem; }
+    .sample-content p { margin-bottom: .75rem; }
+    .sample-content a { color: #38bdf8; }
+    .sample-content img { border-radius: 8px; max-width: 100%; margin: .5rem 0; }
+
+    /* Status badge */
+    .status { display: inline-flex; align-items: center; gap: .4rem; font-size: .8rem; padding: .3rem .7rem; border-radius: 20px; font-weight: 600; }
+    .status.ok   { background: rgba(34,197,94,.15); color: #4ade80; }
+    .status.err  { background: rgba(239,68,68,.15);  color: #f87171; }
+    .status.wait { background: rgba(148,163,184,.1); color: #94a3b8; }
+
+    .log-box {
+      background: #020617;
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 8px;
+      padding: .85rem 1rem;
+      font-family: monospace;
+      font-size: .8rem;
+      color: #94a3b8;
+      max-height: 160px;
+      overflow-y: auto;
+      margin-top: .75rem;
+    }
+    .log-box .ok   { color: #4ade80; }
+    .log-box .err  { color: #f87171; }
+    .log-box .info { color: #7dd3fc; }
+
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li { padding: .35rem 0; font-size: .875rem; color: #94a3b8; display: flex; align-items: center; gap: .5rem; }
+    .checklist li::before { content: '○'; color: #475569; font-size: .7rem; }
+    .checklist li.pass::before { content: '✓'; color: #4ade80; }
+    .checklist li.fail::before { content: '✗'; color: #f87171; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Eascess Widget — Test Sayfası</h1>
+  <p class="subtitle">
+    Bu sayfa widget.js'in yerelde çalışıp çalışmadığını test etmek için kullanılır.
+    Uygulama <code>localhost</code>'ta çalışırken lisans doğrulama atlanır.
+  </p>
+
+  <!-- Key + Load -->
+  <div class="card">
+    <h2>Widget Yükle</h2>
+    <div class="input-row">
+      <input type="text" id="key-input" placeholder="License key (UUID)" value="">
+      <button class="btn" onclick="loadWidget()">Widget'ı Yükle</button>
+      <button class="btn danger" onclick="removeWidget()">Kaldır</button>
+    </div>
+    <div id="status-row" style="margin-top:.75rem;">
+      <span class="status wait" id="status-badge">Bekleniyor</span>
+    </div>
+    <div class="log-box" id="log-box">
+      <span class="info">» Widget henüz yüklenmedi.</span>
+    </div>
+  </div>
+
+  <!-- Test Checklist -->
+  <div class="card">
+    <h2>Test Kontrol Listesi (Manuel)</h2>
+    <ul class="checklist" id="checklist">
+      <li id="chk-load">Widget butonu ekranda görünüyor</li>
+      <li id="chk-open">Butona tıklayınca panel açılıyor</li>
+      <li id="chk-close">ESC tuşuyla / Kapat butonuyla panel kapanıyor</li>
+      <li id="chk-focus">Panel açılınca ilk buton otomatik focus alıyor</li>
+      <li id="chk-tab">Tab ile tüm kontrollerde gezinebiliyorum (focus trap çalışıyor)</li>
+      <li id="chk-font">Yazı boyutu A+ / A− butonları çalışıyor</li>
+      <li id="chk-contrast">Kontrast seçici çalışıyor (Yüksek/Negatif)</li>
+      <li id="chk-toggle">Toggle switch'ler (Gri Tonlama, Bağlantı Vurgulama vb.) çalışıyor</li>
+      <li id="chk-persist">Sayfayı yenileyince tercihler korunuyor</li>
+      <li id="chk-reset">Sıfırla butonu tüm tercihleri temizliyor</li>
+      <li id="chk-outside">Panelin dışına tıklayınca kapanıyor</li>
+      <li id="chk-screenreader">role="dialog", aria-expanded, aria-pressed attribute'ları mevcut</li>
+    </ul>
+    <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap;">
+      <button class="btn" onclick="markAll('pass')">Tümünü Geç ✓</button>
+      <button class="btn danger" onclick="markAll('')">Temizle</button>
+    </div>
+  </div>
+
+  <!-- Sample Page Content (WCAG test için) -->
+  <div class="card sample-content">
+    <h2>Örnek Sayfa İçeriği</h2>
+    <div class="sample-content">
+      <h3>Erişilebilirlik Testi</h3>
+      <p>
+        Bu paragraf font büyüklüğü, kontrast ve metin aralığı özelliklerini test etmek için
+        hazırlanmış örnek içeriktir.
+        <a href="#">Örnek bağlantı 1</a> ve <a href="#">örnek bağlantı 2</a> bağlantı vurgulama özelliğini test eder.
+      </p>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
+        ut labore et dolore magna aliqua. Animasyon durdurma özelliğini aşağıdaki öğe ile test edin:
+      </p>
+      <div style="width:40px;height:40px;background:#38bdf8;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;"></div>
+      <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+      <p style="margin-top:.75rem;">
+        <strong>Büyük imleç</strong> özelliğini bu alan üzerinde hareket ederek test edebilirsiniz.
+      </p>
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='80' viewBox='0 0 200 80'%3E%3Crect width='200' height='80' fill='%231e293b'/%3E%3Ctext x='100' y='45' font-family='sans-serif' font-size='14' fill='%2394a3b8' text-anchor='middle'%3EÖrnek Görsel (alt text yok)%3C/text%3E%3C/svg%3E" alt="">
+    </div>
+  </div>
+</div>
+
+<script>
+  var widgetScript = null;
+
+  function log(msg, type) {
+    var box = document.getElementById('log-box');
+    var line = document.createElement('div');
+    line.className = type || 'info';
+    line.textContent = '» ' + new Date().toLocaleTimeString() + ' — ' + msg;
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function setStatus(text, type) {
+    var badge = document.getElementById('status-badge');
+    badge.textContent = text;
+    badge.className = 'status ' + (type || 'wait');
+  }
+
+  function loadWidget() {
+    var key = document.getElementById('key-input').value.trim();
+    removeWidget();
+
+    setStatus('Yükleniyor…', 'wait');
+    log('Widget yükleniyor… key=' + (key || '(boş, localhost modu)'));
+
+    widgetScript = document.createElement('script');
+    widgetScript.src = '/js/widget.js?' + Date.now(); // cache buster
+    widgetScript.defer = true;
+    if (key) widgetScript.setAttribute('data-key', key);
+    widgetScript.setAttribute('data-api', ''); // localhost API
+
+    // data-key yoksa localhost test modu devreye girer
+    if (!key) widgetScript.setAttribute('data-key', '00000000-0000-0000-0000-000000000001');
+
+    widgetScript.onload = function () {
+      setStatus('Widget yüklendi', 'ok');
+      log('widget.js başarıyla yüklendi.', 'ok');
+      setTimeout(function () {
+        var host = document.getElementById('eascess-widget-host');
+        if (host) {
+          log('Shadow host bulundu — widget DOM\'da.', 'ok');
+        } else {
+          log('UYARI: eascess-widget-host elementi bulunamadı.', 'err');
+          setStatus('Yükleme hatası', 'err');
+        }
+      }, 500);
+    };
+
+    widgetScript.onerror = function () {
+      setStatus('Script yüklenemedi', 'err');
+      log('widget.js yüklenirken hata oluştu.', 'err');
+    };
+
+    document.head.appendChild(widgetScript);
+  }
+
+  function removeWidget() {
+    // Widget host'u kaldır
+    var host = document.getElementById('eascess-widget-host');
+    if (host) host.remove();
+
+    // Inject edilen stilleri kaldır
+    ['eascess-styles', 'eascess-focus-styles'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.remove();
+    });
+
+    // İmleç sıfırla
+    document.documentElement.style.cursor = '';
+
+    // Eski script tag'ini kaldır
+    if (widgetScript && widgetScript.parentNode) {
+      widgetScript.parentNode.removeChild(widgetScript);
+      widgetScript = null;
+    }
+
+    setStatus('Kaldırıldı', 'wait');
+    log('Widget kaldırıldı.', 'info');
+  }
+
+  function markAll(cls) {
+    document.querySelectorAll('.checklist li').forEach(function (li) {
+      li.className = cls ? cls : '';
+    });
+  }
+
+  // Checklist item'larına tıklayınca geç/geç işaretle
+  document.querySelectorAll('.checklist li').forEach(function (li) {
+    li.style.cursor = 'pointer';
+    li.addEventListener('click', function () {
+      li.className = li.className === 'pass' ? 'fail' : li.className === 'fail' ? '' : 'pass';
+    });
+  });
+</script>
+</body>
+</html>

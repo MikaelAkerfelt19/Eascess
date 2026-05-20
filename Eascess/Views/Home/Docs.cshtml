@@ -1,0 +1,193 @@
+@{
+    ViewData["Title"] = "Belgeler";
+}
+
+<div style="display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 70px)">
+
+    <!-- Sol kenar çubuğu -->
+    <nav style="background:var(--cream-100);border-right:1px solid var(--cream-200);padding:32px 16px;position:sticky;top:0;height:calc(100vh - 70px);overflow-y:auto">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-400);margin-bottom:10px;padding:0 8px">Başlarken</div>
+        <a href="#hizli-baslangic" class="ea-nav-item active" style="font-size:13px">Hızlı Başlangıç</a>
+        <a href="#kurulum" class="ea-nav-item" style="font-size:13px">Widget Kurulumu</a>
+        <a href="#domain-ekleme" class="ea-nav-item" style="font-size:13px">Domain Ekleme</a>
+
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-400);margin:20px 0 10px;padding:0 8px">Widget</div>
+        <a href="#script-etiketi" class="ea-nav-item" style="font-size:13px">Script Etiketi</a>
+        <a href="#ozellikler" class="ea-nav-item" style="font-size:13px">Özellikler</a>
+        <a href="#ayarlar" class="ea-nav-item" style="font-size:13px">Görünüm Ayarları</a>
+
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-400);margin:20px 0 10px;padding:0 8px">API</div>
+        <a href="#api-lisans" class="ea-nav-item" style="font-size:13px">Lisans Doğrulama</a>
+        <a href="#api-config" class="ea-nav-item" style="font-size:13px">Widget Config</a>
+        <a href="#api-ai" class="ea-nav-item" style="font-size:13px">AI Alt Metin</a>
+    </nav>
+
+    <!-- İçerik -->
+    <div style="padding:40px 56px;max-width:820px">
+
+        <!-- Hızlı Başlangıç -->
+        <div id="hizli-baslangic" style="margin-bottom:56px">
+            <div style="display:inline-flex;align-items:center;gap:6px;background:var(--brand-grad-soft);color:var(--indigo-700);padding:4px 12px;border-radius:999px;font-size:11px;font-weight:600;margin-bottom:16px">Başlarken</div>
+            <h1 style="font-family:var(--font-display);font-size:42px;font-weight:400;letter-spacing:-0.02em;margin:0 0 12px;line-height:1">Hızlı Başlangıç</h1>
+            <p style="font-size:16px;color:var(--ink-600);line-height:1.6;margin:0 0 24px">Eascess'i sitenize entegre etmek yalnızca 3 adım alır.</p>
+
+            <div style="display:flex;flex-direction:column;gap:16px">
+                @foreach (var adim in new[] {
+                    new { N = "1", Baslik = "Hesap oluşturun", Icerik = "eascess.io adresinden ücretsiz hesap açın. Kredi kartı gerektirmez." },
+                    new { N = "2", Baslik = "Domain ekleyin", Icerik = "Panel'den 'Domain Ekle' ile sitenizin URL'sini girin. Size özel lisans anahtarı otomatik üretilir." },
+                    new { N = "3", Baslik = "Script'i yapıştırın", Icerik = "Oluşturulan &lt;script&gt; etiketini sitenizin &lt;/body&gt; kapanışından önce yapıştırın. Widget hazır." },
+                })
+                {
+                    <div style="display:flex;gap:16px;align-items:flex-start">
+                        <div style="width:32px;height:32px;border-radius:999px;background:var(--ink-900);color:white;display:grid;place-items:center;font-weight:600;font-size:13px;flex-shrink:0">@adim.N</div>
+                        <div>
+                            <div style="font-size:15px;font-weight:600;color:var(--ink-900);margin-bottom:4px">@adim.Baslik</div>
+                            <p style="font-size:14px;color:var(--ink-600);margin:0;line-height:1.6">@Html.Raw(adim.Icerik)</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--cream-300);margin-bottom:56px">
+
+        <!-- Widget Kurulumu -->
+        <div id="kurulum" style="margin-bottom:56px">
+            <h2 id="script-etiketi" style="font-family:var(--font-display);font-size:28px;font-weight:400;letter-spacing:-0.02em;margin:0 0 12px">Widget Kurulumu</h2>
+            <p style="font-size:15px;color:var(--ink-600);line-height:1.6;margin:0 0 20px">Aşağıdaki script etiketini HTML'inizin <code>&lt;/body&gt;</code> kapanışından hemen önce yerleştirin:</p>
+
+            <div class="ea-code-block" style="margin-bottom:20px">
+                <pre style="margin:0;font-size:13px;line-height:1.7;color:var(--cream-100)">&lt;<span style="color:#93c5fd">script</span>
+  <span style="color:#86efac">src</span>=<span style="color:#fbbf24">"https://cdn.eascess.io/widget.js"</span>
+  <span style="color:#86efac">data-key</span>=<span style="color:#fbbf24">"YOUR_LICENSE_KEY"</span>
+  <span style="color:#86efac">defer</span>
+&gt;&lt;/<span style="color:#93c5fd">script</span>&gt;</pre>
+            </div>
+
+            <div class="ea-card" style="padding:16px 20px;display:flex;gap:12px;align-items:flex-start">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--teal-600)" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <p style="font-size:13px;color:var(--ink-700);margin:0;line-height:1.6">
+                    <strong>YOUR_LICENSE_KEY</strong> kısmını Panel → Domainler → Script sayfanızda bulunan anahtarla değiştirin. Her domain için farklı bir anahtar üretilir.
+                </p>
+            </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--cream-300);margin-bottom:56px">
+
+        <!-- Özellikler -->
+        <div id="ozellikler" style="margin-bottom:56px">
+            <h2 style="font-family:var(--font-display);font-size:28px;font-weight:400;letter-spacing:-0.02em;margin:0 0 12px">Widget Özellikleri</h2>
+            <p style="font-size:15px;color:var(--ink-600);line-height:1.6;margin:0 0 20px">Widget açıldığında kullanıcıya aşağıdaki erişilebilirlik seçenekleri sunulur:</p>
+
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+                @foreach (var oz in new[] {
+                    "Yazı Boyutu Ayarı (7 kademe)",
+                    "Yüksek Kontrast / Negatif Kontrast",
+                    "Gri Tonlama",
+                    "Bağlantı Vurgulama",
+                    "Animasyonları Durdur",
+                    "Büyük İmleç",
+                    "Okuma Rehberi",
+                    "Metin Aralığı Artırma",
+                    "Disleksi Dostu Font",
+                    "AI Görsel Alt Metni (Pro)",
+                })
+                {
+                    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--cream-100);border:1px solid var(--cream-300);border-radius:var(--r-sm)">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                        <span style="font-size:13px;color:var(--ink-800)">@oz</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--cream-300);margin-bottom:56px">
+
+        <!-- API Referansı -->
+        <div id="api-lisans" style="margin-bottom:48px">
+            <h2 style="font-family:var(--font-display);font-size:28px;font-weight:400;letter-spacing:-0.02em;margin:0 0 8px">API Referansı</h2>
+            <p style="font-size:15px;color:var(--ink-600);line-height:1.6;margin:0 0 28px">Tüm API uçnoktaları CORS korumalıdır — yalnızca kayıtlı domainlerden gelen istekler kabul edilir.</p>
+
+            <!-- Lisans doğrulama -->
+            <div style="margin-bottom:32px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                    <span style="background:var(--cream-200);color:var(--ink-700);font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;font-family:var(--font-mono)">GET</span>
+                    <code style="font-size:14px">/api/license/validate</code>
+                </div>
+                <p style="font-size:14px;color:var(--ink-600);margin:0 0 12px">Lisans anahtarını ve domain eşleşmesini doğrular.</p>
+                <div class="ea-code-block" style="font-size:12px">
+                    <pre style="margin:0;color:var(--cream-100);line-height:1.7">GET /api/license/validate?key=<span style="color:#fbbf24">{licenseKey}</span>&domain=<span style="color:#fbbf24">{hostname}</span>
+
+<span style="color:#86efac">// Başarılı yanıt</span>
+{
+  "valid": <span style="color:#93c5fd">true</span>,
+  "plan": <span style="color:#fbbf24">"pro"</span>,
+  "expiresAt": <span style="color:#93c5fd">null</span>
+}
+
+<span style="color:#86efac">// Hata yanıtı</span>
+{
+  "valid": <span style="color:#93c5fd">false</span>,
+  "reason": <span style="color:#fbbf24">"invalid"</span>
+}</pre>
+                </div>
+            </div>
+
+            <!-- Widget config -->
+            <div id="api-config" style="margin-bottom:32px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                    <span style="background:var(--cream-200);color:var(--ink-700);font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;font-family:var(--font-mono)">GET</span>
+                    <code style="font-size:14px">/api/widget/config</code>
+                </div>
+                <p style="font-size:14px;color:var(--ink-600);margin:0 0 12px">Widget görünüm ayarlarını döndürür (tema rengi, konum, dil, AI durumu).</p>
+                <div class="ea-code-block" style="font-size:12px">
+                    <pre style="margin:0;color:var(--cream-100);line-height:1.7">GET /api/widget/config?key=<span style="color:#fbbf24">{licenseKey}</span>
+
+{
+  "themeColor": <span style="color:#fbbf24">"#38bdf8"</span>,
+  "position": <span style="color:#fbbf24">"bottom-right"</span>,
+  "language": <span style="color:#fbbf24">"tr"</span>,
+  "isAiEnabled": <span style="color:#93c5fd">true</span>
+}</pre>
+                </div>
+            </div>
+
+            <!-- AI alt metin -->
+            <div id="api-ai">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                    <span style="background:oklch(88% 0.1 270 / 0.4);color:var(--indigo-700);font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;font-family:var(--font-mono)">POST</span>
+                    <code style="font-size:14px">/api/scan/alt-text</code>
+                </div>
+                <p style="font-size:14px;color:var(--ink-600);margin:0 0 12px">Görsel URL listesi için AI destekli alt metin üretir. (Pro plan gerektirir)</p>
+                <div class="ea-code-block" style="font-size:12px">
+                    <pre style="margin:0;color:var(--cream-100);line-height:1.7"><span style="color:#86efac">// İstek gövdesi</span>
+{
+  "licenseKey": <span style="color:#fbbf24">"YOUR_LICENSE_KEY"</span>,
+  "images": [
+    <span style="color:#fbbf24">"https://example.com/foto.jpg"</span>,
+    <span style="color:#fbbf24">"https://example.com/banner.png"</span>
+  ]
+}
+
+<span style="color:#86efac">// Yanıt</span>
+{
+  "results": [
+    { "url": <span style="color:#fbbf24">"..."</span>, "altText": <span style="color:#fbbf24">"Masada oturan iki kişi"</span>, "cached": <span style="color:#93c5fd">false</span> }
+  ],
+  "processedCount": <span style="color:#93c5fd">1</span>,
+  "cachedCount": <span style="color:#93c5fd">0</span>,
+  "quotaRemaining": <span style="color:#93c5fd">1999</span>
+}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div style="background:var(--brand-grad-soft);border:1px solid oklch(72% 0.11 190 / 0.2);border-radius:var(--r-lg);padding:32px;text-align:center">
+            <div style="font-family:var(--font-display);font-size:22px;letter-spacing:-0.02em;margin-bottom:8px">Sorunuz mu var?</div>
+            <p style="font-size:14px;color:var(--ink-600);margin:0 0 18px">Bu belgeler sürekli güncellenmektedir. Bulamadığınız bir bilgi için bize yazın.</p>
+            <a href="mailto:hello@eascess.io" class="ea-btn ea-btn-brand">hello@eascess.io</a>
+        </div>
+    </div>
+
+</div>

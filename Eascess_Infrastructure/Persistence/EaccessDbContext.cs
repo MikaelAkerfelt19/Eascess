@@ -14,6 +14,7 @@ public partial class EaccessDbContext : IdentityDbContext<AppUser>
 
     public virtual DbSet<AiProcessingQueue> AiProcessingQueues { get; set; }
     public virtual DbSet<AiUsageLog> AiUsageLogs { get; set; }
+    public virtual DbSet<ImageAltTextCache> ImageAltTextCaches { get; set; }
     public virtual DbSet<AuditLog> AuditLogs { get; set; }
     public virtual DbSet<Domain> Domains { get; set; }
     public virtual DbSet<Invoice> Invoices { get; set; }
@@ -25,6 +26,8 @@ public partial class EaccessDbContext : IdentityDbContext<AppUser>
     public virtual DbSet<ScanReportDetail> ScanReportDetails { get; set; }
     public virtual DbSet<UserSubscription> UserSubscriptions { get; set; }
     public virtual DbSet<WidgetSetting> WidgetSettings { get; set; }
+    public virtual DbSet<WidgetUsageLog> WidgetUsageLogs { get; set; }
+    public virtual DbSet<SupportTicket> SupportTickets { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,6 +48,14 @@ public partial class EaccessDbContext : IdentityDbContext<AppUser>
             entity.Property(e => e.RequestDate).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.TokensUsed).HasDefaultValue(0);
             entity.HasOne(d => d.Domain).WithMany(p => p.AiUsageLogs).HasConstraintName("FK_AiUsageLogs_Domains");
+        });
+
+        modelBuilder.Entity<ImageAltTextCache>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.GeneratedAt).HasDefaultValueSql("(getutcdate())");
+            entity.HasOne(d => d.Domain).WithMany(p => p.ImageAltTextCaches)
+                .HasConstraintName("FK_ImageAltTextCache_Domains");
         });
 
         modelBuilder.Entity<AuditLog>(entity =>
@@ -103,6 +114,11 @@ public partial class EaccessDbContext : IdentityDbContext<AppUser>
         {
             entity.HasKey(e => e.Id).HasName("PK__Plans__3214EC07DD689DB1");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.HasData(
+                new Plan { Id = 1, Name = "Ücretsiz", MonthlyPrice = 0,   MaxDomains = 1,   MonthlyAiQuota = 50,     IsActive = true, IsDeleted = false },
+                new Plan { Id = 2, Name = "Pro",      MonthlyPrice = 299, MaxDomains = 10,  MonthlyAiQuota = 2000,   IsActive = true, IsDeleted = false },
+                new Plan { Id = 3, Name = "Kurumsal", MonthlyPrice = 0,   MaxDomains = 999, MonthlyAiQuota = 999999, IsActive = true, IsDeleted = false }
+            );
         });
 
         modelBuilder.Entity<PlanFeature>(entity =>
@@ -137,6 +153,30 @@ public partial class EaccessDbContext : IdentityDbContext<AppUser>
             entity.HasOne(d => d.User).WithMany(p => p.UserSubscriptions).HasConstraintName("FK_UserSubscriptions_AspNetUsers");
         });
 
+        modelBuilder.Entity<SupportTicket>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.Status).HasDefaultValue("Open");
+            entity.HasOne(d => d.User).WithMany(p => p.SupportTickets)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SupportTickets_Users");
+            entity.HasOne(d => d.Domain).WithMany()
+                .HasForeignKey(d => d.DomainId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_SupportTickets_Domains");
+        });
+
+        modelBuilder.Entity<WidgetUsageLog>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.OccurredAt).HasDefaultValueSql("(getutcdate())");
+            entity.HasOne(d => d.Domain).WithMany(p => p.WidgetUsageLogs)
+                .HasConstraintName("FK_WidgetUsageLog_Domains");
+        });
+
         modelBuilder.Entity<WidgetSetting>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__WidgetSe__3214EC07D5A978C5");
@@ -147,6 +187,7 @@ public partial class EaccessDbContext : IdentityDbContext<AppUser>
             entity.Property(e => e.ThemeColor).HasDefaultValue("#0056b3");
             entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.VersionNumber).HasDefaultValue(1);
+            entity.Property(e => e.PoweredByVisible).HasDefaultValue(true);
             entity.HasOne(d => d.Domain).WithMany(p => p.WidgetSettings).HasConstraintName("FK_WidgetSettings_Domains");
         });
 

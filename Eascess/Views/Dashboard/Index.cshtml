@@ -1,63 +1,142 @@
 @model IEnumerable<Eascess.Models.DomainListItemViewModel>
 @{
     ViewData["Title"] = "Panel";
+    ViewData["Active"] = "dashboard";
+    Layout = "~/Views/Shared/_AppLayout.cshtml";
     var domainList = Model.ToList();
+    var verifiedCount = domainList.Count(d => d.IsVerified);
+    var pendingCount  = domainList.Count(d => !d.IsVerified);
+    var hour = DateTime.Now.Hour;
+    var greeting = hour < 12 ? "Günaydın" : hour < 18 ? "İyi günler" : "İyi akşamlar";
 }
 
-<div class="ea-page">
-
-    <div style="margin-bottom:2rem;">
-        <h2 style="font-size:1.5rem;font-weight:700;margin:0 0 .3rem;color:#fff;">Hoş geldiniz</h2>
-        <p style="margin:0;color:var(--ea-muted);font-size:.875rem;">Eascess erişilebilirlik panelinize hoş geldiniz.</p>
+<!-- Topbar -->
+<div class="ea-topbar">
+    <div>
+        <div class="ea-topbar-eyebrow">Genel Bakış · son 30 gün</div>
+        <h1 class="ea-topbar-title">@greeting</h1>
     </div>
-
-    <!-- Stats -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem;">
-        <div class="ea-card">
-            <div class="ea-stat">
-                <div class="ea-stat__icon ea-stat__icon--sky">🌐</div>
-                <div>
-                    <div class="ea-stat__value">@domainList.Count</div>
-                    <div class="ea-stat__label">Kayıtlı Site</div>
-                </div>
-            </div>
-        </div>
-        <div class="ea-card">
-            <div class="ea-stat">
-                <div class="ea-stat__icon ea-stat__icon--indigo">✅</div>
-                <div>
-                    <div class="ea-stat__value">@domainList.Count(d => d.IsVerified)</div>
-                    <div class="ea-stat__label">Aktif Widget</div>
-                </div>
-            </div>
-        </div>
-        <div class="ea-card">
-            <div class="ea-stat">
-                <div class="ea-stat__icon ea-stat__icon--purple">📊</div>
-                <div>
-                    <div class="ea-stat__value">@ViewBag.TotalReportCount</div>
-                    <div class="ea-stat__label">Tarama Raporu</div>
-                </div>
-            </div>
-        </div>
+    <div class="ea-topbar-actions">
+        <a asp-controller="Domains" asp-action="Add" class="ea-btn ea-btn-brand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Domain Ekle
+        </a>
     </div>
+</div>
 
-    <!-- Domain list -->
-    <div class="ea-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:1.25rem 1.5rem;border-bottom:1px solid var(--ea-border);">
+@if (ViewBag.TrialDaysLeft is int trialDays)
+{
+    var urgency = trialDays <= 3 ? "background:oklch(95% 0.06 25);border:1px solid oklch(80% 0.1 25)" : "background:oklch(96% 0.04 145);border:1px solid oklch(82% 0.1 145)";
+    var color   = trialDays <= 3 ? "var(--danger,#dc2626)" : "oklch(30% 0.12 145)";
+    <div style="@urgency;border-radius:var(--r-md);padding:14px 20px;display:flex;align-items:center;gap:12px;margin-bottom:0">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="@color" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+        </svg>
+        <span style="font-size:14px;color:@color;flex:1">
+            <strong>14 Günlük Ücretsiz Denemeniz</strong> — Bitimine <strong>@trialDays gün</strong> kaldı. Pro özellikler aktif.
+        </span>
+        <a asp-controller="Home" asp-action="Pricing" style="font-size:13px;font-weight:600;color:@color;text-decoration:none;white-space:nowrap">Pro'ya Geç →</a>
+    </div>
+}
+
+<!-- İstatistik kartları -->
+<div class="ea-stats">
+    <div class="ea-stat">
+        <div class="ea-stat-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Erişilebilirlik Skoru
+        </div>
+        <div class="ea-stat-value">—</div>
+        <div class="ea-stat-delta">Skor görmek için tarama yapın</div>
+        <div class="ea-stat-accent"></div>
+    </div>
+    <div class="ea-stat">
+        <div class="ea-stat-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg>
+            Aktif Domainler
+        </div>
+        <div class="ea-stat-value">@domainList.Count</div>
+        <div class="ea-stat-delta">@verifiedCount doğrulandı · @pendingCount bekliyor</div>
+        <div class="ea-stat-accent"></div>
+    </div>
+    <div class="ea-stat">
+        <div class="ea-stat-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M7 16V9M12 16V4M17 16v-7"/></svg>
+            Tarama Raporları
+        </div>
+        <div class="ea-stat-value">@ViewBag.TotalReportCount</div>
+        <div class="ea-stat-delta">Toplam denetim sayısı</div>
+        <div class="ea-stat-accent"></div>
+    </div>
+    <div class="ea-stat">
+        <div class="ea-stat-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>
+            Açık Sorunlar
+        </div>
+        <div class="ea-stat-value">—</div>
+        <div class="ea-stat-delta">Sorun bulmak için tarama yapın</div>
+        <div class="ea-stat-accent"></div>
+    </div>
+</div>
+
+<!-- Plan bilgi kartı -->
+@{
+    var aiUsed    = (int)(ViewBag.AiUsedThisMonth ?? 0);
+    var aiQuota   = (int)(ViewBag.MonthlyAiQuota ?? 50);
+    var aiPct     = aiQuota > 0 ? Math.Min(100, (int)Math.Round(aiUsed * 100.0 / aiQuota)) : 0;
+    var domCount  = (int)(ViewBag.DomainCount ?? 0);
+    var maxDom    = (int)(ViewBag.MaxDomains ?? 1);
+    var planName  = (string)(ViewBag.PlanName ?? "Ücretsiz");
+    var isPro     = planName != "Ücretsiz";
+}
+<div class="ea-card" style="padding:20px 24px;display:flex;align-items:center;gap:32px;flex-wrap:wrap;margin-bottom:0">
+    <div style="display:flex;align-items:center;gap:10px">
+        <div style="background:@(isPro ? "var(--brand-grad)" : "var(--cream-200)");color:@(isPro ? "white" : "var(--ink-700)");padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700">
+            @planName
+        </div>
+        @if (!isPro)
+        {
+            <a asp-controller="Home" asp-action="Pricing" style="font-size:13px;color:var(--indigo-700);font-weight:600;text-decoration:none">Planı yükselt →</a>
+        }
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:200px">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--ink-500)" stroke-width="2" stroke-linecap="round"><path d="M12 2l1.5 5.5L19 9l-5.5 1.5L12 16l-1.5-5.5L5 9l5.5-1.5z"/></svg>
+        <span style="font-size:13px;color:var(--ink-600)">YZ Tarama</span>
+        <div style="flex:1;height:6px;background:var(--cream-300);border-radius:999px;overflow:hidden;max-width:160px">
+            <div style="height:100%;width:@aiPct%;background:@(aiPct >= 90 ? "var(--danger)" : aiPct >= 70 ? "var(--warning)" : "var(--indigo-700)");border-radius:999px;transition:width .3s"></div>
+        </div>
+        <span style="font-size:12px;color:var(--ink-500)">@aiUsed / @aiQuota</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--ink-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18"/></svg>
+        <span style="font-size:13px;color:var(--ink-600)">Domain</span>
+        <span style="font-size:13px;font-weight:600;color:var(--ink-900)">@domCount / @maxDom</span>
+    </div>
+</div>
+
+<!-- Domain tablosu + AI Denetçi kartı -->
+<div style="display:grid;grid-template-columns:1.7fr 1fr;gap:18px">
+
+    <!-- Domain tablosu -->
+    <div class="ea-card" style="padding:0;overflow:hidden">
+        <div style="padding:18px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--cream-300)">
             <div>
-                <p class="ea-section-title">Web Sitelerim</p>
+                <div class="ea-card-title">Domainleriniz</div>
+                <div class="ea-card-sub">Lisans anahtarları, doğrulama ve durum özeti.</div>
             </div>
-            <a asp-controller="Domains" asp-action="Add" class="ea-btn ea-btn--primary ea-btn--sm">+ Site Ekle</a>
+            <a asp-controller="Domains" asp-action="Index" class="ea-btn ea-btn-ghost" style="padding:8px 12px;min-height:36px;font-size:13px">
+                Tümünü Gör
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
         </div>
 
         @if (!domainList.Any())
         {
             <div class="ea-empty">
                 <div class="ea-empty__icon">🌐</div>
-                <p class="ea-empty__title">Henüz site eklenmedi</p>
-                <p class="ea-empty__desc">İlk web sitenizi ekleyerek erişilebilirlik entegrasyonuna başlayın.</p>
-                <a asp-controller="Domains" asp-action="Add" class="ea-btn ea-btn--primary">İlk Siteyi Ekle</a>
+                <p class="ea-empty__title">Henüz domain yok</p>
+                <p class="ea-empty__desc">Başlamak için ilk domaininizi ekleyin.</p>
+                <a asp-controller="Domains" asp-action="Add" class="ea-btn ea-btn-brand">Domain Ekle</a>
             </div>
         }
         else
@@ -75,45 +154,73 @@
                     @foreach (var d in domainList)
                     {
                         <tr>
-                            <td style="font-weight:600;">@d.DomainUrl</td>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:10px">
+                                    <div style="width:30px;height:30px;border-radius:8px;background:var(--cream-200);display:grid;place-items:center;color:var(--ink-600)">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600;color:var(--ink-900)">@d.DomainUrl</div>
+                                        <div style="font-size:12px;color:var(--ink-500)">@planName plan</div>
+                                    </div>
+                                </div>
+                            </td>
                             <td>
                                 @if (d.IsVerified)
                                 {
-                                    <span class="ea-badge ea-badge--success">Aktif</span>
+                                    <span class="ea-badge ea-badge-ok">
+                                        <span class="ea-badge-dot"></span> Doğrulandı
+                                    </span>
                                 }
                                 else
                                 {
-                                    <span class="ea-badge ea-badge--warning">Script Bekleniyor</span>
+                                    <span class="ea-badge ea-badge-wait">
+                                        <span class="ea-badge-dot"></span> Script Bekleniyor
+                                    </span>
                                 }
                             </td>
-                            <td style="color:var(--ea-muted);font-size:.8rem;">
-                                @d.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")
-                            </td>
-                            <td style="text-align:right;">
-                                <div style="display:flex;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;">
+                            <td style="color:var(--ink-600)">@d.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
+                            <td style="text-align:right">
+                                <div style="display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap">
                                     <form asp-controller="Scan" asp-action="Start" asp-route-id="@d.Id" method="post" style="display:inline">
                                         @Html.AntiForgeryToken()
-                                        <button type="submit" class="ea-btn ea-btn--ghost ea-btn--sm"
+                                        <button type="submit" class="ea-btn ea-btn-ghost" style="padding:6px 10px;min-height:32px;font-size:12px"
                                                 onclick="this.disabled=true;this.textContent='…';this.form.submit();">
-                                            🔍 Tara
+                                            Tara
                                         </button>
                                     </form>
                                     <a asp-controller="Reports" asp-action="Domain" asp-route-id="@d.Id"
-                                       class="ea-btn ea-btn--ghost ea-btn--sm">📊 Raporlar</a>
+                                       class="ea-btn ea-btn-ghost" style="padding:6px 10px;min-height:32px;font-size:12px">Raporlar</a>
                                     <a asp-controller="Domains" asp-action="Script" asp-route-id="@d.Id"
-                                       class="ea-btn ea-btn--ghost ea-btn--sm">&lt;/&gt; Script</a>
+                                       class="ea-btn ea-btn-ghost" style="padding:6px 10px;min-height:32px;font-size:12px">Script</a>
                                 </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-            <div style="padding:.85rem 1.5rem;border-top:1px solid var(--ea-border);">
-                <a asp-controller="Domains" asp-action="Index" style="font-size:.8rem;color:var(--ea-sky);text-decoration:none;">
-                    Tüm siteleri yönet →
-                </a>
-            </div>
         }
+    </div>
+
+    <!-- Yapay Zeka Denetçi kartı -->
+    <div class="ea-card" style="background:var(--ink-900);color:var(--cream-50);border:none;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:radial-gradient(600px circle at 100% 0%,oklch(42% 0.15 270 / 0.4),transparent 50%)"></div>
+        <div style="position:relative">
+            <div style="display:inline-flex;align-items:center;gap:6px;background:oklch(72% 0.11 190 / 0.18);color:var(--teal-500);padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2l1.5 5.5L19 9l-5.5 1.5L12 16l-1.5-5.5L5 9l5.5-1.5z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>
+                YZ Denetçi
+            </div>
+            <div style="font-family:var(--font-display);font-size:24px;line-height:1.2;margin-top:14px;letter-spacing:-0.02em">
+                Yapay zeka destekli erişilebilirlik içgörüleri için domainlerinizi tarayın.
+            </div>
+            <div style="font-size:14px;color:oklch(80% 0.02 260);margin-top:12px;line-height:1.5">
+                Bir domain ekleyip doğrulayın, ardından tarama yaparak WCAG ihlallerini, kontrast sorunlarını ve tek tık düzeltmelerini görün.
+            </div>
+            <div style="margin-top:18px;display:flex;gap:8px">
+                <a asp-controller="Domains" asp-action="Add" class="ea-btn" style="background:white;color:var(--ink-900)">Domain Ekle</a>
+                <a asp-controller="Reports" asp-action="Index" class="ea-btn ea-btn-ghost" style="border-color:rgba(255,255,255,.2);color:white">Raporları Gör</a>
+            </div>
+        </div>
     </div>
 
 </div>

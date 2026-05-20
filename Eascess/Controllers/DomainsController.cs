@@ -15,17 +15,20 @@ public class DomainsController : Controller
     private readonly IWidgetSettingService _widgetSettingService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<AppUser> _userManager;
+    private readonly IPlanService _planService;
 
     public DomainsController(
         IRepository<Domain> domainRepo,
         IWidgetSettingService widgetSettingService,
         IUnitOfWork unitOfWork,
-        UserManager<AppUser> userManager)
+        UserManager<AppUser> userManager,
+        IPlanService planService)
     {
         _domainRepo = domainRepo;
         _widgetSettingService = widgetSettingService;
         _unitOfWork = unitOfWork;
         _userManager = userManager;
+        _planService = planService;
     }
 
     // ── Domain Listesi ────────────────────────────────────────────────────────
@@ -63,6 +66,16 @@ public class DomainsController : Controller
 
         var userId = _userManager.GetUserId(User)!;
         var normalizedUrl = NormalizeUrl(model.DomainUrl);
+
+        // Plan limiti kontrolü
+        var plan = await _planService.GetUserActivePlanAsync(userId);
+        var userDomains = await _domainRepo.FindAsync(d => d.UserId == userId && d.IsDeleted != true);
+        if (userDomains.Count() >= plan.MaxDomains)
+        {
+            ModelState.AddModelError(string.Empty,
+                $"Planınız en fazla {plan.MaxDomains} domain desteklemektedir. Daha fazla eklemek için planınızı yükseltin.");
+            return View(model);
+        }
 
         var existing = await _domainRepo.FirstOrDefaultAsync(
             d => d.DomainUrl == normalizedUrl && d.IsDeleted != true);

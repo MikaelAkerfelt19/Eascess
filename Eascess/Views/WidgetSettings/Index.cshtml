@@ -1,45 +1,30 @@
 @using Eascess_Application.DTOs
 @model WidgetSettingDto
 @{
-    ViewData["Title"] = "Widget Ayarları";
+    ViewData["Title"] = "Widget Stüdyo";
+    ViewData["Active"] = "widget";
+    Layout = "~/Views/Shared/_AppLayout.cshtml";
 }
 
-<div class="ea-page ea-page--narrow">
-
-    <div class="ea-breadcrumb">
-        <a asp-controller="Domains" asp-action="Index">Web Sitelerim</a>
-        <span class="ea-breadcrumb__sep">/</span>
-        <a asp-controller="Domains" asp-action="Script" asp-route-id="@Model.DomainId">@Model.DomainUrl</a>
-        <span class="ea-breadcrumb__sep">/</span>
-        <span class="ea-breadcrumb__current">Widget Ayarları</span>
-    </div>
-
-    @if (TempData["Success"] is string msg)
-    {
-        <div class="ea-alert ea-alert--success" style="margin-bottom:1.25rem;">✓ @msg</div>
-    }
-
-    <!-- Önizleme -->
-    <div class="ea-card" style="padding:1.75rem;margin-bottom:.75rem;">
-        <p style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ea-muted);margin:0 0 1rem;">Canlı Önizleme</p>
-        <div id="preview-area" style="background:rgba(255,255,255,.04);border:1px solid var(--ea-border);border-radius:10px;height:140px;position:relative;overflow:hidden;">
-            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-                <p style="font-size:.78rem;color:var(--ea-muted);">Müşteri sitesi alanı</p>
-            </div>
-            <!-- Önizleme butonu -->
-            <div id="preview-btn"
-                 style="position:absolute;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:all .2s;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/>
-                </svg>
-            </div>
+<!-- Topbar -->
+<div class="ea-topbar">
+    <div>
+        <div class="ea-topbar-eyebrow">
+            <a asp-controller="Domains" asp-action="Script" asp-route-id="@Model.DomainId" style="color:var(--ink-500)">@Model.DomainUrl</a> / Ayarlar
         </div>
+        <h1 class="ea-topbar-title">Widget Stüdyo</h1>
     </div>
+</div>
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="ea-alert ea-alert--success">✓ @msg</div>
+}
+
+<div style="display:grid;grid-template-columns:1fr 1.2fr;gap:18px;align-items:start">
 
     <!-- Ayarlar formu -->
-    <div class="ea-card" style="padding:1.75rem;">
-        <h4 style="font-size:1.1rem;font-weight:700;color:#fff;margin:0 0 1.5rem;">Widget Ayarları</h4>
-
+    <div class="ea-card" style="padding:24px">
         <form asp-action="Update" asp-controller="WidgetSettings" method="post" novalidate>
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
@@ -47,32 +32,32 @@
             <input type="hidden" asp-for="DomainUrl" />
 
             <!-- Tema rengi -->
-            <div style="margin-bottom:1.5rem;">
+            <div style="margin-bottom:20px">
                 <label class="ea-label">Tema Rengi</label>
-                <div style="display:flex;align-items:center;gap:.75rem;">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                     <input type="color" asp-for="ThemeColor" id="color-input"
-                           style="width:44px;height:44px;border:1px solid var(--ea-border);border-radius:8px;background:rgba(255,255,255,.07);cursor:pointer;padding:3px;"
+                           style="width:44px;height:44px;border:1px solid var(--cream-300);border-radius:var(--r-sm);background:white;cursor:pointer;padding:3px"
                            oninput="updatePreview()" />
                     <input type="text" id="color-text" value="@Model.ThemeColor"
-                           class="ea-input" style="width:140px;"
+                           class="ea-input" style="width:120px"
                            oninput="syncColor(this.value)" placeholder="#38bdf8" />
-                    <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
-                        @foreach (var c in new[] { "#38bdf8", "#818cf8", "#c084fc", "#e879f9", "#22d3ee", "#4ade80", "#fb923c", "#f87171" })
+                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                        @foreach (var c in new[] { "#38bdf8", "#818cf8", "#c084fc", "#22d3ee", "#4ade80", "#fb923c", "#f87171", "#facc15" })
                         {
                             <button type="button" onclick="setColor('@c')"
-                                    style="width:24px;height:24px;background:@c;border:none;border-radius:50%;cursor:pointer;transition:transform .15s;"
+                                    style="width:22px;height:22px;background:@c;border:2px solid white;border-radius:50%;cursor:pointer;box-shadow:0 0 0 1px var(--cream-300);transition:transform .15s"
                                     onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
                             </button>
                         }
                     </div>
                 </div>
-                <p class="ea-form-hint">Widget butonunun arka plan rengi</p>
+                <p style="font-size:12px;color:var(--ink-500);margin:6px 0 0">Widget butonunun arka plan rengi</p>
             </div>
 
-            <!-- Pozisyon -->
-            <div style="margin-bottom:1.5rem;">
+            <!-- Konum -->
+            <div style="margin-bottom:20px">
                 <label class="ea-label">Konum</label>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;max-width:340px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:300px">
                     @foreach (var pos in new[] {
                         ("bottom-right", "Sağ Alt"),
                         ("bottom-left",  "Sol Alt"),
@@ -80,11 +65,10 @@
                         ("top-left",     "Sol Üst"),
                     })
                     {
-                        <label style="display:flex;align-items:center;gap:.5rem;padding:.65rem 1rem;border:1px solid var(--ea-border);border-radius:8px;cursor:pointer;font-size:.83rem;transition:border-color .15s,background .15s;"
-                               class="pos-option @(Model.Position == pos.Item1 ? "pos-selected" : "")">
+                        <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--cream-300);border-radius:var(--r-sm);cursor:pointer;font-size:13px;transition:border-color .15s,background .15s;@(Model.Position == pos.Item1 ? "border-color:var(--teal-600);background:oklch(96% 0.04 190)" : "background:white")">
                             <input type="radio" name="Position" value="@pos.Item1"
                                    @(Model.Position == pos.Item1 ? "checked" : "")
-                                   style="accent-color:var(--ea-sky);"
+                                   style="accent-color:var(--teal-600)"
                                    onchange="updatePreview()" />
                             @pos.Item2
                         </label>
@@ -93,48 +77,93 @@
             </div>
 
             <!-- Dil -->
-            <div style="margin-bottom:1.5rem;">
+            <div style="margin-bottom:20px">
                 <label class="ea-label" asp-for="Language">Dil</label>
-                <select asp-for="Language" class="ea-input" style="max-width:200px;">
-                    <option value="tr">🇹🇷 Türkçe</option>
-                    <option value="en">🇬🇧 English</option>
+                <select asp-for="Language" class="ea-input" style="max-width:180px">
+                    <option value="tr">Türkçe</option>
+                    <option value="en">İngilizce</option>
                 </select>
             </div>
 
-            <!-- AI etkin -->
-            <div style="margin-bottom:2rem;padding:1.1rem 1.25rem;background:rgba(255,255,255,.04);border:1px solid var(--ea-border);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
-                <div>
-                    <p style="margin:0;font-size:.9rem;font-weight:600;color:#fff;">Yapay Zeka Alt Metin</p>
-                    <p style="margin:.2rem 0 0;font-size:.78rem;color:var(--ea-muted);">Azure Computer Vision ile eksik alt metinleri otomatik doldur</p>
+            <!-- Marka özelleştirme -->
+            <div style="margin-bottom:20px;padding:16px;background:var(--cream-50,#fafaf9);border:1px solid var(--cream-300);border-radius:var(--r-md)">
+                <div style="font-size:13px;font-weight:600;color:var(--ink-700);margin-bottom:12px">Marka Özelleştirme</div>
+
+                <div style="margin-bottom:12px">
+                    <label class="ea-label" asp-for="LogoUrl">Logo URL <span style="font-weight:400;color:var(--ink-500)">(isteğe bağlı)</span></label>
+                    <input type="url" asp-for="LogoUrl" class="ea-input" placeholder="https://example.com/logo.png"
+                           oninput="updateBrandPreview()" />
+                    <p style="font-size:12px;color:var(--ink-500);margin:4px 0 0">Widget başlık alanında görünen logo. Önerilen: 22px yükseklik, şeffaf PNG.</p>
                 </div>
-                <label style="position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0;">
+
+                <div style="margin-bottom:12px">
+                    <label class="ea-label" asp-for="WidgetTitle">Başlık Metni <span style="font-weight:400;color:var(--ink-500)">(isteğe bağlı)</span></label>
+                    <input type="text" asp-for="WidgetTitle" class="ea-input" placeholder="Erişilebilirlik Araçları" maxlength="30"
+                           oninput="updateBrandPreview()" />
+                    <p style="font-size:12px;color:var(--ink-500);margin:4px 0 0">Boş bırakılırsa varsayılan dil metni kullanılır.</p>
+                </div>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+                    <div>
+                        <div style="font-size:13px;font-weight:500;color:var(--ink-800)">"Eascess ile güçlendirildi" Göster</div>
+                        <div style="font-size:12px;color:var(--ink-500)">Widget altında marka ataması</div>
+                    </div>
+                    <label style="position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0">
+                        <input type="checkbox" asp-for="PoweredByVisible"
+                               style="opacity:0;width:0;height:0"
+                               id="pb-toggle" />
+                        <span id="pb-slider"
+                              onclick="togglePoweredBy()"
+                              style="position:absolute;inset:0;border-radius:26px;cursor:pointer;transition:.3s;background:@(Model.PoweredByVisible ? "var(--brand-grad)" : "var(--cream-300)")">
+                            <span style="position:absolute;height:20px;width:20px;left:@(Model.PoweredByVisible ? "23px" : "3px");bottom:3px;background:white;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)" id="pb-thumb"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Yapay zeka alt metin -->
+            <div style="margin-bottom:24px;padding:16px;background:var(--cream-100);border:1px solid var(--cream-300);border-radius:var(--r-md);display:flex;align-items:center;justify-content:space-between;gap:16px">
+                <div>
+                    <div style="font-size:14px;font-weight:600;color:var(--ink-900)">Yapay Zeka Alt Metin</div>
+                    <div style="font-size:12px;color:var(--ink-500);margin-top:2px">Azure Computer Vision ile eksik alt metinleri otomatik oluştur</div>
+                </div>
+                <label style="position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0">
                     <input type="checkbox" asp-for="IsAiEnabled"
-                           style="opacity:0;width:0;height:0;"
+                           style="opacity:0;width:0;height:0"
                            id="ai-toggle" />
                     <span id="ai-slider"
                           onclick="toggleAi()"
-                          style="position:absolute;inset:0;border-radius:26px;cursor:pointer;transition:.3s;background:@(Model.IsAiEnabled ? "linear-gradient(135deg,#38bdf8,#818cf8)" : "rgba(255,255,255,.1)");">
-                        <span style="position:absolute;height:20px;width:20px;left:@(Model.IsAiEnabled ? "23px" : "3px");bottom:3px;background:white;border-radius:50%;transition:.3s;" id="ai-thumb"></span>
+                          style="position:absolute;inset:0;border-radius:26px;cursor:pointer;transition:.3s;background:@(Model.IsAiEnabled ? "var(--brand-grad)" : "var(--cream-300)")">
+                        <span style="position:absolute;height:20px;width:20px;left:@(Model.IsAiEnabled ? "23px" : "3px");bottom:3px;background:white;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)" id="ai-thumb"></span>
                     </span>
                 </label>
             </div>
 
-            <div style="display:flex;gap:.6rem;">
-                <button type="submit" class="ea-btn ea-btn--primary">Kaydet</button>
-                <a asp-controller="Domains" asp-action="Script" asp-route-id="@Model.DomainId" class="ea-btn ea-btn--ghost">İptal</a>
+            <div style="display:flex;gap:8px">
+                <button type="submit" class="ea-btn ea-btn-brand">Kaydet</button>
+                <a asp-controller="Domains" asp-action="Script" asp-route-id="@Model.DomainId" class="ea-btn ea-btn-ghost">İptal</a>
             </div>
         </form>
     </div>
 
-</div>
+    <!-- Canlı önizleme -->
+    <div class="ea-card" style="padding:20px">
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500);margin-bottom:14px">Canlı Önizleme</div>
+        <div id="preview-area" style="background:var(--cream-100);border:1px solid var(--cream-300);border-radius:var(--r-md);height:180px;position:relative;overflow:hidden">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+                <p style="font-size:13px;color:var(--ink-400)">Müşteri sitesi alanı</p>
+            </div>
+            <div id="preview-btn"
+                 style="position:absolute;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:all .2s">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/>
+                </svg>
+            </div>
+        </div>
+        <p style="font-size:12px;color:var(--ink-500);margin:10px 0 0">Bu basitleştirilmiş bir önizlemedir. Gerçek widget Shadow DOM içinde çalışır.</p>
+    </div>
 
-<style>
-    .pos-selected {
-        border-color: rgba(56,189,248,.5) !important;
-        background: rgba(56,189,248,.08) !important;
-        color: var(--ea-sky);
-    }
-</style>
+</div>
 
 @section Scripts {
     <script>
@@ -148,12 +177,10 @@
             previewBtn.style.background = color;
             const pos = document.querySelector('input[name="Position"]:checked')?.value || 'bottom-right';
             const [v, h] = pos.split('-');
+            previewBtn.style.top = ''; previewBtn.style.bottom = '';
+            previewBtn.style.left = ''; previewBtn.style.right = '';
             previewBtn.style[v] = '12px';
             previewBtn.style[h] = '12px';
-            previewBtn.style[v === 'bottom' ? 'top' : 'bottom'] = '';
-            previewBtn.style[h === 'right' ? 'left' : 'right'] = '';
-            document.querySelectorAll('.pos-option').forEach(el => el.classList.remove('pos-selected'));
-            document.querySelector(`input[value="${pos}"]`)?.parentElement?.classList.add('pos-selected');
         }
 
         function syncColor(val) {
@@ -169,18 +196,38 @@
             updatePreview();
         }
 
-        // AI toggle
         const aiToggle = document.getElementById('ai-toggle');
         const aiSlider = document.getElementById('ai-slider');
         const aiThumb  = document.getElementById('ai-thumb');
+
         function toggleAi() {
             aiToggle.checked = !aiToggle.checked;
             const on = aiToggle.checked;
-            aiSlider.style.background = on ? 'linear-gradient(135deg,#38bdf8,#818cf8)' : 'rgba(255,255,255,.1)';
+            aiSlider.style.background = on ? 'var(--brand-grad)' : 'var(--cream-300)';
             aiThumb.style.left = on ? '23px' : '3px';
         }
 
-        // Init preview
+        const pbToggle = document.getElementById('pb-toggle');
+        const pbSlider = document.getElementById('pb-slider');
+        const pbThumb  = document.getElementById('pb-thumb');
+
+        function togglePoweredBy() {
+            pbToggle.checked = !pbToggle.checked;
+            const on = pbToggle.checked;
+            pbSlider.style.background = on ? 'var(--brand-grad)' : 'var(--cream-300)';
+            pbThumb.style.left = on ? '23px' : '3px';
+        }
+
+        function updateBrandPreview() {
+            const logoUrl = document.getElementById('LogoUrl')?.value;
+            const title   = document.getElementById('WidgetTitle')?.value;
+            const headEl  = document.getElementById('preview-head');
+            if (!headEl) return;
+            headEl.innerHTML =
+                (logoUrl ? '<img src="' + logoUrl + '" alt="" style="height:18px;object-fit:contain;border-radius:3px;margin-right:4px" onerror="this.style.display=\'none\'">' : '') +
+                '<span>' + (title || 'Erişilebilirlik') + '</span>';
+        }
+
         updatePreview();
         document.querySelectorAll('input[name="Position"]').forEach(r => r.addEventListener('change', updatePreview));
     </script>

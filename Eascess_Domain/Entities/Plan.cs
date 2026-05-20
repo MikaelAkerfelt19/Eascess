@@ -17,6 +17,10 @@ public partial class Plan
     [Column(TypeName = "decimal(18, 2)")]
     public decimal MonthlyPrice { get; set; }
 
+    public int MaxDomains { get; set; }
+
+    public int MonthlyAiQuota { get; set; }
+
     public bool IsActive { get; set; }
 
     public bool IsDeleted { get; set; }

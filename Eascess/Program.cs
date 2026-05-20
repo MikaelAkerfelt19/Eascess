@@ -1,12 +1,16 @@
 using Eascess.Middleware;
+using Eascess_Application.Options;
 using Eascess_Application.Services;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
 using Eascess_Infrastructure.Persistence;
 using Eascess_Infrastructure.Repositories;
 using Eascess_Infrastructure.Scanning;
+using Eascess_Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Polly;
+using Polly.Extensions.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +40,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Application services
+builder.Services.AddScoped<IPlanService, PlanService>();
 builder.Services.AddScoped<IScanReportService, ScanReportService>();
 builder.Services.AddScoped<IWidgetService, WidgetService>();
 builder.Services.AddScoped<IWidgetSettingService, WidgetSettingService>();
@@ -55,6 +60,35 @@ builder.Services.AddHttpClient("WcagScanner", client =>
     MaxAutomaticRedirections = 5,
     ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
 });
+
+// AI Alt-Text — Gemini
+builder.Services.Configure<GeminiOptions>(
+    builder.Configuration.GetSection(GeminiOptions.SectionName));
+
+builder.Services.AddHttpClient<GeminiAltTextGeneratorService>(client =>
+{
+    var timeout = builder.Configuration.GetValue("AltTextGenerator:Gemini:TimeoutSeconds", 15);
+    client.Timeout = TimeSpan.FromSeconds(timeout);
+})
+.AddPolicyHandler(HttpPolicyExtensions
+    .HandleTransientHttpError()
+    .WaitAndRetryAsync(2, attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt))));
+
+builder.Services.AddScoped<IAltTextGeneratorService>(sp =>
+    sp.GetRequiredService<GeminiAltTextGeneratorService>());
+builder.Services.AddScoped<IAiScanService, AiScanService>();
+builder.Services.AddScoped<IWidgetAnalyticsService, WidgetAnalyticsService>();
+
+// Email & Monthly Report (ADIM 7)
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection(EmailOptions.SectionName));
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+builder.Services.AddScoped<IMonthlyReportService, MonthlyReportService>();
+builder.Services.AddHostedService<MonthlyReportJob>();
+
+// Public scan & trial reminder (ADIM 9)
+builder.Services.AddScoped<IPublicScanService, PublicScanService>();
+builder.Services.AddHostedService<TrialReminderJob>();
+builder.Services.AddMemoryCache();
 
 // CORS — Statik AllowAnyOrigin(*) yerine DynamicCorsMiddleware kullanılıyor.
 // Her müşterinin domain'i DB'den doğrulanarak izin veriliyor.

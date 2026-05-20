@@ -33,6 +33,9 @@ public partial class Domain
     public virtual ICollection<AiProcessingQueue> AiProcessingQueues { get; set; } = new List<AiProcessingQueue>();
 
     [InverseProperty("Domain")]
+    public virtual ICollection<ImageAltTextCache> ImageAltTextCaches { get; set; } = new List<ImageAltTextCache>();
+
+    [InverseProperty("Domain")]
     public virtual ICollection<AiUsageLog> AiUsageLogs { get; set; } = new List<AiUsageLog>();
 
     [InverseProperty("Domain")]
@@ -47,4 +50,7 @@ public partial class Domain
 
     [InverseProperty("Domain")]
     public virtual ICollection<WidgetSetting> WidgetSettings { get; set; } = new List<WidgetSetting>();
+
+    [InverseProperty("Domain")]
+    public virtual ICollection<WidgetUsageLog> WidgetUsageLogs { get; set; } = new List<WidgetUsageLog>();
 }

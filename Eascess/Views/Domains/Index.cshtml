@@ -1,93 +1,113 @@
 @model IEnumerable<Eascess.Models.DomainListItemViewModel>
 @{
-    ViewData["Title"] = "Web Sitelerim";
+    ViewData["Title"] = "Domainler";
+    ViewData["Active"] = "domains";
+    Layout = "~/Views/Shared/_AppLayout.cshtml";
 }
 
-<div class="ea-page">
+<!-- Topbar -->
+<div class="ea-topbar">
+    <div>
+        <div class="ea-topbar-eyebrow">Yönetim</div>
+        <h1 class="ea-topbar-title">Domainleriniz</h1>
+    </div>
+    <div class="ea-topbar-actions">
+        <a asp-action="Add" class="ea-btn ea-btn-brand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Domain Ekle
+        </a>
+    </div>
+</div>
 
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
-        <div>
-            <h2 style="font-size:1.5rem;font-weight:700;margin:0 0 .3rem;color:#fff;">Web Sitelerim</h2>
-            <p style="margin:0;color:var(--ea-muted);font-size:.875rem;">Sisteme kayıtlı domainleriniz ve entegrasyon scriptleri</p>
+@if (TempData["Success"] is string successMsg)
+{
+    <div class="ea-alert ea-alert--success">✓ @successMsg</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="ea-card">
+        <div class="ea-empty">
+            <div class="ea-empty__icon">🌐</div>
+            <p class="ea-empty__title">Henüz domain yok</p>
+            <p class="ea-empty__desc">Erişilebilirlik takibine başlamak için ilk domaininizi ekleyin.</p>
+            <a asp-action="Add" class="ea-btn ea-btn-brand">Domain Ekle</a>
         </div>
-        <a asp-action="Add" class="ea-btn ea-btn--primary">+ Yeni Site Ekle</a>
+    </div>
+}
+else
+{
+    <div class="ea-card" style="padding:0;overflow:hidden">
+        <table class="ea-table">
+            <thead>
+                <tr>
+                    <th>Domain</th>
+                    <th>Durum</th>
+                    <th>Lisans Anahtarı</th>
+                    <th>Eklenme</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var domain in Model)
+                {
+                    <tr>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:10px">
+                                <div style="width:30px;height:30px;border-radius:8px;background:var(--cream-200);display:grid;place-items:center;color:var(--ink-600)">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg>
+                                </div>
+                                <span style="font-weight:600;color:var(--ink-900)">@domain.DomainUrl</span>
+                            </div>
+                        </td>
+                        <td>
+                            @if (domain.IsVerified)
+                            {
+                                <span class="ea-badge ea-badge-ok"><span class="ea-badge-dot"></span> Doğrulandı</span>
+                            }
+                            else
+                            {
+                                <span class="ea-badge ea-badge-wait"><span class="ea-badge-dot"></span> Script Bekleniyor</span>
+                            }
+                        </td>
+                        <td>
+                            <code style="font-size:12px">@domain.LicenseKey.ToString()[..8]…</code>
+                        </td>
+                        <td style="color:var(--ink-600);font-size:13px">@domain.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
+                        <td style="text-align:right">
+                            <div style="display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap">
+                                <a asp-action="Script" asp-route-id="@domain.Id" class="ea-btn ea-btn-ghost" style="padding:6px 10px;min-height:32px;font-size:12px">Script</a>
+                                <a asp-controller="Reports" asp-action="Domain" asp-route-id="@domain.Id" class="ea-btn ea-btn-ghost" style="padding:6px 10px;min-height:32px;font-size:12px">Raporlar</a>
+                                <form asp-action="Delete" asp-route-id="@domain.Id" method="post" style="display:inline"
+                                      onsubmit="return confirm('@domain.DomainUrl adresini silmek istediğinize emin misiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="ea-btn ea-btn--danger" style="padding:6px 10px;min-height:32px;font-size:12px">Sil</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 
-    @if (TempData["Success"] is string successMsg)
-    {
-        <div class="ea-alert ea-alert--success" style="margin-bottom:1.25rem;">
-            ✓ @successMsg
-        </div>
-    }
-
-    @if (!Model.Any())
-    {
-        <div class="ea-card">
-            <div class="ea-empty">
-                <div class="ea-empty__icon">🌐</div>
-                <p class="ea-empty__title">Henüz site eklemediniz</p>
-                <p class="ea-empty__desc">İlk web sitenizi ekleyerek erişilebilirlik entegrasyonuna başlayın.</p>
-                <a asp-action="Add" class="ea-btn ea-btn--primary">İlk Siteyi Ekle</a>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div style="display:flex;flex-direction:column;gap:.75rem;">
-            @foreach (var domain in Model)
-            {
-                <div class="ea-card ea-domain-card">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
-                        <div>
-                            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem;">
-                                <span style="font-size:.95rem;font-weight:600;color:#fff;">@domain.DomainUrl</span>
-                                @if (domain.IsVerified)
-                                {
-                                    <span class="ea-badge ea-badge--success">Doğrulandı</span>
-                                }
-                                else
-                                {
-                                    <span class="ea-badge ea-badge--warning">Script Bekleniyor</span>
-                                }
-                            </div>
-                            <p style="margin:0;font-size:.78rem;color:var(--ea-muted);">
-                                Eklenme: @domain.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
-                                &nbsp;·&nbsp;
-                                Key: <code>@domain.LicenseKey.ToString()[..8]…</code>
-                            </p>
-                        </div>
-
-                        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
-                            <a asp-action="Script" asp-route-id="@domain.Id" class="ea-btn ea-btn--ghost ea-btn--sm">&lt;/&gt; Script Al</a>
-                            <a asp-controller="Reports" asp-action="Domain" asp-route-id="@domain.Id" class="ea-btn ea-btn--ghost ea-btn--sm">📊 Raporlar</a>
-                            <form asp-action="Delete" asp-route-id="@domain.Id" method="post"
-                                  onsubmit="return confirm('@domain.DomainUrl adresini silmek istediğinize emin misiniz?')">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="ea-btn ea-btn--danger ea-btn--sm">Sil</button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Script önizleme -->
-                    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--ea-border);">
-                        <p style="font-size:.72rem;font-weight:500;color:var(--ea-muted);margin:0 0 .4rem;letter-spacing:.3px;text-transform:uppercase;">Entegrasyon Scripti</p>
-                        <div style="display:flex;gap:.5rem;align-items:stretch;">
-                            <div class="ea-code-block" style="flex:1;padding:.6rem 1rem;font-size:.78rem;">
-                                <code id="script-@domain.Id" style="background:none;padding:0;color:#a5f3fc;">@domain.ScriptTag</code>
-                            </div>
-                            <button class="ea-btn ea-btn--ghost ea-btn--sm"
-                                    onclick="copyScript('script-@domain.Id', this)" type="button"
-                                    style="flex-shrink:0;">
-                                Kopyala
-                            </button>
-                        </div>
-                    </div>
+    <!-- Entegrasyon script önizlemeleri -->
+    <div style="margin-top:18px;display:flex;flex-direction:column;gap:10px">
+        @foreach (var domain in Model)
+        {
+            <div class="ea-card" style="padding:16px 20px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                    <span style="font-size:13px;font-weight:600;color:var(--ink-700)">Entegrasyon scripti · @domain.DomainUrl</span>
+                    <button class="ea-btn ea-btn-ghost" style="padding:5px 10px;min-height:30px;font-size:12px"
+                            onclick="copyScript('script-@domain.Id', this)" type="button">Kopyala</button>
                 </div>
-            }
-        </div>
-    }
-
-</div>
+                <div class="ea-code-block" style="padding:12px 16px;font-size:12px">
+                    <code id="script-@domain.Id" style="background:none;padding:0;color:var(--cream-100)">@domain.ScriptTag</code>
+                </div>
+            </div>
+        }
+    </div>
+}
 
 @section Scripts {
     <script>
@@ -95,14 +115,8 @@
             const text = document.getElementById(id).textContent;
             navigator.clipboard.writeText(text).then(() => {
                 const orig = btn.textContent;
-                btn.textContent = 'Kopyalandı ✓';
-                btn.style.color = '#4ade80';
-                btn.style.borderColor = 'rgba(74,222,128,.3)';
-                setTimeout(() => {
-                    btn.textContent = orig;
-                    btn.style.color = '';
-                    btn.style.borderColor = '';
-                }, 2000);
+                btn.textContent = 'Kopyalandı!';
+                setTimeout(() => { btn.textContent = orig; }, 2000);
             });
         }
     </script>

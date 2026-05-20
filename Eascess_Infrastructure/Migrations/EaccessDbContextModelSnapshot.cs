@@ -165,6 +165,12 @@ namespace Eascess_Infrastructure.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("TrialEndsAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("TrialStartedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -292,6 +298,53 @@ namespace Eascess_Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Domains");
+                });
+
+            modelBuilder.Entity("Eascess_Domain.Entities.ImageAltTextCache", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AltText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DomainId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("GeneratedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getutcdate())");
+
+                    b.Property<string>("OriginalUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UrlHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "UrlHash" }, "IX_ImageAltTextCache_UrlHash");
+
+                    b.HasIndex(new[] { "DomainId", "UrlHash" }, "UQ_ImageAltTextCache_Domain_UrlHash")
+                        .IsUnique();
+
+                    b.ToTable("ImageAltTextCache");
                 });
 
             modelBuilder.Entity("Eascess_Domain.Entities.Invoice", b =>
@@ -447,6 +500,12 @@ namespace Eascess_Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("MaxDomains")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MonthlyAiQuota")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("MonthlyPrice")
                         .HasColumnType("decimal(18, 2)");
 
@@ -459,6 +518,38 @@ namespace Eascess_Infrastructure.Migrations
                         .HasName("PK__Plans__3214EC07DD689DB1");
 
                     b.ToTable("Plans");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDomains = 1,
+                            MonthlyAiQuota = 50,
+                            MonthlyPrice = 0m,
+                            Name = "Ücretsiz"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDomains = 10,
+                            MonthlyAiQuota = 2000,
+                            MonthlyPrice = 299m,
+                            Name = "Pro"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDomains = 999,
+                            MonthlyAiQuota = 999999,
+                            MonthlyPrice = 0m,
+                            Name = "Kurumsal"
+                        });
                 });
 
             modelBuilder.Entity("Eascess_Domain.Entities.PlanFeature", b =>
@@ -571,6 +662,51 @@ namespace Eascess_Infrastructure.Migrations
                     b.ToTable("ScanReportDetails");
                 });
 
+            modelBuilder.Entity("Eascess_Domain.Entities.SupportTicket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getutcdate())");
+
+                    b.Property<int?>("DomainId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Open");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DomainId");
+
+                    b.HasIndex(new[] { "UserId", "CreatedAt" }, "IX_SupportTickets_User_Date");
+
+                    b.ToTable("SupportTickets");
+                });
+
             modelBuilder.Entity("Eascess_Domain.Entities.UserSubscription", b =>
                 {
                     b.Property<int>("Id")
@@ -650,11 +786,20 @@ namespace Eascess_Infrastructure.Migrations
                         .HasColumnType("nvarchar(10)")
                         .HasDefaultValue("tr");
 
+                    b.Property<string>("LogoUrl")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
                     b.Property<string>("Position")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasDefaultValue("bottom-right");
+
+                    b.Property<bool>("PoweredByVisible")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("ThemeColor")
                         .ValueGeneratedOnAdd()
@@ -672,6 +817,10 @@ namespace Eascess_Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(1);
 
+                    b.Property<string>("WidgetTitle")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.HasKey("Id")
                         .HasName("PK__WidgetSe__3214EC07D5A978C5");
 
@@ -679,6 +828,37 @@ namespace Eascess_Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("WidgetSettings");
+                });
+
+            modelBuilder.Entity("Eascess_Domain.Entities.WidgetUsageLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("(newid())");
+
+                    b.Property<int>("DomainId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FeatureName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(getutcdate())");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "DomainId", "OccurredAt" }, "IX_WidgetUsageLog_Domain_Date");
+
+                    b.ToTable("WidgetUsageLogs");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -860,6 +1040,18 @@ namespace Eascess_Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Eascess_Domain.Entities.ImageAltTextCache", b =>
+                {
+                    b.HasOne("Eascess_Domain.Entities.Domain", "Domain")
+                        .WithMany("ImageAltTextCaches")
+                        .HasForeignKey("DomainId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_ImageAltTextCache_Domains");
+
+                    b.Navigation("Domain");
+                });
+
             modelBuilder.Entity("Eascess_Domain.Entities.Invoice", b =>
                 {
                     b.HasOne("Eascess_Domain.Entities.Payment", "Payment")
@@ -953,6 +1145,25 @@ namespace Eascess_Infrastructure.Migrations
                     b.Navigation("ScanReport");
                 });
 
+            modelBuilder.Entity("Eascess_Domain.Entities.SupportTicket", b =>
+                {
+                    b.HasOne("Eascess_Domain.Entities.Domain", "Domain")
+                        .WithMany()
+                        .HasForeignKey("DomainId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_SupportTickets_Domains");
+
+                    b.HasOne("Eascess_Domain.Entities.AppUser", "User")
+                        .WithMany("SupportTickets")
+                        .HasForeignKey("UserId")
+                        .IsRequired()
+                        .HasConstraintName("FK_SupportTickets_Users");
+
+                    b.Navigation("Domain");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Eascess_Domain.Entities.UserSubscription", b =>
                 {
                     b.HasOne("Eascess_Domain.Entities.Plan", "Plan")
@@ -982,6 +1193,18 @@ namespace Eascess_Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_WidgetSettings_Domains");
+
+                    b.Navigation("Domain");
+                });
+
+            modelBuilder.Entity("Eascess_Domain.Entities.WidgetUsageLog", b =>
+                {
+                    b.HasOne("Eascess_Domain.Entities.Domain", "Domain")
+                        .WithMany("WidgetUsageLogs")
+                        .HasForeignKey("DomainId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_WidgetUsageLog_Domains");
 
                     b.Navigation("Domain");
                 });
@@ -1047,6 +1270,8 @@ namespace Eascess_Infrastructure.Migrations
 
                     b.Navigation("Payments");
 
+                    b.Navigation("SupportTickets");
+
                     b.Navigation("UserSubscriptions");
                 });
 
@@ -1056,11 +1281,15 @@ namespace Eascess_Infrastructure.Migrations
 
                     b.Navigation("AiUsageLogs");
 
+                    b.Navigation("ImageAltTextCaches");
+
                     b.Navigation("Pages");
 
                     b.Navigation("ScanReports");
 
                     b.Navigation("WidgetSettings");
+
+                    b.Navigation("WidgetUsageLogs");
                 });
 
             modelBuilder.Entity("Eascess_Domain.Entities.Page", b =>

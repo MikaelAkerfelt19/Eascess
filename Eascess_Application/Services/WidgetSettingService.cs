@@ -47,6 +47,9 @@ public class WidgetSettingService : IWidgetSettingService
             Position = setting.Position ?? "bottom-right",
             Language = setting.Language ?? "tr",
             IsAiEnabled = setting.IsAiEnabled,
+            LogoUrl = setting.LogoUrl,
+            WidgetTitle = setting.WidgetTitle,
+            PoweredByVisible = setting.PoweredByVisible,
         };
     }
 
@@ -70,6 +73,9 @@ public class WidgetSettingService : IWidgetSettingService
         setting.Position = dto.Position;
         setting.Language = dto.Language;
         setting.IsAiEnabled = dto.IsAiEnabled;
+        setting.LogoUrl = string.IsNullOrWhiteSpace(dto.LogoUrl) ? null : dto.LogoUrl.Trim();
+        setting.WidgetTitle = string.IsNullOrWhiteSpace(dto.WidgetTitle) ? null : dto.WidgetTitle.Trim();
+        setting.PoweredByVisible = dto.PoweredByVisible;
         setting.UpdatedAt = DateTime.UtcNow;
 
         _settingRepo.Update(setting);

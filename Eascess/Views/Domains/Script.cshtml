@@ -1,96 +1,100 @@
 @model Eascess.Models.DomainListItemViewModel
 @{
     ViewData["Title"] = "Entegrasyon Scripti";
+    ViewData["Active"] = "domains";
+    Layout = "~/Views/Shared/_AppLayout.cshtml";
 }
 
-<div class="ea-page ea-page--narrow">
-
-    <div class="ea-breadcrumb">
-        <a asp-action="Index">Web Sitelerim</a>
-        <span class="ea-breadcrumb__sep">/</span>
-        <span class="ea-breadcrumb__current">@Model.DomainUrl</span>
+<!-- Topbar -->
+<div class="ea-topbar">
+    <div>
+        <div class="ea-topbar-eyebrow"><a asp-action="Index" style="color:var(--ink-500)">Domainler</a> / @Model.DomainUrl</div>
+        <h1 class="ea-topbar-title">Entegrasyon Scripti</h1>
     </div>
+    <div class="ea-topbar-actions">
+        @if (Model.IsVerified)
+        {
+            <span class="ea-badge ea-badge-ok"><span class="ea-badge-dot"></span> Aktif</span>
+        }
+        else
+        {
+            <span class="ea-badge ea-badge-wait"><span class="ea-badge-dot"></span> Script Bekleniyor</span>
+        }
+    </div>
+</div>
 
-    <div class="ea-card" style="padding:2rem;">
+<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:18px;align-items:start">
 
-        <div style="display:flex;align-items:center;gap:.65rem;margin-bottom:.3rem;">
-            <h4 style="font-size:1.2rem;font-weight:700;color:#fff;margin:0;">Entegrasyon Scripti</h4>
-            @if (Model.IsVerified)
-            {
-                <span class="ea-badge ea-badge--success">Aktif</span>
-            }
-            else
-            {
-                <span class="ea-badge ea-badge--warning">Bekleniyor</span>
-            }
-        </div>
-        <p style="font-size:.83rem;color:var(--ea-muted);margin:0 0 2rem;">
-            <strong style="color:rgba(255,255,255,.7)">@Model.DomainUrl</strong> için oluşturulan entegrasyon scripti
-        </p>
+    <!-- Adım kartları -->
+    <div style="display:flex;flex-direction:column;gap:14px">
 
         <!-- Adım 1 -->
-        <div style="margin-bottom:1.75rem;">
-            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;">
-                <span class="ea-step-num">1</span>
-                <span style="font-size:.88rem;font-weight:600;color:#fff;">Aşağıdaki kodu kopyalayın</span>
+        <div class="ea-card" style="padding:22px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                <span class="ea-step-num active">1</span>
+                <span style="font-size:14px;font-weight:600;color:var(--ink-900)">Kodu kopyalayın</span>
             </div>
-            <div class="ea-code-block" style="padding-right:7rem;position:relative;">
-                <code id="script-code" style="background:none;padding:0;color:#a5f3fc;word-break:break-all;">@Model.ScriptTag</code>
+            <div class="ea-code-block" style="position:relative;padding-right:80px">
+                <code id="script-code" style="background:none;padding:0;color:var(--cream-100);word-break:break-all;font-size:12px">@Model.ScriptTag</code>
                 <button id="copy-btn" onclick="copyScript()" type="button"
-                        class="ea-btn ea-btn--ghost ea-btn--sm"
-                        style="position:absolute;top:.6rem;right:.6rem;">
+                        class="ea-btn ea-btn-ghost"
+                        style="position:absolute;top:10px;right:10px;padding:5px 10px;min-height:28px;font-size:12px;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:white">
                     Kopyala
                 </button>
             </div>
         </div>
 
         <!-- Adım 2 -->
-        <div style="margin-bottom:1.75rem;">
-            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;">
+        <div class="ea-card" style="padding:22px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
                 <span class="ea-step-num">2</span>
-                <span style="font-size:.88rem;font-weight:600;color:#fff;">Sitenizin <code>&lt;head&gt;</code> etiketleri arasına yapıştırın</span>
+                <span style="font-size:14px;font-weight:600;color:var(--ink-900)"><code>&lt;/body&gt;</code> etiketinden önce yapıştırın</span>
             </div>
-            <div class="ea-code-block">
-                <pre style="margin:0;font-size:.8rem;color:var(--ea-muted);font-family:inherit;">&lt;html&gt;
-  &lt;head&gt;
-    &lt;title&gt;Siteniz&lt;/title&gt;
-    <span style="color:#fbbf24;">@Model.ScriptTag</span>
-  &lt;/head&gt;
-  &lt;body&gt;...&lt;/body&gt;
+            <div class="ea-code-block" style="font-size:12px">
+                <pre style="margin:0;color:var(--ink-400);font-family:inherit">&lt;html&gt;
+  &lt;head&gt;...&lt;/head&gt;
+  &lt;body&gt;
+    &lt;!-- içeriğiniz --&gt;
+    <span style="color:#fbbf24">@Model.ScriptTag</span>
+  &lt;/body&gt;
 &lt;/html&gt;</pre>
             </div>
         </div>
 
         <!-- Adım 3 -->
-        <div style="margin-bottom:2rem;">
-            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">
+        <div class="ea-card" style="padding:22px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
                 <span class="ea-step-num">3</span>
-                <span style="font-size:.88rem;font-weight:600;color:#fff;">Sitenizi ziyaret edin</span>
+                <span style="font-size:14px;font-weight:600;color:var(--ink-900)">Sitenizi ziyaret edin</span>
             </div>
-            <p style="font-size:.83rem;color:var(--ea-muted);margin:0 0 0 2.1rem;line-height:1.6;">
-                Script yüklendikten sonra Eascess lisans anahtarınızı doğrular ve
-                erişilebilirlik widget'ı sitenizde otomatik olarak belirir.
+            <p style="font-size:14px;color:var(--ink-600);margin:0 0 0 42px;line-height:1.55">
+                Script yüklendikten sonra Eascess lisans anahtarınızı doğrular ve erişilebilirlik widget'ı sitenizde otomatik olarak görünür.
             </p>
         </div>
 
-        <!-- Aksiyon butonları -->
-        <div style="display:flex;gap:.6rem;margin-bottom:1.5rem;">
+        <div style="display:flex;gap:8px">
             <a asp-controller="WidgetSettings" asp-action="Index" asp-route-id="@Model.Id"
-               class="ea-btn ea-btn--primary ea-btn--sm">⚙️ Widget Ayarları</a>
+               class="ea-btn ea-btn-brand" style="font-size:13px;min-height:38px;padding:9px 14px">
+                Widget Ayarları
+            </a>
             <a asp-controller="Reports" asp-action="Domain" asp-route-id="@Model.Id"
-               class="ea-btn ea-btn--ghost ea-btn--sm">📊 Raporlar</a>
+               class="ea-btn ea-btn-ghost" style="font-size:13px;min-height:38px;padding:9px 14px">
+                Raporları Görüntüle
+            </a>
         </div>
+    </div>
 
-        <!-- Meta bilgiler -->
-        <div style="border-top:1px solid var(--ea-border);padding-top:1.25rem;display:grid;grid-template-columns:auto 1fr;gap:.5rem 1rem;font-size:.78rem;">
-            <span style="color:var(--ea-muted);font-weight:600;">Lisans Anahtarı</span>
-            <span class="font-monospace" style="color:var(--ea-sky);">@Model.LicenseKey</span>
-            <span style="color:var(--ea-muted);font-weight:600;">Domain</span>
-            <span>@Model.DomainUrl</span>
-            <span style="color:var(--ea-muted);font-weight:600;">Eklenme</span>
-            <span>@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
-        </div>
-
+    <!-- Detay kartı -->
+    <div class="ea-card" style="padding:22px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink-700);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px">Detaylar</div>
+        <dl style="display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0;font-size:13px">
+            <dt style="color:var(--ink-500);font-weight:600">Domain</dt>
+            <dd style="color:var(--ink-900);margin:0;font-weight:500">@Model.DomainUrl</dd>
+            <dt style="color:var(--ink-500);font-weight:600">Lisans Anahtarı</dt>
+            <dd style="margin:0"><code style="font-size:11px">@Model.LicenseKey</code></dd>
+            <dt style="color:var(--ink-500);font-weight:600">Eklenme</dt>
+            <dd style="color:var(--ink-700);margin:0">@Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</dd>
+        </dl>
     </div>
 
 </div>
@@ -101,14 +105,8 @@
             const code = document.getElementById('script-code').textContent;
             const btn = document.getElementById('copy-btn');
             navigator.clipboard.writeText(code).then(() => {
-                btn.textContent = 'Kopyalandı ✓';
-                btn.style.color = '#4ade80';
-                btn.style.borderColor = 'rgba(74,222,128,.3)';
-                setTimeout(() => {
-                    btn.textContent = 'Kopyala';
-                    btn.style.color = '';
-                    btn.style.borderColor = '';
-                }, 2500);
+                btn.textContent = 'Kopyalandı!';
+                setTimeout(() => { btn.textContent = 'Kopyala'; }, 2500);
             });
         }
     </script>

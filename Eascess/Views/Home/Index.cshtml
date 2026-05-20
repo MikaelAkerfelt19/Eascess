@@ -1,96 +1,202 @@
 @{
-    ViewData["Title"] = "Ana Sayfa";
+    ViewData["Title"] = "Erişilebilirlik, nazikçe sunuldu.";
 }
 
 <!-- Hero -->
 <section class="ea-hero">
-    <div style="max-width:680px">
+
+    <!-- Dekoratif aydınlık topları -->
+    <div class="ea-orb" style="top:-100px;right:-80px;width:480px;height:480px;background:var(--brand-grad);filter:blur(120px);opacity:.18"></div>
+    <div class="ea-orb" style="bottom:-120px;left:-40px;width:360px;height:360px;background:radial-gradient(circle,oklch(72% 0.11 190 / 0.25),transparent 70%);filter:blur(80px)"></div>
+
+    <!-- Sol: başlık ve açıklama -->
+    <div class="ea-hero__left">
         <div class="ea-hero__eyebrow">
-            ✦ WCAG 2.2 Uyumlu Erişilebilirlik Katmanı
+            <span style="width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block"></span>
+            EAA 2025 uyumlu · WCAG 2.2 hazır
         </div>
+
         <h1 class="ea-hero__title">
-            Web sitenizi<br><span>herkes için</span><br>erişilebilir yapın
+            Erişilebilirlik,<br>
+            <span>nazikçe sunuldu.</span>
         </h1>
+
         <p class="ea-hero__desc">
-            Tek satır kod. Sıfır geliştirici müdahalesi. Yapay zeka destekli erişilebilirlik widget'ı ile
-            sitenizi anında WCAG 2.2 standartlarına uyumlu hale getirin.
+            Tek satır JavaScript ile her ziyaretçiye kontrast, hareket, yazı tipi ve
+            boşluk kontrolü sağlayın; üstelik kendini sürekli yenileyen bir WCAG 2.2 denetimiyle.
         </p>
+
         <div class="ea-hero__actions">
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <a asp-controller="Dashboard" asp-action="Index" class="ea-btn ea-btn--primary ea-btn--lg">
-                    Panele Git →
+                <a asp-controller="Dashboard" asp-action="Index" class="ea-btn ea-btn-brand" style="font-size:15px;padding:14px 22px;min-height:52px">
+                    Panele Git
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
             }
             else
             {
-                <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn--primary ea-btn--lg">
-                    Ücretsiz Başla →
+                <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn-brand" style="font-size:15px;padding:14px 22px;min-height:52px">
+                    Widget'ı Yükle
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
-                <a asp-controller="Account" asp-action="Login" class="ea-btn ea-btn--ghost ea-btn--lg">
+                <a asp-controller="Account" asp-action="Login" class="ea-btn ea-btn-ghost" style="font-size:15px;padding:14px 22px;min-height:52px;background:white">
                     Giriş Yap
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
             }
         </div>
+
+        <!-- İstatistikler -->
+        <div class="ea-hero__stats">
+            @foreach (var stat in new[] {
+                new { V = "2.3m",  L = "Sunulan oturum" },
+                new { V = "AAA",   L = "Varsayılan hedef" },
+                new { V = "4.1kb", L = "Gzip, sıfır bağımlılık" },
+                new { V = "<40ms", L = "Yükleme süresi" },
+            })
+            {
+                <div>
+                    <div class="ea-hero__stat-val">@stat.V</div>
+                    <div class="ea-hero__stat-label">@stat.L</div>
+                </div>
+            }
+        </div>
     </div>
+
+    <!-- Sağ: giriş kartı -->
+    <div style="position:relative;padding-top:10px">
+
+        <!-- Dekoratif tarayıcı penceresi -->
+        <div style="position:absolute;right:-20px;top:60px;width:460px;height:300px;background:white;border-radius:14px;border:1px solid var(--cream-300);box-shadow:var(--sh-lg);overflow:hidden;transform:rotate(2deg)">
+            <div style="padding:8px 12px;background:var(--cream-100);border-bottom:1px solid var(--cream-300);display:flex;gap:6px;align-items:center">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--cream-300)"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--cream-300)"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--cream-300)"></div>
+                <div style="flex:1;text-align:center;font-size:10px;color:var(--ink-500);font-family:var(--font-mono)">siteniz.com</div>
+            </div>
+            <div style="padding:20px">
+                <div style="height:8px;width:60%;background:var(--cream-200);border-radius:4px;margin-bottom:10px"></div>
+                <div style="height:6px;width:80%;background:var(--cream-200);border-radius:4px;margin-bottom:6px"></div>
+                <div style="height:6px;width:70%;background:var(--cream-200);border-radius:4px;margin-bottom:6px"></div>
+                <div style="height:6px;width:75%;background:var(--cream-200);border-radius:4px"></div>
+            </div>
+        </div>
+
+        <!-- Giriş kartı -->
+        <div style="position:relative;background:white;border-radius:18px;padding:32px;box-shadow:var(--sh-xl);border:1px solid var(--cream-300);margin-left:40px;z-index:2">
+            <div style="font-family:var(--font-display);font-size:30px;letter-spacing:-0.02em;line-height:1;margin-bottom:6px">Hoş geldiniz</div>
+            <div style="font-size:14px;color:var(--ink-600);margin-bottom:24px">Eascess çalışma alanınıza giriş yapın.</div>
+
+            <form asp-controller="Account" asp-action="Login" method="post" novalidate>
+                @Html.AntiForgeryToken()
+
+                <label class="ea-label" for="hero-email">E-posta</label>
+                <input id="hero-email" class="ea-input" type="email" name="Email" placeholder="siz@firma.com" style="margin-bottom:14px">
+
+                <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+                    <label class="ea-label" for="hero-pw" style="margin-bottom:0">Şifre</label>
+                    <a href="#" style="font-size:12px;color:var(--indigo-700);font-weight:600">Unuttum?</a>
+                </div>
+                <input id="hero-pw" class="ea-input" type="password" name="Password" placeholder="••••••••••" style="margin-bottom:18px">
+
+                <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-700);margin-bottom:22px;cursor:pointer">
+                    <span style="width:18px;height:18px;border-radius:4px;background:var(--brand-grad);display:grid;place-items:center;color:white;flex-shrink:0">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                    </span>
+                    Bu cihazda beni hatırla
+                </label>
+
+                <button type="submit" class="ea-btn ea-btn-brand" style="width:100%;justify-content:center;font-size:15px;min-height:48px">
+                    Giriş Yap
+                </button>
+            </form>
+
+            <div style="display:flex;align-items:center;gap:10px;margin:22px 0;color:var(--ink-500);font-size:12px">
+                <div style="flex:1;height:1px;background:var(--cream-300)"></div>
+                VEYA
+                <div style="flex:1;height:1px;background:var(--cream-300)"></div>
+            </div>
+
+            <div style="text-align:center;font-size:13px;color:var(--ink-600)">
+                Eascess'e yeni misiniz?
+                <a asp-controller="Account" asp-action="Register" style="color:var(--indigo-700);font-weight:600">Çalışma alanı oluşturun</a>
+            </div>
+        </div>
+    </div>
+
 </section>
 
-<!-- Feature strip -->
+<!-- Özellikler -->
 <section class="ea-features">
-    <div style="text-align:center; margin-bottom:3rem;">
-        <p style="font-size:.8rem; font-weight:600; letter-spacing:.6px; color:var(--ea-sky); text-transform:uppercase; margin:0 0 .6rem;">Neden Eascess?</p>
-        <h2 style="font-size:clamp(1.5rem,4vw,2.4rem); font-weight:800; letter-spacing:-.5px; margin:0; color:#fff;">
-            Entegrasyon <span style="background:var(--ea-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">dakikalar içinde</span>
+    <div class="ea-features-head">
+        <div class="ea-features-eyebrow">Neden Eascess?</div>
+        <h2 class="ea-features-title">
+            Entegrasyon <span>dakikalar içinde</span>
         </h2>
     </div>
+
     <div class="ea-feature-grid">
-        <div class="ea-card ea-feature-card">
-            <div class="ea-feature-icon" style="background:rgba(56,189,248,.12)">⚡</div>
-            <h3 class="ea-feature-title">Tek Satır Entegrasyon</h3>
-            <p class="ea-feature-desc">
-                Sitenizin &lt;head&gt; bölümüne bir &lt;script&gt; etiketi yapıştırmanız yeterli.
-                Herhangi bir kod değişikliğine gerek yok.
-            </p>
+
+        <div class="ea-feature-item">
+            <div class="ea-feature-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <div>
+                <h3 class="ea-feature-title">Tek Satır Entegrasyon</h3>
+                <p class="ea-feature-desc">Sitenizin <code>&lt;/body&gt;</code> etiketinden önce bir <code>&lt;script&gt;</code> yapıştırın. Herhangi bir build adımı yok.</p>
+            </div>
         </div>
-        <div class="ea-card ea-feature-card">
-            <div class="ea-feature-icon" style="background:rgba(192,132,252,.12)">🤖</div>
-            <h3 class="ea-feature-title">Yapay Zeka Desteği</h3>
-            <p class="ea-feature-desc">
-                Azure Computer Vision ile eksik alt metinler otomatik doldurulur.
-                Görme engelli kullanıcılar için eksiksiz deneyim.
-            </p>
+
+        <div class="ea-feature-item">
+            <div class="ea-feature-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div>
+                <h3 class="ea-feature-title">Yapay Zeka Alt Metin</h3>
+                <p class="ea-feature-desc">Azure Computer Vision ile eksik alt metinler otomatik oluşturulur. Görme engelli kullanıcılar için eksiksiz deneyim.</p>
+            </div>
         </div>
-        <div class="ea-card ea-feature-card">
-            <div class="ea-feature-icon" style="background:rgba(34,211,238,.12)">📊</div>
-            <h3 class="ea-feature-title">Detaylı Raporlama</h3>
-            <p class="ea-feature-desc">
-                WCAG 2.2 uyumluluk skoru, hata dağılımı ve sayfa bazlı
-                erişilebilirlik sorunlarını takip edin.
-            </p>
+
+        <div class="ea-feature-item">
+            <div class="ea-feature-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div>
+                <h3 class="ea-feature-title">WCAG 2.2 Denetimi</h3>
+                <p class="ea-feature-desc">Kendini sürekli yenileyen uyumluluk skoru, hata dağılımı ve sayfa bazlı sorun takibi.</p>
+            </div>
         </div>
-        <div class="ea-card ea-feature-card">
-            <div class="ea-feature-icon" style="background:rgba(232,121,249,.12)">🔒</div>
-            <h3 class="ea-feature-title">İzole & Güvenli</h3>
-            <p class="ea-feature-desc">
-                Shadow DOM ile sitenizin mevcut CSS'iyle çakışmaz.
-                Kullanıcı form verileri asla okunmaz veya kaydedilmez.
-            </p>
+
+        <div class="ea-feature-item">
+            <div class="ea-feature-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+                <h3 class="ea-feature-title">İzole &amp; Güvenli</h3>
+                <p class="ea-feature-desc">Shadow DOM ile sitenizin CSS'iyle çakışmaz. Kullanıcı verileri asla okunmaz veya kaydedilmez.</p>
+            </div>
         </div>
-        <div class="ea-card ea-feature-card">
-            <div class="ea-feature-icon" style="background:rgba(129,140,248,.12)">🌐</div>
-            <h3 class="ea-feature-title">Çoklu Domain</h3>
-            <p class="ea-feature-desc">
-                Birden fazla web sitenizi tek panelden yönetin.
-                Her site için benzersiz lisans anahtarı ve ayarlar.
-            </p>
+
+        <div class="ea-feature-item">
+            <div class="ea-feature-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div>
+                <h3 class="ea-feature-title">Çoklu Domain</h3>
+                <p class="ea-feature-desc">Tüm web sitelerinizi tek panelden yönetin. Her site için benzersiz lisans anahtarı ve ayarlar.</p>
+            </div>
         </div>
-        <div class="ea-card ea-feature-card">
-            <div class="ea-feature-icon" style="background:rgba(56,189,248,.12)">⚙️</div>
-            <h3 class="ea-feature-title">Özelleştirilebilir Widget</h3>
-            <p class="ea-feature-desc">
-                Tema rengi, konum ve dil ayarları sitenize özel.
-                Marka kimliğinizle uyumlu erişilebilirlik deneyimi.
-            </p>
+
+        <div class="ea-feature-item">
+            <div class="ea-feature-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+            </div>
+            <div>
+                <h3 class="ea-feature-title">Widget Stüdyo</h3>
+                <p class="ea-feature-desc">Tema rengi, konum ve dil ayarlarını görsel editörden yapın. Marka kimliğinizle uyumlu erişilebilirlik.</p>
+            </div>
         </div>
+
     </div>
 </section>

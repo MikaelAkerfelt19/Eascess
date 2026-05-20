@@ -9,12 +9,17 @@ namespace Eascess.Tests.Unit;
 public class LicenseValidationServiceTests
 {
     private readonly Mock<IRepository<Domain>> _domainRepoMock;
+    private readonly Mock<IPlanService> _planServiceMock;
     private readonly LicenseValidationService _sut;
 
     public LicenseValidationServiceTests()
     {
         _domainRepoMock = new Mock<IRepository<Domain>>();
-        _sut = new LicenseValidationService(_domainRepoMock.Object);
+        _planServiceMock = new Mock<IPlanService>();
+        _planServiceMock.Setup(p => p.GetUserActivePlanAsync(It.IsAny<string>()))
+            .ReturnsAsync(new Eascess_Domain.Entities.Plan { Id = 1, Name = "Ücretsiz", MaxDomains = 1, MonthlyAiQuota = 50 });
+
+        _sut = new LicenseValidationService(_domainRepoMock.Object, _planServiceMock.Object);
     }
 
     // ─── ValidateAsync ───────────────────────────────────────────────────────
@@ -30,7 +35,7 @@ public class LicenseValidationServiceTests
 
         Assert.True(result.Valid);
         Assert.Null(result.Reason);
-        Assert.Equal("free", result.Plan);
+        Assert.Equal("ücretsiz", result.Plan);
     }
 
     [Fact]

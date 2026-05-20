@@ -30,6 +30,9 @@ public class WidgetService : IWidgetService
             Language = setting?.Language ?? "tr",
             IsAiEnabled = setting?.IsAiEnabled ?? true,
             DomainUrl = domain.DomainUrl,
+            LogoUrl = setting?.LogoUrl,
+            WidgetTitle = setting?.WidgetTitle,
+            PoweredByVisible = setting?.PoweredByVisible ?? true,
         };
     }
 }

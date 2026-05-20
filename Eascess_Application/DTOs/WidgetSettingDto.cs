@@ -9,4 +9,7 @@ public class WidgetSettingDto
     public string Position { get; set; } = "bottom-right";
     public string Language { get; set; } = "tr";
     public bool IsAiEnabled { get; set; } = true;
+    public string? LogoUrl { get; set; }
+    public string? WidgetTitle { get; set; }
+    public bool PoweredByVisible { get; set; } = true;
 }

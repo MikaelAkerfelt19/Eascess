@@ -1,26 +1,24 @@
 @model Eascess.Models.AddDomainViewModel
 @{
-    ViewData["Title"] = "Yeni Site Ekle";
+    ViewData["Title"] = "Domain Ekle";
+    ViewData["Active"] = "domains";
+    Layout = "~/Views/Shared/_AppLayout.cshtml";
 }
 
-<div class="ea-page ea-page--narrow">
-
-    <div class="ea-breadcrumb">
-        <a asp-action="Index">Web Sitelerim</a>
-        <span class="ea-breadcrumb__sep">/</span>
-        <span class="ea-breadcrumb__current">Yeni Site Ekle</span>
+<!-- Topbar -->
+<div class="ea-topbar">
+    <div>
+        <div class="ea-topbar-eyebrow"><a asp-action="Index" style="color:var(--ink-500)">Domainler</a> / Ekle</div>
+        <h1 class="ea-topbar-title">Domain Ekle</h1>
     </div>
+</div>
 
-    <div class="ea-card" style="padding:2rem;">
-        <h4 style="font-size:1.2rem;font-weight:700;color:#fff;margin:0 0 .4rem;">Yeni Site Ekle</h4>
-        <p style="font-size:.83rem;color:var(--ea-muted);margin:0 0 2rem;line-height:1.6;">
-            Sitenizi ekledikten sonra size özel bir entegrasyon scripti oluşturulur.
-            Bu scripti sitenizin <code>&lt;head&gt;</code> etiketleri arasına yapıştırın.
-        </p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start">
 
+    <div class="ea-card" style="padding:28px">
         @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
         {
-            <div class="ea-alert ea-alert--danger">
+            <div class="ea-alert ea-alert--danger" style="margin-bottom:16px">
                 <div asp-validation-summary="All"></div>
             </div>
         }
@@ -28,32 +26,31 @@
         <form asp-action="Add" method="post" novalidate>
             @Html.AntiForgeryToken()
 
-            <div style="margin-bottom:1.5rem;">
+            <div style="margin-bottom:20px">
                 <label asp-for="DomainUrl" class="ea-label">Domain Adresi</label>
                 <input asp-for="DomainUrl"
                        class="ea-input"
                        placeholder="example.com"
                        autocomplete="off"
                        autofocus />
-                <span asp-validation-for="DomainUrl" class="ea-error"></span>
-                <p class="ea-form-hint">Protokol (https://) olmadan da girebilirsiniz. Örn: <strong style="color:rgba(255,255,255,.6)">mysite.com</strong></p>
+                <span asp-validation-for="DomainUrl" class="text-danger"></span>
+                <p style="font-size:12px;color:var(--ink-500);margin:6px 0 0">Protokolsüz (https://) de girebilirsiniz. Örn: <strong>siteniz.com</strong></p>
             </div>
 
-            <div style="display:flex;gap:.6rem;">
-                <button type="submit" class="ea-btn ea-btn--primary">Site Ekle</button>
-                <a asp-action="Index" class="ea-btn ea-btn--ghost">İptal</a>
+            <div style="display:flex;gap:8px">
+                <button type="submit" class="ea-btn ea-btn-brand">Domain Ekle</button>
+                <a asp-action="Index" class="ea-btn ea-btn-ghost">İptal</a>
             </div>
         </form>
     </div>
 
-    <!-- Nasıl Çalışır -->
-    <div class="ea-card" style="padding:1.5rem;margin-top:.75rem;">
-        <p style="font-size:.83rem;font-weight:600;color:#fff;margin:0 0 .85rem;">Nasıl Çalışır?</p>
-        <ol style="margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.6rem;">
-            <li style="font-size:.82rem;color:var(--ea-muted);">Sitenizi buraya ekleyin</li>
-            <li style="font-size:.82rem;color:var(--ea-muted);">Size özel <code>&lt;script&gt;</code> etiketini kopyalayın</li>
-            <li style="font-size:.82rem;color:var(--ea-muted);">Etiketi sitenizin <code>&lt;head&gt;</code> bölümüne yapıştırın</li>
-            <li style="font-size:.82rem;color:var(--ea-muted);">Eascess widget'ı otomatik olarak sitenizde belirir</li>
+    <div class="ea-card" style="padding:24px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink-700);margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em">Nasıl Çalışır?</div>
+        <ol style="margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:10px">
+            <li style="font-size:14px;color:var(--ink-600);line-height:1.5">Domaininizi buraya ekleyin</li>
+            <li style="font-size:14px;color:var(--ink-600);line-height:1.5">Oluşturulan <code>&lt;script&gt;</code> etiketini kopyalayın</li>
+            <li style="font-size:14px;color:var(--ink-600);line-height:1.5">Sitenizin kapanış <code>&lt;/body&gt;</code> etiketinden önce yapıştırın</li>
+            <li style="font-size:14px;color:var(--ink-600);line-height:1.5">Eascess widget'ı sitenizde otomatik olarak görünür</li>
         </ol>
     </div>
 

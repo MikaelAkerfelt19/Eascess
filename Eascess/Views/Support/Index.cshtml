@@ -1,0 +1,74 @@
+@using Eascess_Domain.Entities
+@model IList<SupportTicket>
+@{
+    ViewData["Title"] = "Destek Talepleri";
+    ViewData["Active"] = "support";
+    Layout = "~/Views/Shared/_AppLayout.cshtml";
+}
+
+<!-- Topbar -->
+<div class="ea-topbar">
+    <div>
+        <div class="ea-topbar-eyebrow">Yardım & Destek</div>
+        <h1 class="ea-topbar-title">Destek Talepleri</h1>
+    </div>
+    <a asp-action="Create" class="ea-btn ea-btn-brand">+ Yeni Talep</a>
+</div>
+
+@if (TempData["Success"] is string msg)
+{
+    <div class="ea-alert ea-alert--success">✓ @msg</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="ea-card" style="padding:40px;text-align:center">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="var(--ink-300)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <p style="color:var(--ink-500);margin:0 0 16px">Henüz destek talebiniz yok.</p>
+        <a asp-action="Create" class="ea-btn ea-btn-brand">İlk Talebinizi Oluşturun</a>
+    </div>
+}
+else
+{
+    <div class="ea-card" style="overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+            <thead>
+                <tr style="border-bottom:1px solid var(--cream-300)">
+                    <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-500)">#</th>
+                    <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-500)">Konu</th>
+                    <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-500)">Durum</th>
+                    <th style="padding:12px 16px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-500)">Tarih</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in Model)
+                {
+                    <tr style="border-bottom:1px solid var(--cream-200)">
+                        <td style="padding:12px 16px;font-size:13px;color:var(--ink-500)">#@t.Id</td>
+                        <td style="padding:12px 16px;font-size:14px;font-weight:500;color:var(--ink-900)">@t.Subject</td>
+                        <td style="padding:12px 16px">
+                            @{
+                                var (bg, fg) = t.Status switch
+                                {
+                                    "Open"     => ("oklch(95% 0.04 145)", "oklch(30% 0.08 145)"),
+                                    "Resolved" => ("oklch(95% 0.02 260)", "oklch(30% 0.06 260)"),
+                                    _          => ("var(--cream-200)", "var(--ink-600)"),
+                                };
+                                var label = t.Status switch
+                                {
+                                    "Open"     => "Açık",
+                                    "Resolved" => "Çözüldü",
+                                    _          => t.Status,
+                                };
+                            }
+                            <span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;background:@bg;color:@fg">@label</span>
+                        </td>
+                        <td style="padding:12px 16px;font-size:13px;color:var(--ink-500)">@t.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

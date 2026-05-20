@@ -1,0 +1,142 @@
+@using Eascess_Application.Services
+@{
+    ViewData["Title"] = "Widget Analitikleri";
+    ViewData["Active"] = "reports";
+    Layout = "~/Views/Shared/_AppLayout.cshtml";
+
+    var domain  = (Eascess_Domain.Entities.Domain)ViewBag.Domain;
+    var daily   = (IReadOnlyList<DailyUsageCount>)ViewBag.Daily;
+    var top     = (IReadOnlyList<TopFeature>)ViewBag.Top;
+    var monthly = (MonthlyStats)ViewBag.Monthly;
+
+    int maxDaily = daily.Any() ? daily.Max(d => d.Count) : 1;
+    string arrow = monthly.ChangePercent >= 0 ? "↑" : "↓";
+    string arrowClass = monthly.ChangePercent >= 0 ? "ea-badge-ok" : "ea-badge-err";
+
+    // Özellik isimlerini Türkçeye çevir
+    var featureLabels = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["epilepsyMode"]     = "Epilepsi Güvenli Mod",
+        ["visionMode"]       = "Görme Engelli Modu",
+        ["cognitiveMode"]    = "Bilişsel Erişilebilirlik",
+        ["adhdMode"]         = "DEHB Dostu Mod",
+        ["screenReaderMode"] = "Ekran Okuyucu Modu",
+        ["grayscale"]        = "Gri Tonlama",
+        ["contrast"]         = "Kontrast",
+        ["highlightLinks"]   = "Bağlantıları Vurgula",
+        ["highlightHeadings"]= "Başlıkları Vurgula",
+        ["pauseAnimations"]  = "Animasyonları Durdur",
+        ["bigCursor"]        = "Büyük İmleç",
+        ["readingGuide"]     = "Okuma Rehberi",
+        ["readingMask"]      = "Okuma Maskesi",
+        ["textSpacing"]      = "Metin Aralığı",
+        ["dyslexiaFont"]     = "Disleksi Fontu",
+        ["hideImages"]       = "Görselleri Gizle",
+        ["lineHeight"]       = "Satır Yüksekliği",
+        ["textAlign"]        = "Metin Hizalama",
+        ["bgColor"]          = "Arka Plan Rengi",
+        ["textColor"]        = "Metin Rengi",
+        ["headingColor"]     = "Başlık Rengi",
+    };
+}
+
+<div class="ea-topbar">
+    <nav class="ea-breadcrumb">
+        <a asp-controller="Reports" asp-action="Index">Raporlar</a>
+        <span>/</span>
+        <span>@domain.DomainUrl — Analitikler</span>
+    </nav>
+</div>
+
+<!-- Aylık özet -->
+<div class="ea-stats" style="margin-bottom:1.5rem">
+    <div class="ea-stat">
+        <div class="ea-stat__label">Bu Ay Açılma</div>
+        <div class="ea-stat__value">@monthly.ThisMonth</div>
+    </div>
+    <div class="ea-stat">
+        <div class="ea-stat__label">Geçen Ay</div>
+        <div class="ea-stat__value">@monthly.LastMonth</div>
+    </div>
+    <div class="ea-stat">
+        <div class="ea-stat__label">Değişim</div>
+        <div class="ea-stat__value">
+            <span class="ea-badge-@(monthly.ChangePercent >= 0 ? "ok" : "err")">
+                @arrow @Math.Abs(monthly.ChangePercent)%
+            </span>
+        </div>
+    </div>
+    <div class="ea-stat">
+        <div class="ea-stat__label">Son 30 Gün Toplam</div>
+        <div class="ea-stat__value">@daily.Sum(d => d.Count)</div>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start">
+
+    <!-- Günlük bar chart -->
+    <div style="background:var(--cream-50);border:1px solid var(--cream-200);border-radius:12px;padding:1.5rem">
+        <h2 style="font-size:.9rem;font-weight:700;color:var(--ink-800);margin-bottom:1.25rem">
+            Son 30 Gün — Widget Açılma
+        </h2>
+
+        @if (!daily.Any())
+        {
+            <p style="font-size:.85rem;color:var(--ink-500);text-align:center;padding:2rem 0">
+                Henüz veri yok. Widget açıldığında burada görünecek.
+            </p>
+        }
+        else
+        {
+            <div style="display:flex;align-items:flex-end;gap:3px;height:120px;overflow-x:auto">
+                @foreach (var d in daily)
+                {
+                    var pct = maxDaily > 0 ? (int)Math.Round((double)d.Count / maxDaily * 100) : 0;
+                    <div title="@d.Date.ToString("dd MMM"): @d.Count açılma"
+                         style="flex:1;min-width:6px;height:@(pct)%;background:var(--teal-500);border-radius:3px 3px 0 0;transition:opacity .15s"
+                         onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">
+                    </div>
+                }
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--ink-400);margin-top:.4rem">
+                <span>@(daily.First().Date.ToString("dd MMM"))</span>
+                <span>@(daily.Last().Date.ToString("dd MMM"))</span>
+            </div>
+        }
+    </div>
+
+    <!-- En çok kullanılan özellikler -->
+    <div style="background:var(--cream-50);border:1px solid var(--cream-200);border-radius:12px;padding:1.5rem">
+        <h2 style="font-size:.9rem;font-weight:700;color:var(--ink-800);margin-bottom:1rem">
+            En Çok Kullanılan Özellikler
+        </h2>
+
+        @if (!top.Any())
+        {
+            <p style="font-size:.85rem;color:var(--ink-500)">Henüz özellik kullanım verisi yok.</p>
+        }
+        else
+        {
+            int topMax = top.First().Count;
+            @foreach (var f in top)
+            {
+                var label = featureLabels.GetValueOrDefault(f.FeatureName, f.FeatureName);
+                var barPct = topMax > 0 ? (int)Math.Round((double)f.Count / topMax * 100) : 0;
+                <div style="margin-bottom:.6rem">
+                    <div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--ink-700);margin-bottom:.2rem">
+                        <span>@label</span>
+                        <span style="font-weight:600">@f.Count</span>
+                    </div>
+                    <div style="height:6px;background:var(--cream-200);border-radius:3px">
+                        <div style="height:100%;width:@(barPct)%;background:var(--teal-500);border-radius:3px"></div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<div style="margin-top:1rem">
+    <a asp-controller="Reports" asp-action="Domain" asp-route-id="@domain.Id"
+       style="font-size:.8rem;color:var(--teal-500)">← Tarama Raporlarına Dön</a>
+</div>

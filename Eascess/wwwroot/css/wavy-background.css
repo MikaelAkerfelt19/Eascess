@@ -112,3 +112,88 @@
         background: #0f172a; /* fallback koyu arka plan */
     }
 }
+/* ============================================
+   Gradient Bars Animation (Yeni Hero Arka Planı)
+   ============================================ */
+
+/* ea-hero içindeki her şeyin bar animasyonunun üstünde kalmasını sağla */
+.ea-hero {
+    position: relative;
+    overflow: hidden; /* Dışarı taşan animasyonları gizle */
+}
+
+    .ea-hero > div:not(.ea-gradient-bars) {
+        position: relative;
+        z-index: 10;
+    }
+
+/* Çubukların ana konteyneri */
+.ea-gradient-bars {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    opacity: 0.35; /* Dark glass temasına uygun hafif saydamlık */
+    pointer-events: none;
+    transform: translateZ(0); /* Donanım hızlandırma */
+    backface-visibility: hidden;
+}
+
+/* Tekil çubuk stili */
+.ea-gradient-bar {
+    height: 100%;
+    transform-origin: bottom;
+    transition: transform 0.5s ease-in-out;
+    animation: pulseBar 2s ease-in-out infinite alternate;
+    /* Kendi tema değişkenlerini kullanıyoruz */
+    background: linear-gradient(to top, var(--ea-indigo), transparent);
+    outline: 1px solid rgba(0, 0, 0, 0);
+    box-sizing: border-box;
+}
+
+@keyframes pulseBar {
+    0% {
+        transform: scaleY(var(--initial-scale));
+    }
+
+    100% {
+        transform: scaleY(calc(var(--initial-scale) * 0.7));
+    }
+}
+document.addEventListener("DOMContentLoaded", function () {
+    const container = document.getElementById('ea-gradient-bars');
+    
+    if (container) {
+        const numBars = 15; // 15, 17 veya 19 gibi tek sayılar kavisin ortalanması için iyidir
+        
+        for (let i = 0; i < numBars; i++) {
+            // Çubukların parabolik kavisini hesapla
+            const position = i / (numBars - 1);
+            const maxHeight = 100;
+            const minHeight = 30;
+            
+            const center = 0.5;
+            const distanceFromCenter = Math.abs(position - center);
+            const heightPercentage = Math.pow(distanceFromCenter * 2, 1.2);
+            
+            const height = minHeight + (maxHeight - minHeight) * heightPercentage;
+            const scaleY = height / 100;
+
+            // DOM elemanını oluştur
+            const bar = document.createElement('div');
+            bar.className = 'ea-gradient-bar';
+            
+            // Çubuğa özel stilleri ata
+            bar.style.flex = `1 0 calc(100% / ${numBars})`;
+            bar.style.maxWidth = `calc(100% / ${numBars})`;
+            bar.style.setProperty('--initial-scale', scaleY);
+            bar.style.transform = `scaleY(${scaleY})`;
+            bar.style.animationDelay = `${i * 0.1}s`; // Dalga efektini yaratır
+
+            container.appendChild(bar);
+        }
+    }
+});

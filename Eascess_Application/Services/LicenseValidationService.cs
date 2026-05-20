@@ -6,10 +6,12 @@ namespace Eascess_Application.Services;
 public class LicenseValidationService : ILicenseValidationService
 {
     private readonly IRepository<Domain> _domainRepo;
+    private readonly IPlanService _planService;
 
-    public LicenseValidationService(IRepository<Domain> domainRepo)
+    public LicenseValidationService(IRepository<Domain> domainRepo, IPlanService planService)
     {
         _domainRepo = domainRepo;
+        _planService = planService;
     }
 
     public async Task<LicenseValidationResult> ValidateAsync(Guid licenseKey, string domain)
@@ -29,7 +31,8 @@ public class LicenseValidationService : ILicenseValidationService
         if (!string.Equals(NormalizeDomain(match.DomainUrl), normalizedDomain, StringComparison.OrdinalIgnoreCase))
             return new LicenseValidationResult(false, "invalid");
 
-        return new LicenseValidationResult(true, null, "free", null);
+        var plan = await _planService.GetUserActivePlanAsync(match.UserId);
+        return new LicenseValidationResult(true, null, plan.Name.ToLowerInvariant(), null);
     }
 
     public async Task<bool> DomainIsRegisteredAsync(string domainUrl)

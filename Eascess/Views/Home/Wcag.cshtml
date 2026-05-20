@@ -1,0 +1,134 @@
+@{
+    ViewData["Title"] = "WCAG 2.2 Rehberi";
+}
+
+<!-- Sayfa başlığı -->
+<section style="padding:60px 56px 48px;border-bottom:1px solid var(--cream-200)">
+    <div style="max-width:760px">
+        <div style="display:inline-flex;align-items:center;gap:8px;background:white;border:1px solid var(--cream-300);padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;color:var(--ink-700);box-shadow:var(--sh-sm);margin-bottom:20px">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Web Content Accessibility Guidelines
+        </div>
+        <h1 style="font-family:var(--font-display);font-size:clamp(36px,5vw,60px);line-height:1;letter-spacing:-0.03em;margin:0 0 18px;font-weight:400">
+            WCAG 2.2 nedir<br>ve neden önemli?
+        </h1>
+        <p style="font-size:18px;color:var(--ink-600);line-height:1.6;max-width:620px;margin:0">
+            Web İçeriği Erişilebilirlik Kılavuzları (WCAG), web içeriğini engelli bireyler için daha erişilebilir kılmak amacıyla W3C tarafından yayımlanan uluslararası standarttır.
+        </p>
+    </div>
+</section>
+
+<!-- Seviyeler -->
+<section style="padding:56px;border-bottom:1px solid var(--cream-200)">
+    <div style="max-width:1100px;margin:0 auto">
+        <h2 style="font-family:var(--font-display);font-size:32px;font-weight:400;letter-spacing:-0.02em;margin:0 0 8px">Uyumluluk Seviyeleri</h2>
+        <p style="font-size:15px;color:var(--ink-500);margin:0 0 36px">WCAG üç kademeli uyumluluk seviyesi tanımlar. Eascess varsayılan olarak <strong>AAA</strong> hedefler.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+            <!-- Seviye A -->
+            <div class="ea-card" style="padding:28px;border-top:4px solid var(--teal-500)">
+                <div style="font-family:var(--font-display);font-size:42px;font-weight:400;color:var(--teal-600);letter-spacing:-0.02em;line-height:1;margin-bottom:10px">A</div>
+                <div style="font-size:16px;font-weight:600;color:var(--ink-900);margin-bottom:8px">Temel Uyumluluk</div>
+                <p style="font-size:14px;color:var(--ink-600);line-height:1.6;margin:0 0 20px">En temel erişilebilirlik gereksinimleri. Bu seviyeyi karşılamamak, bazı kullanıcıların içeriğe hiç erişememesi anlamına gelir.</p>
+                <ul style="margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:8px">
+                    @foreach (var item in new[] { "Metin olmayan içeriklere alternatif", "Yalnızca ses/video içerikleri için metin", "Renk tek başına bilgi taşımaz", "Klavye ile tam erişim" })
+                    {
+                        <li style="font-size:13px;color:var(--ink-700)">@item</li>
+                    }
+                </ul>
+            </div>
+
+            <!-- Seviye AA -->
+            <div class="ea-card" style="padding:28px;border-top:4px solid var(--indigo-700);position:relative">
+                <div style="position:absolute;top:16px;right:16px;background:var(--indigo-700);color:white;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px">Yasal standart</div>
+                <div style="font-family:var(--font-display);font-size:42px;font-weight:400;color:var(--indigo-700);letter-spacing:-0.02em;line-height:1;margin-bottom:10px">AA</div>
+                <div style="font-size:16px;font-weight:600;color:var(--ink-900);margin-bottom:8px">Orta Düzey Uyumluluk</div>
+                <p style="font-size:14px;color:var(--ink-600);line-height:1.6;margin:0 0 20px">Çoğu yasal düzenlemenin (EAA 2025, ADA, EN 301 549) gerektirdiği seviye. Tüm kamu ve ticari web siteleri için gereklidir.</p>
+                <ul style="margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:8px">
+                    @foreach (var item in new[] { "Minimum 4.5:1 kontrast oranı", "Klavye focus görünür olmalı", "Hata mesajları anlaşılır olmalı", "Başlık ve etiket tutarlılığı" })
+                    {
+                        <li style="font-size:13px;color:var(--ink-700)">@item</li>
+                    }
+                </ul>
+            </div>
+
+            <!-- Seviye AAA -->
+            <div class="ea-card" style="padding:28px;border-top:4px solid var(--success)">
+                <div style="font-family:var(--font-display);font-size:42px;font-weight:400;color:var(--success);letter-spacing:-0.02em;line-height:1;margin-bottom:10px">AAA</div>
+                <div style="font-size:16px;font-weight:600;color:var(--ink-900);margin-bottom:8px">Gelişmiş Uyumluluk</div>
+                <p style="font-size:14px;color:var(--ink-600);line-height:1.6;margin:0 0 20px">Eascess'in varsayılan hedefi. En geniş kullanıcı kitlesine en iyi deneyimi sunar.</p>
+                <ul style="margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:8px">
+                    @foreach (var item in new[] { "7:1 kontrast oranı", "İşaret dili desteği", "Okuma düzeyi erişilebilirliği", "Animasyonsuz alternatif sunar" })
+                    {
+                        <li style="font-size:13px;color:var(--ink-700)">@item</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4 İlke -->
+<section style="padding:56px;background:var(--cream-100);border-bottom:1px solid var(--cream-200)">
+    <div style="max-width:1100px;margin:0 auto">
+        <h2 style="font-family:var(--font-display);font-size:32px;font-weight:400;letter-spacing:-0.02em;margin:0 0 8px">4 Temel İlke — POUR</h2>
+        <p style="font-size:15px;color:var(--ink-500);margin:0 0 36px">WCAG tüm kriterleri bu dört ilke altında gruplandırır.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
+            @foreach (var p in new[] {
+                new { Harf = "P", Tr = "Algılanabilir", En = "Perceivable", Desc = "Bilgi ve arayüz bileşenleri, kullanıcıların algılayabileceği biçimlerde sunulmalıdır. Yani ekrana bakamayan biri için ses, duyamayan biri için altyazı gibi alternatifler gereklidir.", Renk = "var(--teal-500)" },
+                new { Harf = "O", Tr = "Çalıştırılabilir", En = "Operable", Desc = "Arayüz bileşenleri ve navigasyon işletilebilir olmalıdır. Mouse kullanamayan kullanıcılar yalnızca klavye ile her işlemi gerçekleştirebilmelidir.", Renk = "var(--indigo-700)" },
+                new { Harf = "U", Tr = "Anlaşılabilir", En = "Understandable", Desc = "Bilgi ve arayüzin çalışması anlaşılabilir olmalıdır. Form hataları açık ve çözüm önerisiyle birlikte gösterilmelidir.", Renk = "var(--success)" },
+                new { Harf = "R", Tr = "Sağlam", En = "Robust", Desc = "İçerik, yardımcı teknolojiler dahil çeşitli kullanıcı aracıları tarafından güvenilir biçimde yorumlanabilmelidir.", Renk = "var(--warning)" },
+            })
+            {
+                <div class="ea-card" style="padding:24px;display:flex;gap:20px;align-items:flex-start">
+                    <div style="width:52px;height:52px;border-radius:14px;background:@p.Renk;display:grid;place-items:center;flex-shrink:0">
+                        <span style="font-family:var(--font-display);font-size:26px;color:white;font-weight:400">@p.Harf</span>
+                    </div>
+                    <div>
+                        <div style="font-size:16px;font-weight:600;color:var(--ink-900)">@p.Tr <span style="font-weight:400;color:var(--ink-400);font-size:13px">/ @p.En</span></div>
+                        <p style="font-size:13px;color:var(--ink-600);line-height:1.6;margin:6px 0 0">@p.Desc</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Eascess nasıl yardımcı olur -->
+<section style="padding:56px">
+    <div style="max-width:1100px;margin:0 auto">
+        <h2 style="font-family:var(--font-display);font-size:32px;font-weight:400;letter-spacing:-0.02em;margin:0 0 8px">Eascess ne kontrol eder?</h2>
+        <p style="font-size:15px;color:var(--ink-500);margin:0 0 36px">Otomatik WCAG 2.2 tarama motorumuz aşağıdaki kategorileri kontrol eder.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:40px">
+            @foreach (var kriter in new[] {
+                new { Ikon = "🎨", Baslik = "Renk Kontrastı", Aciklama = "Metin ve arka plan arasındaki kontrast oranı WCAG AA/AAA eşiğini karşılıyor mu?" },
+                new { Ikon = "🖼️", Baslik = "Görsel Alt Metni", Aciklama = "img elementlerinde alt attribute var mı? Yapay zeka ile eksik alt metinler otomatik üretilebilir." },
+                new { Ikon = "📝", Baslik = "Form Etiketleri", Aciklama = "Input, select ve textarea elementleri label ile ilişkilendirilmiş mi?" },
+                new { Ikon = "⌨️", Baslik = "Klavye Erişimi", Aciklama = "Tüm interaktif elementler yalnızca Tab ile ulaşılabilir ve kullanılabilir mi?" },
+                new { Ikon = "🔤", Baslik = "Başlık Hiyerarşisi", Aciklama = "h1–h6 etiketleri doğru sırada ve anlamlı şekilde kullanılmış mı?" },
+                new { Ikon = "🔗", Baslik = "Bağlantı Metinleri", Aciklama = "Bağlantılar bağlamdan bağımsız anlaşılır mı? 'Buraya tıkla' gibi belirsiz metinler tespit edilir." },
+            })
+            {
+                <div class="ea-card" style="padding:20px">
+                    <div style="font-size:24px;margin-bottom:10px">@kriter.Ikon</div>
+                    <div style="font-size:14px;font-weight:600;color:var(--ink-900);margin-bottom:6px">@kriter.Baslik</div>
+                    <p style="font-size:13px;color:var(--ink-600);line-height:1.6;margin:0">@kriter.Aciklama</p>
+                </div>
+            }
+        </div>
+
+        <div style="background:var(--ink-900);border-radius:var(--r-lg);padding:36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+            <div style="color:white">
+                <div style="font-family:var(--font-display);font-size:24px;letter-spacing:-0.02em;margin-bottom:8px">Siteniz WCAG 2.2 uyumlu mu?</div>
+                <div style="font-size:14px;color:oklch(80% 0.02 260);line-height:1.5">Ücretsiz hesap oluşturun, domaininizi ekleyin ve saniyeler içinde tarama başlatın.</div>
+            </div>
+            <div style="display:flex;gap:10px;flex-shrink:0">
+                <a asp-controller="Account" asp-action="Register" class="ea-btn" style="background:white;color:var(--ink-900);font-size:14px">Ücretsiz Başla</a>
+                <a asp-controller="Home" asp-action="Docs" class="ea-btn ea-btn-ghost" style="border-color:rgba(255,255,255,.2);color:white;font-size:14px">Belgeleri Gör</a>
+            </div>
+        </div>
+    </div>
+</section>

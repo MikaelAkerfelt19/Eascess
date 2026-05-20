@@ -31,6 +31,17 @@ public partial class WidgetSetting
 
     public bool IsActive { get; set; }
 
+    /// <summary>Panel başlığında gösterilecek logo URL'si (https:// zorunlu)</summary>
+    [StringLength(512)]
+    public string? LogoUrl { get; set; }
+
+    /// <summary>"Erişilebilirlik" yerine özel başlık — maks 30 karakter</summary>
+    [StringLength(30)]
+    public string? WidgetTitle { get; set; }
+
+    /// <summary>False → "Powered by Eascess" footer'ı gizle (Pro plan)</summary>
+    public bool PoweredByVisible { get; set; } = true;
+
     [ForeignKey("DomainId")]
     [InverseProperty("WidgetSettings")]
     public virtual Domain Domain { get; set; } = null!;

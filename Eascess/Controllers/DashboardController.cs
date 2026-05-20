@@ -13,15 +13,18 @@ public class DashboardController : Controller
 {
     private readonly IRepository<Domain> _domainRepo;
     private readonly IScanReportService _scanReportService;
+    private readonly IPlanService _planService;
     private readonly UserManager<AppUser> _userManager;
 
     public DashboardController(
         IRepository<Domain> domainRepo,
         IScanReportService scanReportService,
+        IPlanService planService,
         UserManager<AppUser> userManager)
     {
         _domainRepo = domainRepo;
         _scanReportService = scanReportService;
+        _planService = planService;
         _userManager = userManager;
     }
 
@@ -41,6 +44,21 @@ public class DashboardController : Controller
         }).ToList();
 
         ViewBag.TotalReportCount = await _scanReportService.GetTotalReportCountAsync(userId);
+
+        var plan = await _planService.GetUserActivePlanAsync(userId);
+        ViewBag.PlanName = plan.Name;
+        ViewBag.MaxDomains = plan.MaxDomains;
+        ViewBag.MonthlyAiQuota = plan.MonthlyAiQuota;
+        ViewBag.AiUsedThisMonth = await _planService.GetMonthlyAiUsageAsync(userId);
+        ViewBag.DomainCount = domainList.Count;
+
+        var appUser = await _userManager.GetUserAsync(User);
+        if (appUser?.TrialEndsAt.HasValue == true && appUser.IsTrialActive)
+        {
+            var daysLeft = (int)Math.Ceiling((appUser.TrialEndsAt.Value - DateTime.UtcNow).TotalDays);
+            ViewBag.TrialDaysLeft = Math.Max(0, daysLeft);
+        }
+
         return View(vm);
     }
 }

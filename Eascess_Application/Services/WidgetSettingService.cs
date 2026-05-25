@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Eascess_Application.DTOs;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
@@ -69,9 +70,9 @@ public class WidgetSettingService : IWidgetSettingService
             if (setting is null) return false;
         }
 
-        setting.ThemeColor = dto.ThemeColor;
-        setting.Position = dto.Position;
-        setting.Language = dto.Language;
+        setting.ThemeColor = IsValidHexColor(dto.ThemeColor) ? dto.ThemeColor : "#38bdf8";
+        setting.Position   = IsValidPosition(dto.Position)   ? dto.Position   : "bottom-right";
+        setting.Language   = IsValidLanguage(dto.Language)   ? dto.Language   : "tr";
         setting.IsAiEnabled = dto.IsAiEnabled;
         setting.LogoUrl = string.IsNullOrWhiteSpace(dto.LogoUrl) ? null : dto.LogoUrl.Trim();
         setting.WidgetTitle = string.IsNullOrWhiteSpace(dto.WidgetTitle) ? null : dto.WidgetTitle.Trim();
@@ -82,6 +83,15 @@ public class WidgetSettingService : IWidgetSettingService
         await _unitOfWork.SaveChangesAsync();
         return true;
     }
+
+    private static readonly string[] ValidPositions = ["bottom-right", "bottom-left", "top-right", "top-left"];
+    private static readonly string[] ValidLanguages  = ["tr", "en"];
+    private static bool IsValidHexColor(string? c) =>
+        c is not null && Regex.IsMatch(c, @"^#[0-9a-fA-F]{6}$");
+    private static bool IsValidPosition(string? p) =>
+        p is not null && ValidPositions.Contains(p);
+    private static bool IsValidLanguage(string? l) =>
+        l is not null && ValidLanguages.Contains(l);
 
     public async Task CreateDefaultAsync(int domainId)
     {

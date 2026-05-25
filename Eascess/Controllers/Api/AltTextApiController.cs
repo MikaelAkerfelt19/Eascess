@@ -1,5 +1,6 @@
 using Eascess_Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Eascess.Controllers.Api;
 
@@ -15,6 +16,7 @@ public class AltTextApiController : ControllerBase
     }
 
     [HttpPost("alt-text")]
+    [EnableRateLimiting("ai-scan")]
     public async Task<IActionResult> GenerateAltText(
         [FromBody] AltTextRequest request, CancellationToken ct)
     {

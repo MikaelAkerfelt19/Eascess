@@ -66,10 +66,13 @@ public class AccountController : Controller
     // ── Register ─────────────────────────────────────────────────────────────
 
     [HttpGet]
-    public IActionResult Register()
+    public IActionResult Register(string? @ref = null)
     {
         if (User.Identity?.IsAuthenticated == true)
             return RedirectToAction("Index", "Dashboard");
+
+        if (@ref == "ai-alt-text")
+            ViewData["PromoMessage"] = "AI Alt Metin özelliğini denemek için kayıt olun";
 
         return View();
     }

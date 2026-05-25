@@ -12,6 +12,7 @@ namespace Eascess.Controllers;
 public class DomainsController : Controller
 {
     private readonly IRepository<Domain> _domainRepo;
+    private readonly IRepository<WidgetSetting> _widgetSettingRepo;
     private readonly IWidgetSettingService _widgetSettingService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<AppUser> _userManager;
@@ -19,12 +20,14 @@ public class DomainsController : Controller
 
     public DomainsController(
         IRepository<Domain> domainRepo,
+        IRepository<WidgetSetting> widgetSettingRepo,
         IWidgetSettingService widgetSettingService,
         IUnitOfWork unitOfWork,
         UserManager<AppUser> userManager,
         IPlanService planService)
     {
         _domainRepo = domainRepo;
+        _widgetSettingRepo = widgetSettingRepo;
         _widgetSettingService = widgetSettingService;
         _unitOfWork = unitOfWork;
         _userManager = userManager;
@@ -121,6 +124,15 @@ public class DomainsController : Controller
         domain.IsDeleted = true;
         domain.DeletedAt = DateTime.UtcNow;
         _domainRepo.Update(domain);
+
+        // İlişkili widget ayarlarını deaktive et
+        var widgetSettings = await _widgetSettingRepo.FindAsync(w => w.DomainId == id);
+        foreach (var ws in widgetSettings)
+        {
+            ws.IsActive = false;
+            _widgetSettingRepo.Update(ws);
+        }
+
         await _unitOfWork.SaveChangesAsync();
 
         TempData["Success"] = "Domain silindi.";
@@ -146,6 +158,8 @@ public class DomainsController : Controller
             CreatedAt = domain.CreatedAt,
         };
 
+        ViewBag.WidgetSettings = await _widgetSettingService.GetByDomainAsync(id, userId);
+
         return View(vm);
     }
 
@@ -154,8 +168,14 @@ public class DomainsController : Controller
     private static string NormalizeUrl(string url)
     {
         url = url.Trim().ToLowerInvariant();
-        if (url.StartsWith("https://")) url = url[8..];
-        else if (url.StartsWith("http://")) url = url[7..];
-        return url.TrimEnd('/');
+
+        if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+            url = "https://" + url;
+
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            return url.Replace("https://", "").Replace("http://", "").TrimEnd('/');
+
+        // Sadece host'u al — port, path, query yok
+        return uri.Host.TrimEnd('/');
     }
 }

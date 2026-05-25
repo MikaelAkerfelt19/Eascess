@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using Eascess.Middleware;
 using Eascess_Application.Options;
 using Eascess_Application.Services;
@@ -8,6 +9,7 @@ using Eascess_Infrastructure.Repositories;
 using Eascess_Infrastructure.Scanning;
 using Eascess_Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
@@ -54,11 +56,18 @@ builder.Services.AddHttpClient("WcagScanner", client =>
     client.DefaultRequestHeaders.UserAgent.ParseAdd(
         "Eascess-Scanner/1.0 (WCAG accessibility audit; +https://eascess.io)");
 })
-.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+.ConfigurePrimaryHttpMessageHandler(() =>
 {
-    AllowAutoRedirect = true,
-    MaxAutomaticRedirections = 5,
-    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
+    var handler = new HttpClientHandler
+    {
+        AllowAutoRedirect = true,
+        MaxAutomaticRedirections = 5,
+    };
+    // SSL doğrulamayı yalnızca geliştirme ortamında devre dışı bırak
+    if (builder.Environment.IsDevelopment())
+        handler.ServerCertificateCustomValidationCallback =
+            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+    return handler;
 });
 
 // AI Alt-Text — Gemini
@@ -88,7 +97,21 @@ builder.Services.AddHostedService<MonthlyReportJob>();
 // Public scan & trial reminder (ADIM 9)
 builder.Services.AddScoped<IPublicScanService, PublicScanService>();
 builder.Services.AddHostedService<TrialReminderJob>();
+builder.Services.AddHostedService<TrialExpiryJob>();
 builder.Services.AddMemoryCache();
+
+// Rate limiting — AI endpoint: IP başına dakikada 10 istek
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("ai-scan", limiter =>
+    {
+        limiter.PermitLimit = 10;
+        limiter.Window = TimeSpan.FromMinutes(1);
+        limiter.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiter.QueueLimit = 0;
+    });
+    options.RejectionStatusCode = 429;
+});
 
 // CORS — Statik AllowAnyOrigin(*) yerine DynamicCorsMiddleware kullanılıyor.
 // Her müşterinin domain'i DB'den doğrulanarak izin veriliyor.
@@ -103,12 +126,35 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Güvenlik başlıkları
+app.Use(async (ctx, next) =>
+{
+    ctx.Response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+    ctx.Response.Headers["X-Frame-Options"]           = "SAMEORIGIN";
+    ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    ctx.Response.Headers["Referrer-Policy"]        = "strict-origin-when-cross-origin";
+    ctx.Response.Headers["Permissions-Policy"]     = "camera=(), microphone=(), geolocation=()";
+    // widget.js müşteri sitelerine embed edildiği için 'unsafe-inline' gereklidir
+    ctx.Response.Headers["Content-Security-Policy"] =
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline'; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+        "font-src 'self' https://fonts.gstatic.com; " +
+        "img-src 'self' data: https:; " +
+        "connect-src 'self'; " +
+        "frame-src 'self'; " +
+        "object-src 'none'; " +
+        "base-uri 'self';";
+    await next();
+});
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseMiddleware<DynamicCorsMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllerRoute(
     name: "default",

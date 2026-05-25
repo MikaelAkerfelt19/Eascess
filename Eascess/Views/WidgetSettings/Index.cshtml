@@ -36,8 +36,7 @@
                 <label class="ea-label">Tema Rengi</label>
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                     <input type="color" asp-for="ThemeColor" id="color-input"
-                           style="width:44px;height:44px;border:1px solid var(--cream-300);border-radius:var(--r-sm);background:white;cursor:pointer;padding:3px"
-                           oninput="updatePreview()" />
+                           style="width:44px;height:44px;border:1px solid var(--cream-300);border-radius:var(--r-sm);background:white;cursor:pointer;padding:3px" />
                     <input type="text" id="color-text" value="@Model.ThemeColor"
                            class="ea-input" style="width:120px"
                            oninput="syncColor(this.value)" placeholder="#38bdf8" />
@@ -69,7 +68,7 @@
                             <input type="radio" name="Position" value="@pos.Item1"
                                    @(Model.Position == pos.Item1 ? "checked" : "")
                                    style="accent-color:var(--teal-600)"
-                                   onchange="updatePreview()" />
+                                   />
                             @pos.Item2
                         </label>
                     }
@@ -114,7 +113,7 @@
                                id="pb-toggle" />
                         <span id="pb-slider"
                               onclick="togglePoweredBy()"
-                              style="position:absolute;inset:0;border-radius:26px;cursor:pointer;transition:.3s;background:@(Model.PoweredByVisible ? "var(--brand-grad)" : "var(--cream-300)")">
+                              style="position:absolute;inset:0;border-radius:26px;cursor:pointer;transition:.3s;background:@(Model.PoweredByVisible ? "var(--indigo-700)" : "var(--cream-300)")">
                             <span style="position:absolute;height:20px;width:20px;left:@(Model.PoweredByVisible ? "23px" : "3px");bottom:3px;background:white;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)" id="pb-thumb"></span>
                         </span>
                     </label>
@@ -125,7 +124,7 @@
             <div style="margin-bottom:24px;padding:16px;background:var(--cream-100);border:1px solid var(--cream-300);border-radius:var(--r-md);display:flex;align-items:center;justify-content:space-between;gap:16px">
                 <div>
                     <div style="font-size:14px;font-weight:600;color:var(--ink-900)">Yapay Zeka Alt Metin</div>
-                    <div style="font-size:12px;color:var(--ink-500);margin-top:2px">Azure Computer Vision ile eksik alt metinleri otomatik oluştur</div>
+                    <div style="font-size:12px;color:var(--ink-500);margin-top:2px">Gemini 2.5 ile eksik alt metinleri otomatik oluştur</div>
                 </div>
                 <label style="position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0">
                     <input type="checkbox" asp-for="IsAiEnabled"
@@ -133,7 +132,7 @@
                            id="ai-toggle" />
                     <span id="ai-slider"
                           onclick="toggleAi()"
-                          style="position:absolute;inset:0;border-radius:26px;cursor:pointer;transition:.3s;background:@(Model.IsAiEnabled ? "var(--brand-grad)" : "var(--cream-300)")">
+                          style="position:absolute;inset:0;border-radius:26px;cursor:pointer;transition:.3s;background:@(Model.IsAiEnabled ? "var(--indigo-700)" : "var(--cream-300)")">
                         <span style="position:absolute;height:20px;width:20px;left:@(Model.IsAiEnabled ? "23px" : "3px");bottom:3px;background:white;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)" id="ai-thumb"></span>
                     </span>
                 </label>
@@ -149,53 +148,83 @@
     <!-- Canlı önizleme -->
     <div class="ea-card" style="padding:20px">
         <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500);margin-bottom:14px">Canlı Önizleme</div>
-        <div id="preview-area" style="background:var(--cream-100);border:1px solid var(--cream-300);border-radius:var(--r-md);height:180px;position:relative;overflow:hidden">
-            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-                <p style="font-size:13px;color:var(--ink-400)">Müşteri sitesi alanı</p>
+        <div style="border:1px solid var(--cream-300);border-radius:var(--r-md);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--cream-100);border-bottom:1px solid var(--cream-300)">
+                <div style="display:flex;gap:4px">
+                    <span style="width:9px;height:9px;border-radius:50%;background:#fc615d;display:block"></span>
+                    <span style="width:9px;height:9px;border-radius:50%;background:#fdbc40;display:block"></span>
+                    <span style="width:9px;height:9px;border-radius:50%;background:#34c749;display:block"></span>
+                </div>
+                <div style="flex:1;text-align:center;font-size:11px;color:var(--ink-500);font-family:var(--font-mono);background:white;border:1px solid var(--cream-300);border-radius:4px;padding:3px 8px">orneksite.com</div>
             </div>
-            <div id="preview-btn"
-                 style="position:absolute;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:all .2s">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/>
-                </svg>
-            </div>
+            <iframe id="preview-iframe"
+                    src="/widget-demo.html"
+                    title="Widget canlı önizleme"
+                    sandbox="allow-scripts allow-same-origin"
+                    style="width:100%;height:560px;border:none;display:block"></iframe>
         </div>
-        <p style="font-size:12px;color:var(--ink-500);margin:10px 0 0">Bu basitleştirilmiş bir önizlemedir. Gerçek widget Shadow DOM içinde çalışır.</p>
+        <p style="font-size:12px;color:var(--ink-500);margin:8px 0 0">Gerçek widget Shadow DOM içinde izole çalışır. Değişiklikler anında yansır.</p>
     </div>
 
 </div>
 
 @section Scripts {
     <script>
-        const colorInput = document.getElementById('color-input');
-        const colorText  = document.getElementById('color-text');
-        const previewBtn = document.getElementById('preview-btn');
+        const colorInput   = document.getElementById('color-input');
+        const colorText    = document.getElementById('color-text');
+        const previewFrame = document.getElementById('preview-iframe');
 
-        function updatePreview() {
-            const color = colorInput.value;
-            colorText.value = color;
-            previewBtn.style.background = color;
-            const pos = document.querySelector('input[name="Position"]:checked')?.value || 'bottom-right';
-            const [v, h] = pos.split('-');
-            previewBtn.style.top = ''; previewBtn.style.bottom = '';
-            previewBtn.style.left = ''; previewBtn.style.right = '';
-            previewBtn.style[v] = '12px';
-            previewBtn.style[h] = '12px';
+        function getCurrentConfig() {
+            return {
+                themeColor:       colorInput.value,
+                position:         document.querySelector('input[name="Position"]:checked')?.value || 'bottom-right',
+                language:         document.getElementById('Language')?.value || 'tr',
+                isAiEnabled:      document.getElementById('ai-toggle')?.checked || false,
+                poweredByVisible: document.getElementById('pb-toggle')?.checked !== false,
+                logoUrl:          document.getElementById('LogoUrl')?.value || '',
+                widgetTitle:      document.getElementById('WidgetTitle')?.value || '',
+            };
+        }
+
+        function pushConfigToPreview() {
+            if (!previewFrame?.contentWindow) return;
+            previewFrame.contentWindow.postMessage(
+                { type: 'eascess-config-update', config: getCurrentConfig() },
+                '*'
+            );
         }
 
         function syncColor(val) {
             if (/^#[0-9a-fA-F]{6}$/.test(val)) {
                 colorInput.value = val;
-                updatePreview();
+                pushConfigToPreview();
             }
         }
 
         function setColor(c) {
             colorInput.value = c;
             colorText.value  = c;
-            updatePreview();
+            pushConfigToPreview();
         }
 
+        // iframe yüklendikten sonra mevcut config'i gönder
+        previewFrame?.addEventListener('load', function () {
+            setTimeout(pushConfigToPreview, 300);
+        });
+
+        // Tüm form girdilerine listener bağla
+        colorInput?.addEventListener('input', function () {
+            colorText.value = colorInput.value;
+            pushConfigToPreview();
+        });
+        document.querySelectorAll('input[name="Position"]').forEach(r =>
+            r.addEventListener('change', pushConfigToPreview)
+        );
+        document.getElementById('Language')?.addEventListener('change', pushConfigToPreview);
+        document.getElementById('LogoUrl')?.addEventListener('input', pushConfigToPreview);
+        document.getElementById('WidgetTitle')?.addEventListener('input', pushConfigToPreview);
+
+        // Toggle switch'ler
         const aiToggle = document.getElementById('ai-toggle');
         const aiSlider = document.getElementById('ai-slider');
         const aiThumb  = document.getElementById('ai-thumb');
@@ -203,8 +232,9 @@
         function toggleAi() {
             aiToggle.checked = !aiToggle.checked;
             const on = aiToggle.checked;
-            aiSlider.style.background = on ? 'var(--brand-grad)' : 'var(--cream-300)';
+            aiSlider.style.background = on ? 'var(--indigo-700)' : 'var(--cream-300)';
             aiThumb.style.left = on ? '23px' : '3px';
+            pushConfigToPreview();
         }
 
         const pbToggle = document.getElementById('pb-toggle');
@@ -214,21 +244,12 @@
         function togglePoweredBy() {
             pbToggle.checked = !pbToggle.checked;
             const on = pbToggle.checked;
-            pbSlider.style.background = on ? 'var(--brand-grad)' : 'var(--cream-300)';
+            pbSlider.style.background = on ? 'var(--indigo-700)' : 'var(--cream-300)';
             pbThumb.style.left = on ? '23px' : '3px';
+            pushConfigToPreview();
         }
 
-        function updateBrandPreview() {
-            const logoUrl = document.getElementById('LogoUrl')?.value;
-            const title   = document.getElementById('WidgetTitle')?.value;
-            const headEl  = document.getElementById('preview-head');
-            if (!headEl) return;
-            headEl.innerHTML =
-                (logoUrl ? '<img src="' + logoUrl + '" alt="" style="height:18px;object-fit:contain;border-radius:3px;margin-right:4px" onerror="this.style.display=\'none\'">' : '') +
-                '<span>' + (title || 'Erişilebilirlik') + '</span>';
-        }
-
-        updatePreview();
-        document.querySelectorAll('input[name="Position"]').forEach(r => r.addEventListener('change', updatePreview));
+        // updateBrandPreview artık pushConfigToPreview ile kapsanıyor
+        function updateBrandPreview() { pushConfigToPreview(); }
     </script>
 }

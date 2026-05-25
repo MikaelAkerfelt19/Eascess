@@ -163,37 +163,3 @@
         transform: scaleY(calc(var(--initial-scale) * 0.7));
     }
 }
-document.addEventListener("DOMContentLoaded", function () {
-    const container = document.getElementById('ea-gradient-bars');
-    
-    if (container) {
-        const numBars = 15; // 15, 17 veya 19 gibi tek sayılar kavisin ortalanması için iyidir
-        
-        for (let i = 0; i < numBars; i++) {
-            // Çubukların parabolik kavisini hesapla
-            const position = i / (numBars - 1);
-            const maxHeight = 100;
-            const minHeight = 30;
-            
-            const center = 0.5;
-            const distanceFromCenter = Math.abs(position - center);
-            const heightPercentage = Math.pow(distanceFromCenter * 2, 1.2);
-            
-            const height = minHeight + (maxHeight - minHeight) * heightPercentage;
-            const scaleY = height / 100;
-
-            // DOM elemanını oluştur
-            const bar = document.createElement('div');
-            bar.className = 'ea-gradient-bar';
-            
-            // Çubuğa özel stilleri ata
-            bar.style.flex = `1 0 calc(100% / ${numBars})`;
-            bar.style.maxWidth = `calc(100% / ${numBars})`;
-            bar.style.setProperty('--initial-scale', scaleY);
-            bar.style.transform = `scaleY(${scaleY})`;
-            bar.style.animationDelay = `${i * 0.1}s`; // Dalga efektini yaratır
-
-            container.appendChild(bar);
-        }
-    }
-});

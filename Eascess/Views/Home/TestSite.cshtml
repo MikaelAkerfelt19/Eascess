@@ -10,7 +10,7 @@
 <section style="max-width:720px;margin:80px auto;padding:0 24px">
 
     <!-- Başlık -->
-    <div style="text-align:center;margin-bottom:40px">
+    <div style="text-align:center;margin-bottom:40px" data-ea-reveal="fade-up">
         <div style="display:inline-flex;align-items:center;gap:6px;background:oklch(96% 0.04 190);color:var(--teal-600,#0d9488);padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:16px">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2l1.5 5.5L19 9l-5.5 1.5L12 16l-1.5-5.5L5 9l5.5-1.5z"/></svg>
             ÜCRETSİZ WCAG ANALİZİ
@@ -22,7 +22,7 @@
     </div>
 
     <!-- Form -->
-    <div class="ea-card" style="padding:24px 28px">
+    <div class="ea-card" style="padding:24px 28px" data-ea-reveal="fade-up" data-ea-delay="0.1s">
         <form method="post" asp-action="TestSite">
             @Html.AntiForgeryToken()
             <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -43,12 +43,12 @@
                 }
             }
         </form>
-        <p style="font-size:12px;color:var(--ink-400);margin:10px 0 0">Günde en fazla 5 tarama · Sonuçlar kaydedilmez</p>
+        <p style="font-size:12px;color:var(--ink-600);margin:10px 0 0">Günde en fazla 5 tarama · Sonuçlar kaydedilmez</p>
     </div>
 
     @if (rateLimited)
     {
-        <div class="ea-card" style="padding:20px 24px;margin-top:16px;border-left:3px solid var(--danger,#dc2626)">
+        <div class="ea-card" style="padding:20px 24px;margin-top:16px;background:oklch(97% 0.03 25);border:1px solid oklch(80% 0.08 25)">
             <p style="margin:0;color:var(--ink-700)">
                 <strong>Günlük limit aşıldı.</strong> Bugün için 5 tarama hakkınızı kullandınız.
                 Sınırsız tarama için <a asp-controller="Account" asp-action="Register" style="color:var(--indigo-700)">ücretsiz hesap açın</a>.
@@ -60,14 +60,14 @@
     {
         @if (!result.Success)
         {
-            <div class="ea-card" style="padding:20px 24px;margin-top:16px;border-left:3px solid var(--danger,#dc2626)">
+            <div class="ea-card" style="padding:20px 24px;margin-top:16px;background:oklch(97% 0.03 25);border:1px solid oklch(80% 0.08 25)">
                 <p style="margin:0;color:var(--ink-700)"><strong>Tarama başarısız:</strong> @result.ErrorMessage</p>
             </div>
         }
         else
         {
             <!-- Skor kartı -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px" data-ea-reveal="fade-up">
                 @{
                     var scoreColor = result.Score >= 80 ? "oklch(35% 0.12 145)" : result.Score >= 60 ? "oklch(40% 0.12 75)" : "var(--danger,#dc2626)";
                     var scoreBg    = result.Score >= 80 ? "oklch(96% 0.04 145)" : result.Score >= 60 ? "oklch(97% 0.05 75)" : "oklch(97% 0.05 25)";

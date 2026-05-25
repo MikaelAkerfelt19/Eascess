@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Eascess_Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace Eascess_Domain.Entities;
@@ -21,7 +22,7 @@ public class SupportTicket
 
     /// <summary>Open | Closed</summary>
     [StringLength(20)]
-    public string Status { get; set; } = "Open";
+    public string Status { get; set; } = TicketStatus.Open;
 
     public DateTime CreatedAt { get; set; }
 

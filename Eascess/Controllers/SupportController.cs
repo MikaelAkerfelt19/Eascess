@@ -1,4 +1,5 @@
 using Eascess_Application.Services;
+using Eascess_Domain.Constants;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -16,19 +17,22 @@ public class SupportController : Controller
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<AppUser> _userManager;
     private readonly IEmailService _emailService;
+    private readonly ILogger<SupportController> _logger;
 
     public SupportController(
         IRepository<SupportTicket> ticketRepo,
         IRepository<Domain> domainRepo,
         IUnitOfWork unitOfWork,
         UserManager<AppUser> userManager,
-        IEmailService emailService)
+        IEmailService emailService,
+        ILogger<SupportController> logger)
     {
         _ticketRepo = ticketRepo;
         _domainRepo = domainRepo;
         _unitOfWork = unitOfWork;
         _userManager = userManager;
         _emailService = emailService;
+        _logger = logger;
     }
 
     // GET /Support
@@ -70,7 +74,7 @@ public class SupportController : Controller
             DomainId = model.DomainId,
             Subject = model.Subject.Trim(),
             Body = model.Body.Trim(),
-            Status = "Open",
+            Status = TicketStatus.Open,
             CreatedAt = DateTime.UtcNow,
         };
 
@@ -88,7 +92,7 @@ public class SupportController : Controller
                 <p>Talebinizi <a href="https://app.eascess.com/Support">buradan</a> takip edebilirsiniz.</p>
                 """;
             try { await _emailService.SendAsync(user.Email, user.FullName ?? user.UserName ?? "", "Destek talebiniz alındı — Eascess", html); }
-            catch { /* e-posta gönderilemese de işlemi engelleme */ }
+            catch (Exception ex) { _logger.LogWarning(ex, "Destek talebi e-postası gönderilemedi. UserId={UserId}", user.Id); }
         }
 
         TempData["Success"] = "Talebiniz alındı. Ekibimiz en kısa sürede yanıt verecek.";
@@ -113,6 +117,7 @@ public class SupportTicketFormModel
 
     [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Açıklama zorunludur.")]
     [System.ComponentModel.DataAnnotations.MinLength(20, ErrorMessage = "Lütfen en az 20 karakter girin.")]
+    [System.ComponentModel.DataAnnotations.MaxLength(5000, ErrorMessage = "Açıklama en fazla 5000 karakter olabilir.")]
     public string Body { get; set; } = "";
 
     public int? DomainId { get; set; }

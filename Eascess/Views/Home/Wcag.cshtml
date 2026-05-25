@@ -3,26 +3,26 @@
 }
 
 <!-- Sayfa başlığı -->
-<section style="padding:60px 56px 48px;border-bottom:1px solid var(--cream-200)">
-    <div style="max-width:760px">
-        <div style="display:inline-flex;align-items:center;gap:8px;background:white;border:1px solid var(--cream-300);padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;color:var(--ink-700);box-shadow:var(--sh-sm);margin-bottom:20px">
+<section class="ea-mkt-section--hero ea-mkt-section--bordered-b" data-ea-reveal="fade-up">
+    <div class="ea-mkt-inner--760">
+        <div class="ea-mkt-eyebrow-pill">
             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Web Content Accessibility Guidelines
         </div>
-        <h1 style="font-family:var(--font-display);font-size:clamp(36px,5vw,60px);line-height:1;letter-spacing:-0.03em;margin:0 0 18px;font-weight:400">
+        <h1 style="font-family:var(--font-display);font-size:clamp(36px,5vw,60px);line-height:1;letter-spacing:-0.03em;margin:0 0 18px;font-weight:400;text-align:left">
             WCAG 2.2 nedir<br>ve neden önemli?
         </h1>
-        <p style="font-size:18px;color:var(--ink-600);line-height:1.6;max-width:620px;margin:0">
+        <p style="font-size:18px;color:var(--ink-600);line-height:1.6;max-width:620px;margin:0;text-align:left">
             Web İçeriği Erişilebilirlik Kılavuzları (WCAG), web içeriğini engelli bireyler için daha erişilebilir kılmak amacıyla W3C tarafından yayımlanan uluslararası standarttır.
         </p>
     </div>
 </section>
 
 <!-- Seviyeler -->
-<section style="padding:56px;border-bottom:1px solid var(--cream-200)">
-    <div style="max-width:1100px;margin:0 auto">
-        <h2 style="font-family:var(--font-display);font-size:32px;font-weight:400;letter-spacing:-0.02em;margin:0 0 8px">Uyumluluk Seviyeleri</h2>
-        <p style="font-size:15px;color:var(--ink-500);margin:0 0 36px">WCAG üç kademeli uyumluluk seviyesi tanımlar. Eascess varsayılan olarak <strong>AAA</strong> hedefler.</p>
+<section class="ea-mkt-section ea-mkt-section--bordered-b" data-ea-reveal="fade-up">
+    <div class="ea-mkt-inner">
+        <h2 class="ea-mkt-h2">Uyumluluk Seviyeleri</h2>
+        <p class="ea-mkt-lead">WCAG üç kademeli uyumluluk seviyesi tanımlar. Eascess varsayılan olarak <strong>AAA</strong> hedefler.</p>
 
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
             <!-- Seviye A -->
@@ -69,21 +69,21 @@
 </section>
 
 <!-- 4 İlke -->
-<section style="padding:56px;background:var(--cream-100);border-bottom:1px solid var(--cream-200)">
-    <div style="max-width:1100px;margin:0 auto">
-        <h2 style="font-family:var(--font-display);font-size:32px;font-weight:400;letter-spacing:-0.02em;margin:0 0 8px">4 Temel İlke — POUR</h2>
-        <p style="font-size:15px;color:var(--ink-500);margin:0 0 36px">WCAG tüm kriterleri bu dört ilke altında gruplandırır.</p>
+<section class="ea-mkt-section ea-mkt-section--alt ea-mkt-section--bordered-b" data-ea-reveal="fade-up">
+    <div class="ea-mkt-inner">
+        <h2 class="ea-mkt-h2">4 Temel İlke — POUR</h2>
+        <p class="ea-mkt-lead">WCAG tüm kriterleri bu dört ilke altında gruplandırır.</p>
 
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
             @foreach (var p in new[] {
-                new { Harf = "P", Tr = "Algılanabilir", En = "Perceivable", Desc = "Bilgi ve arayüz bileşenleri, kullanıcıların algılayabileceği biçimlerde sunulmalıdır. Yani ekrana bakamayan biri için ses, duyamayan biri için altyazı gibi alternatifler gereklidir.", Renk = "var(--teal-500)" },
+                new { Harf = "P", Tr = "Algılanabilir", En = "Perceivable", Desc = "Bilgi ve arayüz bileşenleri, kullanıcıların algılayabileceği biçimlerde sunulmalıdır. Yani ekrana bakamayan biri için ses, duyamayan biri için altyazı gibi alternatifler gereklidir.", Renk = "oklch(32% 0.11 190)" },
                 new { Harf = "O", Tr = "Çalıştırılabilir", En = "Operable", Desc = "Arayüz bileşenleri ve navigasyon işletilebilir olmalıdır. Mouse kullanamayan kullanıcılar yalnızca klavye ile her işlemi gerçekleştirebilmelidir.", Renk = "var(--indigo-700)" },
-                new { Harf = "U", Tr = "Anlaşılabilir", En = "Understandable", Desc = "Bilgi ve arayüzin çalışması anlaşılabilir olmalıdır. Form hataları açık ve çözüm önerisiyle birlikte gösterilmelidir.", Renk = "var(--success)" },
-                new { Harf = "R", Tr = "Sağlam", En = "Robust", Desc = "İçerik, yardımcı teknolojiler dahil çeşitli kullanıcı aracıları tarafından güvenilir biçimde yorumlanabilmelidir.", Renk = "var(--warning)" },
+                new { Harf = "U", Tr = "Anlaşılabilir", En = "Understandable", Desc = "Bilgi ve arayüzin çalışması anlaşılabilir olmalıdır. Form hataları açık ve çözüm önerisiyle birlikte gösterilmelidir.", Renk = "oklch(32% 0.14 155)" },
+                new { Harf = "R", Tr = "Sağlam", En = "Robust", Desc = "İçerik, yardımcı teknolojiler dahil çeşitli kullanıcı aracıları tarafından güvenilir biçimde yorumlanabilmelidir.", Renk = "oklch(35% 0.15 75)" },
             })
             {
                 <div class="ea-card" style="padding:24px;display:flex;gap:20px;align-items:flex-start">
-                    <div style="width:52px;height:52px;border-radius:14px;background:@p.Renk;display:grid;place-items:center;flex-shrink:0">
+                    <div class="ea-wcag-pour-icon" style="background:@p.Renk">
                         <span style="font-family:var(--font-display);font-size:26px;color:white;font-weight:400">@p.Harf</span>
                     </div>
                     <div>
@@ -97,37 +97,42 @@
 </section>
 
 <!-- Eascess nasıl yardımcı olur -->
-<section style="padding:56px">
-    <div style="max-width:1100px;margin:0 auto">
-        <h2 style="font-family:var(--font-display);font-size:32px;font-weight:400;letter-spacing:-0.02em;margin:0 0 8px">Eascess ne kontrol eder?</h2>
-        <p style="font-size:15px;color:var(--ink-500);margin:0 0 36px">Otomatik WCAG 2.2 tarama motorumuz aşağıdaki kategorileri kontrol eder.</p>
+<section class="ea-mkt-section" data-ea-reveal="fade-up">
+    <div class="ea-mkt-inner">
+        <h2 class="ea-mkt-h2">Eascess ne kontrol eder?</h2>
+        <p class="ea-mkt-lead">Otomatik WCAG 2.2 tarama motorumuz aşağıdaki kategorileri kontrol eder.</p>
 
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:40px">
-            @foreach (var kriter in new[] {
-                new { Ikon = "🎨", Baslik = "Renk Kontrastı", Aciklama = "Metin ve arka plan arasındaki kontrast oranı WCAG AA/AAA eşiğini karşılıyor mu?" },
-                new { Ikon = "🖼️", Baslik = "Görsel Alt Metni", Aciklama = "img elementlerinde alt attribute var mı? Yapay zeka ile eksik alt metinler otomatik üretilebilir." },
-                new { Ikon = "📝", Baslik = "Form Etiketleri", Aciklama = "Input, select ve textarea elementleri label ile ilişkilendirilmiş mi?" },
-                new { Ikon = "⌨️", Baslik = "Klavye Erişimi", Aciklama = "Tüm interaktif elementler yalnızca Tab ile ulaşılabilir ve kullanılabilir mi?" },
-                new { Ikon = "🔤", Baslik = "Başlık Hiyerarşisi", Aciklama = "h1–h6 etiketleri doğru sırada ve anlamlı şekilde kullanılmış mı?" },
-                new { Ikon = "🔗", Baslik = "Bağlantı Metinleri", Aciklama = "Bağlantılar bağlamdan bağımsız anlaşılır mı? 'Buraya tıkla' gibi belirsiz metinler tespit edilir." },
-            })
+        @{
+            var kriterliste = new[] {
+                new { Svg = "<path d='M12 3a9 9 0 0 0 0 18z' fill='currentColor' stroke='none'/><circle cx='12' cy='12' r='9'/>", Baslik = "Renk Kontrastı", Aciklama = "Metin ve arka plan arasındaki kontrast oranı WCAG AA/AAA eşiğini karşılıyor mu?" },
+                new { Svg = "<rect x='3' y='3' width='18' height='18' rx='2'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/>", Baslik = "Görsel Alt Metni", Aciklama = "img elementlerinde alt attribute var mı? Yapay zeka ile eksik alt metinler otomatik üretilebilir." },
+                new { Svg = "<path d='M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z'/><line x1='7' y1='7' x2='7.01' y2='7'/>", Baslik = "Form Etiketleri", Aciklama = "Input, select ve textarea elementleri label ile ilişkilendirilmiş mi?" },
+                new { Svg = "<rect x='2' y='6' width='20' height='13' rx='2'/><path d='M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8'/>", Baslik = "Klavye Erişimi", Aciklama = "Tüm interaktif elementler yalnızca Tab ile ulaşılabilir ve kullanılabilir mi?" },
+                new { Svg = "<path d='M4 6h16M4 10h12M4 14h8M4 18h4'/>", Baslik = "Başlık Hiyerarşisi", Aciklama = "h1–h6 etiketleri doğru sırada ve anlamlı şekilde kullanılmış mı?" },
+                new { Svg = "<path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/>", Baslik = "Bağlantı Metinleri", Aciklama = "Bağlantılar bağlamdan bağımsız anlaşılır mı? 'Buraya tıkla' gibi belirsiz metinler tespit edilir." },
+            };
+        }
+        <div class="ea-wcag-check-grid">
+            @foreach (var kriter in kriterliste)
             {
-                <div class="ea-card" style="padding:20px">
-                    <div style="font-size:24px;margin-bottom:10px">@kriter.Ikon</div>
-                    <div style="font-size:14px;font-weight:600;color:var(--ink-900);margin-bottom:6px">@kriter.Baslik</div>
-                    <p style="font-size:13px;color:var(--ink-600);line-height:1.6;margin:0">@kriter.Aciklama</p>
+                <div class="ea-wcag-check-cell">
+                    <div class="ea-wcag-check-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">@Html.Raw(kriter.Svg)</svg>
+                    </div>
+                    <div class="ea-wcag-check-title">@kriter.Baslik</div>
+                    <p class="ea-wcag-check-desc">@kriter.Aciklama</p>
                 </div>
             }
         </div>
 
-        <div style="background:var(--ink-900);border-radius:var(--r-lg);padding:36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
-            <div style="color:white">
-                <div style="font-family:var(--font-display);font-size:24px;letter-spacing:-0.02em;margin-bottom:8px">Siteniz WCAG 2.2 uyumlu mu?</div>
-                <div style="font-size:14px;color:oklch(80% 0.02 260);line-height:1.5">Ücretsiz hesap oluşturun, domaininizi ekleyin ve saniyeler içinde tarama başlatın.</div>
+        <div class="ea-wcag-cta">
+            <div class="ea-wcag-cta__text">
+                <div class="ea-wcag-cta__title">Siteniz WCAG 2.2 uyumlu mu?</div>
+                <div class="ea-wcag-cta__desc">Ücretsiz hesap oluşturun, domaininizi ekleyin ve saniyeler içinde tarama başlatın.</div>
             </div>
-            <div style="display:flex;gap:10px;flex-shrink:0">
-                <a asp-controller="Account" asp-action="Register" class="ea-btn" style="background:white;color:var(--ink-900);font-size:14px">Ücretsiz Başla</a>
-                <a asp-controller="Home" asp-action="Docs" class="ea-btn ea-btn-ghost" style="border-color:rgba(255,255,255,.2);color:white;font-size:14px">Belgeleri Gör</a>
+            <div class="ea-wcag-cta__actions">
+                <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn--white">Ücretsiz Başla</a>
+                <a asp-controller="Home" asp-action="Docs" class="ea-btn ea-btn-ghost" style="border-color:rgba(255,255,255,.2);color:white">Belgeleri Gör</a>
             </div>
         </div>
     </div>

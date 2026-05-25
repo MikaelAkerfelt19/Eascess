@@ -1,3 +1,4 @@
+using Eascess_Domain.Constants;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
 
@@ -15,7 +16,7 @@ public class WidgetAnalyticsService : IWidgetAnalyticsService
         var since = DateTime.UtcNow.AddDays(-days).Date;
         var logs = await _logs.FindAsync(l =>
             l.DomainId == domainId &&
-            l.EventType == "widget_opened" &&
+            l.EventType == WidgetEventTypes.WidgetOpened &&
             l.OccurredAt >= since);
 
         return logs
@@ -30,7 +31,7 @@ public class WidgetAnalyticsService : IWidgetAnalyticsService
         var since = DateTime.UtcNow.AddDays(-days).Date;
         var logs = await _logs.FindAsync(l =>
             l.DomainId == domainId &&
-            l.EventType == "feature_toggled" &&
+            l.EventType == WidgetEventTypes.FeatureToggled &&
             l.FeatureName != null &&
             l.OccurredAt >= since);
 
@@ -50,7 +51,7 @@ public class WidgetAnalyticsService : IWidgetAnalyticsService
 
         var logs = await _logs.FindAsync(l =>
             l.DomainId == domainId &&
-            l.EventType == "widget_opened" &&
+            l.EventType == WidgetEventTypes.WidgetOpened &&
             l.OccurredAt >= lastMonthStart);
 
         var thisMonth = logs.Count(l => l.OccurredAt >= thisMonthStart);

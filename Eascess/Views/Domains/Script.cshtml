@@ -84,17 +84,128 @@
         </div>
     </div>
 
-    <!-- Detay kartı -->
-    <div class="ea-card" style="padding:22px">
-        <div style="font-size:13px;font-weight:600;color:var(--ink-700);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px">Detaylar</div>
-        <dl style="display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0;font-size:13px">
-            <dt style="color:var(--ink-500);font-weight:600">Domain</dt>
-            <dd style="color:var(--ink-900);margin:0;font-weight:500">@Model.DomainUrl</dd>
-            <dt style="color:var(--ink-500);font-weight:600">Lisans Anahtarı</dt>
-            <dd style="margin:0"><code style="font-size:11px">@Model.LicenseKey</code></dd>
-            <dt style="color:var(--ink-500);font-weight:600">Eklenme</dt>
-            <dd style="color:var(--ink-700);margin:0">@Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</dd>
-        </dl>
+    <!-- Sağ sütun -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+        <!-- Detay kartı -->
+        <div class="ea-card" style="padding:22px">
+            <div style="font-size:13px;font-weight:600;color:var(--ink-700);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px">Detaylar</div>
+            <dl style="display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0;font-size:13px">
+                <dt style="color:var(--ink-500);font-weight:600">Domain</dt>
+                <dd style="color:var(--ink-900);margin:0;font-weight:500">@Model.DomainUrl</dd>
+                <dt style="color:var(--ink-500);font-weight:600">Lisans Anahtarı</dt>
+                <dd style="margin:0"><code style="font-size:11px">@Model.LicenseKey</code></dd>
+                <dt style="color:var(--ink-500);font-weight:600">Eklenme</dt>
+                <dd style="color:var(--ink-700);margin:0">@Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</dd>
+            </dl>
+        </div>
+
+        <!-- Widget Önizleme & Konum -->
+        @{
+            var ws = ViewBag.WidgetSettings as Eascess_Application.DTOs.WidgetSettingDto;
+        }
+        @if (ws != null)
+        {
+            <div class="ea-card" style="padding:0;overflow:hidden">
+                <div style="padding:14px 18px;border-bottom:1px solid var(--cream-300);display:flex;justify-content:space-between;align-items:center">
+                    <div style="font-size:13px;font-weight:600;color:var(--ink-900)">Widget Önizleme</div>
+                    <a asp-controller="WidgetSettings" asp-action="Index" asp-route-id="@Model.Id"
+                       style="font-size:12px;font-weight:600;color:var(--indigo-700);text-decoration:none">Tüm Ayarlar →</a>
+                </div>
+
+                <!-- Mini preview iframe -->
+                <div style="position:relative;border-bottom:1px solid var(--cream-300)">
+                    <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--cream-100)">
+                        <div style="display:flex;gap:3px">
+                            <span style="width:8px;height:8px;border-radius:50%;background:#fc615d;display:block"></span>
+                            <span style="width:8px;height:8px;border-radius:50%;background:#fdbc40;display:block"></span>
+                            <span style="width:8px;height:8px;border-radius:50%;background:#34c749;display:block"></span>
+                        </div>
+                        <div style="flex:1;text-align:center;font-size:10px;color:var(--ink-500);background:white;border:1px solid var(--cream-300);border-radius:3px;padding:2px 6px">@Model.DomainUrl</div>
+                    </div>
+                    <iframe id="script-preview-iframe"
+                            src="/widget-demo.html"
+                            title="Widget önizleme"
+                            sandbox="allow-scripts allow-same-origin"
+                            style="width:100%;height:280px;border:none;display:block"></iframe>
+                </div>
+
+                <!-- Hızlı ayarlar formu -->
+                <form asp-controller="WidgetSettings" asp-action="Update" method="post" style="padding:14px 18px">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnUrl" value="/Domains/Script/@Model.Id" />
+                    <input type="hidden" name="Id" value="@ws.Id" />
+                    <input type="hidden" name="DomainId" value="@ws.DomainId" />
+                    <input type="hidden" name="DomainUrl" value="@ws.DomainUrl" />
+                    <input type="hidden" name="Language" value="@ws.Language" />
+                    <input type="hidden" name="IsAiEnabled" value="@ws.IsAiEnabled.ToString().ToLower()" />
+                    <input type="hidden" name="PoweredByVisible" value="@ws.PoweredByVisible.ToString().ToLower()" />
+                    <input type="hidden" name="LogoUrl" value="@ws.LogoUrl" />
+                    <input type="hidden" name="WidgetTitle" value="@ws.WidgetTitle" />
+
+                    <!-- Tema rengi -->
+                    <div style="margin-bottom:14px">
+                        <label class="ea-label" style="font-size:12px;margin-bottom:6px">Tema Rengi</label>
+                        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+                            <input type="color" id="script-color-input" name="ThemeColor" value="@ws.ThemeColor"
+                                   style="width:36px;height:36px;border:1px solid var(--cream-300);border-radius:var(--r-sm);background:white;cursor:pointer;padding:3px" />
+                            <input type="text" id="script-color-text" value="@ws.ThemeColor"
+                                   class="ea-input" style="width:90px;min-height:36px;padding:7px 9px;font-size:12px"
+                                   oninput="scriptSyncColor(this.value)" />
+                            <div style="display:flex;gap:4px;flex-wrap:wrap">
+                                @foreach (var c in new[] { "#38bdf8", "#818cf8", "#c084fc", "#22d3ee", "#4ade80", "#fb923c", "#f87171", "#facc15" })
+                                {
+                                    <button type="button" onclick="scriptSetColor('@c')"
+                                            style="width:18px;height:18px;background:@c;border:2px solid white;border-radius:50%;cursor:pointer;box-shadow:0 0 0 1px var(--cream-300);transition:transform .15s"
+                                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Konum -->
+                    <div style="margin-bottom:14px">
+                        <label class="ea-label" style="font-size:12px;margin-bottom:6px">Widget Konumu</label>
+                        <div style="position:relative;width:130px;height:82px;background:var(--cream-100);border:1px solid var(--cream-300);border-radius:var(--r-sm);overflow:hidden">
+                            <div style="position:absolute;inset:5px;border:1px dashed var(--cream-300);border-radius:3px;pointer-events:none"></div>
+                            @foreach (var pos in new[] {
+                                ("bottom-right", "right:5px;bottom:5px"),
+                                ("bottom-left",  "left:5px;bottom:5px"),
+                                ("top-right",    "right:5px;top:5px"),
+                                ("top-left",     "left:5px;top:5px"),
+                            })
+                            {
+                                var isActive = ws.Position == pos.Item1;
+                                <label style="position:absolute;@pos.Item2;cursor:pointer" title="@pos.Item1">
+                                    <input type="radio" name="Position" value="@pos.Item1"
+                                           @(isActive ? "checked" : "")
+                                           style="position:absolute;opacity:0;width:0;height:0"
+                                           onchange="scriptHighlightPos(this); scriptPushPreview()" />
+                                    <span class="script-pos-dot" data-pos="@pos.Item1"
+                                          style="display:block;width:20px;height:20px;border-radius:50%;border:2px solid @(isActive ? "var(--teal-600)" : "var(--cream-300)");background:@(isActive ? "var(--teal-600)" : "white");transition:all .15s;box-shadow:var(--sh-sm)">
+                                    </span>
+                                </label>
+                            }
+                        </div>
+                        <div id="script-pos-label" style="font-size:11px;color:var(--ink-500);margin-top:4px">
+                            @(ws.Position switch {
+                                "bottom-right" => "Sağ Alt",
+                                "bottom-left"  => "Sol Alt",
+                                "top-right"    => "Sağ Üst",
+                                "top-left"     => "Sol Üst",
+                                _              => "Sağ Alt"
+                            })
+                        </div>
+                    </div>
+
+                    <button type="submit" class="ea-btn ea-btn-brand" style="width:100%;justify-content:center;font-size:13px;min-height:38px">
+                        Kaydet
+                    </button>
+                </form>
+            </div>
+        }
+
     </div>
 
 </div>
@@ -108,6 +219,67 @@
                 btn.textContent = 'Kopyalandı!';
                 setTimeout(() => { btn.textContent = 'Kopyala'; }, 2500);
             });
+        }
+
+        // ── Widget preview & konum seçici ──────────────────────────
+        const scriptColorInput = document.getElementById('script-color-input');
+        const scriptColorText  = document.getElementById('script-color-text');
+        const scriptIframe     = document.getElementById('script-preview-iframe');
+
+        function scriptGetConfig() {
+            return {
+                themeColor: scriptColorInput?.value || '#38bdf8',
+                position:   document.querySelector('input[name="Position"]:checked')?.value || 'bottom-right',
+                language:   'tr',
+                isAiEnabled: false,
+                poweredByVisible: true,
+            };
+        }
+
+        function scriptPushPreview() {
+            scriptIframe?.contentWindow?.postMessage(
+                { type: 'eascess-config-update', config: scriptGetConfig() }, '*'
+            );
+        }
+
+        function scriptSyncColor(val) {
+            if (/^#[0-9a-fA-F]{6}$/.test(val) && scriptColorInput) {
+                scriptColorInput.value = val;
+                scriptPushPreview();
+            }
+        }
+
+        function scriptSetColor(c) {
+            if (!scriptColorInput) return;
+            scriptColorInput.value = c;
+            scriptColorText.value  = c;
+            scriptPushPreview();
+        }
+
+        scriptColorInput?.addEventListener('input', function () {
+            scriptColorText.value = scriptColorInput.value;
+            scriptPushPreview();
+        });
+
+        scriptIframe?.addEventListener('load', function () {
+            setTimeout(scriptPushPreview, 300);
+        });
+
+        var scriptPosLabels = {
+            'bottom-right': 'Sağ Alt',
+            'bottom-left':  'Sol Alt',
+            'top-right':    'Sağ Üst',
+            'top-left':     'Sol Üst',
+        };
+
+        function scriptHighlightPos(radio) {
+            document.querySelectorAll('.script-pos-dot').forEach(function (dot) {
+                var active = dot.dataset.pos === radio.value;
+                dot.style.background  = active ? 'var(--teal-600)' : 'white';
+                dot.style.borderColor = active ? 'var(--teal-600)' : 'var(--cream-300)';
+            });
+            var lbl = document.getElementById('script-pos-label');
+            if (lbl) lbl.textContent = scriptPosLabels[radio.value] || radio.value;
         }
     </script>
 }

@@ -1,4 +1,5 @@
 using Eascess.Models;
+using Eascess_Application.DTOs;
 using Eascess_Application.Services;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
@@ -14,17 +15,20 @@ public class DashboardController : Controller
     private readonly IRepository<Domain> _domainRepo;
     private readonly IScanReportService _scanReportService;
     private readonly IPlanService _planService;
+    private readonly IWidgetSettingService _widgetSettingService;
     private readonly UserManager<AppUser> _userManager;
 
     public DashboardController(
         IRepository<Domain> domainRepo,
         IScanReportService scanReportService,
         IPlanService planService,
+        IWidgetSettingService widgetSettingService,
         UserManager<AppUser> userManager)
     {
         _domainRepo = domainRepo;
         _scanReportService = scanReportService;
         _planService = planService;
+        _widgetSettingService = widgetSettingService;
         _userManager = userManager;
     }
 
@@ -51,6 +55,9 @@ public class DashboardController : Controller
         ViewBag.MonthlyAiQuota = plan.MonthlyAiQuota;
         ViewBag.AiUsedThisMonth = await _planService.GetMonthlyAiUsageAsync(userId);
         ViewBag.DomainCount = domainList.Count;
+
+        if (domainList.Any())
+            ViewBag.QuickWidgetSettings = await _widgetSettingService.GetByDomainAsync(domainList.First().Id, userId);
 
         var appUser = await _userManager.GetUserAsync(User);
         if (appUser?.TrialEndsAt.HasValue == true && appUser.IsTrialActive)

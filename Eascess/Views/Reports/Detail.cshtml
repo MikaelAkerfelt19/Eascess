@@ -95,7 +95,8 @@
             var itemId = $"issue-{i}";
 
             <div class="ea-accordion-item">
-                <button class="ea-accordion-trigger" onclick="toggleIssue('@itemId', this)">
+                <button class="ea-accordion-trigger" onclick="toggleIssue('@itemId', this)"
+                        aria-expanded="false" aria-controls="@itemId">
                     <span class="ea-badge @sevBadge">@sevLabel</span>
                     <span class="ea-badge ea-badge--sky" style="font-size:11px">@issue.WcagLevel</span>
                     <span style="font-weight:600;color:var(--ink-900);flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
@@ -104,7 +105,7 @@
                     <span style="font-size:12px;color:var(--ink-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">
                         @issue.PageUrl
                     </span>
-                    <span style="color:var(--ink-400);margin-left:6px;font-size:11px" id="arr-@itemId">▸</span>
+                    <svg class="issue-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;color:var(--ink-400);transition:transform 0.2s cubic-bezier(0.25,1,0.5,1);margin-left:4px"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="ea-accordion-body" id="@itemId">
                     <dl style="display:grid;grid-template-columns:130px 1fr;gap:6px 12px;margin:0;font-size:13px">
@@ -129,9 +130,10 @@
     <script>
         function toggleIssue(id, btn) {
             const body = document.getElementById(id);
-            const arr  = document.getElementById('arr-' + id);
             const open = body.classList.toggle('open');
-            arr.textContent = open ? '▾' : '▸';
+            btn.setAttribute('aria-expanded', open);
+            const chevron = btn.querySelector('.issue-chevron');
+            if (chevron) chevron.style.transform = open ? 'rotate(180deg)' : '';
         }
     </script>
 }

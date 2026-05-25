@@ -41,20 +41,46 @@ public class WidgetApiController : ControllerBase
             return NotFound(new { error = "Lisans anahtarı bulunamadı veya aktif değil." });
 
         // İlk başarılı çağrıda domain'i otomatik doğrula
-        await AutoVerifyDomainAsync(key);
+        // Güvenlik: sadece isteğin gerçekten o domain'den geldiği doğrulanırsa işaretlenir
+        var origin = Request.Headers.Origin.FirstOrDefault()
+                  ?? Request.Headers.Referer.FirstOrDefault();
+        await AutoVerifyDomainAsync(key, origin);
 
         return Ok(config);
     }
 
-    private async Task AutoVerifyDomainAsync(Guid licenseKey)
+    private async Task AutoVerifyDomainAsync(Guid licenseKey, string? requestOrigin)
     {
         var domain = await _domainRepo.FirstOrDefaultAsync(
             d => d.LicenseKey == licenseKey && d.IsDeleted != true && d.IsVerified != true);
 
         if (domain is null) return;
 
+        // Origin header yoksa veya domain URL'iyle eşleşmiyorsa doğrulama yapma
+        if (string.IsNullOrWhiteSpace(requestOrigin))
+            return;
+
+        if (!OriginMatchesDomain(requestOrigin, domain.DomainUrl))
+            return;
+
         domain.IsVerified = true;
         _domainRepo.Update(domain);
         await _unitOfWork.SaveChangesAsync();
+    }
+
+    private static bool OriginMatchesDomain(string origin, string domainUrl)
+    {
+        try
+        {
+            var originHost = new Uri(origin).Host.TrimStart('.');
+            var domainHost = domainUrl
+                .Replace("https://", "").Replace("http://", "")
+                .Split('/')[0].Split(':')[0].TrimStart('.');
+            return string.Equals(originHost, domainHost, StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

@@ -3,18 +3,21 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] — Eascess</title>
+    <title>@ViewData["Title"] · Eascess</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
 
+    <a href="#main-content" class="ea-skip-link">İçeriğe geç</a>
+
     <!-- Pazarlama Navbar -->
-    <nav class="ea-navbar">
+    <nav class="ea-navbar" aria-label="Ana gezinme">
         <a class="ea-navbar__brand" asp-controller="Home" asp-action="Index">
             <div class="ea-navbar__logo">
-                <img src="~/image/Eascess_logo.png" alt="Eascess Logo" />
+                <img src="~/image/Eascess_logo.png" alt="" />
             </div>
             <span class="ea-navbar__brand-name">Eascess</span>
         </a>
@@ -45,12 +48,15 @@
     </nav>
 
     <!-- Sayfa içeriği -->
-    @RenderBody()
+    <main id="main-content">
+        @RenderBody()
+    </main>
 
     <footer class="ea-footer">
-        &copy; 2026 Eascess — Web erişilebSSilirliği platformu
+        &copy; 2026 Eascess, web erişilebilirliği platformu
     </footer>
 
+    <script src="~/js/site.js" asp-append-version="true" defer></script>
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>

@@ -1,3 +1,4 @@
+using Eascess_Domain.Constants;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,11 @@ public class WidgetLogApiController : ControllerBase
 {
     private static readonly HashSet<string> AllowedEvents =
         new(StringComparer.OrdinalIgnoreCase)
-        { "widget_opened", "feature_toggled", "ai_scan_used" };
+        {
+            WidgetEventTypes.WidgetOpened,
+            WidgetEventTypes.FeatureToggled,
+            WidgetEventTypes.AiScanUsed,
+        };
 
     private readonly IRepository<Domain> _domainRepo;
     private readonly IRepository<WidgetUsageLog> _logRepo;

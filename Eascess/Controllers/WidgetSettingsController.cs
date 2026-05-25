@@ -33,7 +33,7 @@ public class WidgetSettingsController : Controller
     // POST /WidgetSettings/Update
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Update(WidgetSettingDto dto)
+    public async Task<IActionResult> Update(WidgetSettingDto dto, string? returnUrl = null)
     {
         var userId = _userManager.GetUserId(User)!;
 
@@ -45,6 +45,10 @@ public class WidgetSettingsController : Controller
         if (!success) return NotFound();
 
         TempData["Success"] = "Widget ayarları güncellendi.";
+
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            return Redirect(returnUrl);
+
         return RedirectToAction(nameof(Index), new { id = dto.DomainId });
     }
 }

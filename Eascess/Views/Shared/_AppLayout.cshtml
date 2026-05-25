@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] — Eascess</title>
+    <title>@ViewData["Title"] · Eascess</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -11,16 +11,16 @@
 </head>
 <body>
 
+<a href="#ea-main-content" class="ea-skip-link">İçeriğe geç</a>
+
 <div class="ea-app">
 
     <!-- Yan menü -->
-    <aside class="ea-sidebar">
+    <aside class="ea-sidebar" aria-label="Uygulama gezinmesi">
 
         <!-- Marka -->
         <div class="ea-brand">
-            <div class="ea-brand-mark">
-                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.25 3.75 10.15 9 11.32C17.25 21.15 21 16.25 21 11V5L12 1zm0 4a3 3 0 110 6 3 3 0 010-6zm0 8c-2.67 0-8 1.34-8 4v1h16v-1c0-2.66-5.33-4-8-4z"/></svg>
-            </div>
+            <img src="~/image/Eascess_logo.png" alt="Eascess" class="ea-brand-logo" />
             <div>
                 <div class="ea-brand-name">Eascess</div>
                 <div class="ea-brand-meta">WCAG 2.2 · AAA</div>
@@ -109,12 +109,13 @@
     </aside>
 
     <!-- Ana içerik -->
-    <main class="ea-main">
+    <main class="ea-main" id="ea-main-content">
         @RenderBody()
     </main>
 
 </div>
 
+<script src="~/js/site.js" asp-append-version="true" defer></script>
 @await RenderSectionAsync("Scripts", required: false)
 
 </body>

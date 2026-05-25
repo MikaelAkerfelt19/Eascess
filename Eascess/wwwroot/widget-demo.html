@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridyen Danışmanlık — Örnek Site</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── Tokens ──────────────────────────────────────────────────── */
+:root {
+  --cream-50:  oklch(98% 0.006 85);
+  --cream-100: oklch(96% 0.008 85);
+  --cream-200: oklch(93% 0.01 85);
+  --cream-300: oklch(88% 0.012 80);
+  --ink-900: oklch(18% 0.012 260);
+  --ink-800: oklch(24% 0.012 260);
+  --ink-700: oklch(36% 0.014 260);
+  --ink-600: oklch(48% 0.014 260);
+  --ink-500: oklch(60% 0.012 260);
+  --teal:      oklch(72% 0.11 190);
+  --teal-deep: oklch(62% 0.12 200);
+  --navy:      oklch(42% 0.15 270);
+  --brand-grad: linear-gradient(135deg, oklch(72% 0.11 190), oklch(42% 0.15 270));
+  --sh-sm: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.04);
+  --sh-md: 0 4px 12px rgba(16,24,40,.06), 0 2px 4px rgba(16,24,40,.04);
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --font-display: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/*
+  WAVE MOSAIC PATTERN
+  Two sine-wave layers, offset by half a period (40px / 10px).
+  Hex approx: cream-300 → #ded5ca  cream-200 → #ebe3d9
+*/
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-700);
+  background-color: var(--cream-50);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='20'%3E%3Cpath d='M0 10 C13 2 27 2 40 10 C53 18 67 18 80 10' fill='none' stroke='%23ded5ca' stroke-width='.8'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='20'%3E%3Cpath d='M0 10 C13 2 27 2 40 10 C53 18 67 18 80 10' fill='none' stroke='%23ebe3d9' stroke-width='.5'/%3E%3C/svg%3E");
+  background-size: 80px 20px, 80px 20px;
+  background-position: 0 0, 40px 10px;
+  min-height: 100vh;
+}
+
+/* ── Nav ──────────────────────────────────────────────────── */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 40px;
+  background: oklch(97.5% 0.007 85 / 0.9);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid oklch(90% 0.01 80 / 0.7);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.nav-brand {
+  display: flex; align-items: center; gap: 8px; text-decoration: none;
+}
+
+.nav-brand-mark {
+  width: 26px; height: 26px; border-radius: 7px;
+  background: var(--brand-grad);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-brand-name {
+  font-size: 15px; font-weight: 600;
+  color: var(--ink-900); letter-spacing: -0.01em;
+}
+
+.nav-links {
+  display: flex; align-items: center; gap: 24px; list-style: none;
+}
+
+.nav-links a {
+  font-size: 13px; font-weight: 500;
+  color: var(--ink-700); text-decoration: none;
+}
+
+.nav-links a:hover { color: var(--ink-900); }
+
+.nav-cta {
+  font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  color: #fff; background: var(--brand-grad);
+  border: none; border-radius: var(--r-sm);
+  padding: 8px 16px; cursor: pointer;
+  text-decoration: none; min-height: 36px;
+  display: inline-flex; align-items: center;
+}
+
+/* ── Wave separator ───────────────────────────────────────── */
+.wave-sep {
+  display: block; width: 100%; height: 32px;
+  line-height: 0; overflow: hidden;
+  padding: 0 40px;
+}
+
+.wave-sep svg { width: 100%; height: 32px; display: block; }
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  padding: 64px 40px 52px;
+  max-width: 680px;
+  overflow: hidden;
+}
+
+/* Concentric ring decorations (wave/ripple motif) */
+.hero::before {
+  content: '';
+  position: absolute;
+  right: -80px; top: 10px;
+  width: 340px; height: 340px;
+  border-radius: 50%;
+  border: 1.5px solid oklch(88% 0.012 80 / 0.45);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -30px; top: 60px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  border: 1px solid oklch(88% 0.012 80 / 0.3);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--teal-deep); margin-bottom: 18px;
+}
+
+.hero-eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--teal); flex-shrink: 0;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: 400; line-height: 1;
+  letter-spacing: -0.02em; color: var(--ink-900);
+  margin-bottom: 20px;
+}
+
+.hero h1 em { font-style: italic; }
+
+.hero p {
+  font-size: 16px; line-height: 1.65;
+  color: var(--ink-700); max-width: 58ch;
+  margin-bottom: 32px;
+}
+
+.hero-actions {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+
+.btn-brand {
+  font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  color: #fff; background: var(--brand-grad);
+  border: none; border-radius: var(--r-sm);
+  padding: 11px 20px; cursor: pointer;
+  text-decoration: none; min-height: 44px;
+  display: inline-flex; align-items: center;
+  box-shadow: 0 4px 12px oklch(42% 0.15 270 / 0.2);
+  transition: transform 150ms cubic-bezier(.25,1,.5,1), box-shadow 150ms cubic-bezier(.25,1,.5,1);
+}
+
+.btn-brand:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px oklch(42% 0.15 270 / 0.28);
+}
+
+.btn-ghost {
+  font-family: var(--font-body); font-size: 14px; font-weight: 500;
+  color: var(--ink-700); background: transparent;
+  border: 1px solid var(--cream-300);
+  border-radius: var(--r-sm); padding: 11px 20px; cursor: pointer;
+  text-decoration: none; min-height: 44px;
+  display: inline-flex; align-items: center;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.btn-ghost:hover { background: var(--cream-200); color: var(--ink-900); }
+
+/* ── Services ─────────────────────────────────────────────── */
+.services {
+  padding: 52px 40px 48px;
+  /* Slightly denser wave on cream-100 base */
+  background-color: oklch(96% 0.008 85);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='15'%3E%3Cpath d='M0 7.5 C10 2 20 2 30 7.5 C40 13 50 13 60 7.5' fill='none' stroke='%23d6ccbf' stroke-width='.7'/%3E%3C/svg%3E");
+  background-size: 60px 15px;
+}
+
+.section-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-500); margin-bottom: 8px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.8vw, 1.85rem);
+  font-weight: 400; letter-spacing: -0.02em;
+  color: var(--ink-900); margin-bottom: 28px;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.service-card {
+  background: oklch(98% 0.006 85);
+  border: 1px solid oklch(90% 0.01 80);
+  border-radius: var(--r-md); padding: 22px;
+  box-shadow: var(--sh-sm);
+  transition: box-shadow 150ms ease, transform 150ms ease;
+}
+
+.service-card:hover { box-shadow: var(--sh-md); transform: translateY(-1px); }
+
+.service-icon {
+  width: 38px; height: 38px; border-radius: 9px;
+  background: var(--cream-200);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px; color: var(--teal-deep);
+}
+
+.service-card h3 {
+  font-size: 14px; font-weight: 600;
+  color: var(--ink-900); letter-spacing: -0.01em; margin-bottom: 6px;
+}
+
+.service-card p { font-size: 13px; color: var(--ink-600); line-height: 1.6; }
+
+/* ── Numbers — diamond mosaic tile ───────────────────────── */
+/*
+  Diamond grid: 30x30 tile, rhombus stroke
+  Hex approx: oklch(86% 0.013 80) → #cfc5b8
+*/
+.numbers {
+  padding: 36px 40px;
+  background-color: oklch(93% 0.01 85);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Cpath d='M15 1 L29 15 L15 29 L1 15 Z' fill='none' stroke='%23cfc5b8' stroke-width='.7'/%3E%3C/svg%3E");
+  background-size: 30px 30px;
+  display: flex; justify-content: space-around;
+  gap: 24px; flex-wrap: wrap;
+}
+
+.number-item { text-align: center; }
+
+.number-item strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.85rem; font-weight: 400;
+  color: var(--ink-900); letter-spacing: -0.02em;
+  line-height: 1; margin-bottom: 5px;
+}
+
+.number-item span { font-size: 12px; color: var(--ink-600); }
+
+/* ── About ────────────────────────────────────────────────── */
+.about {
+  padding: 52px 40px 48px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 40px; align-items: start;
+  background-color: var(--cream-50);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='20'%3E%3Cpath d='M0 10 C13 2 27 2 40 10 C53 18 67 18 80 10' fill='none' stroke='%23ded5ca' stroke-width='.8'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='20'%3E%3Cpath d='M0 10 C13 2 27 2 40 10 C53 18 67 18 80 10' fill='none' stroke='%23ebe3d9' stroke-width='.5'/%3E%3C/svg%3E");
+  background-size: 80px 20px, 80px 20px;
+  background-position: 0 0, 40px 10px;
+}
+
+.about-copy h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+  font-weight: 400; letter-spacing: -0.02em;
+  color: var(--ink-900); margin-bottom: 14px;
+}
+
+.about-copy p {
+  font-size: 14px; color: var(--ink-700);
+  line-height: 1.65; margin-bottom: 10px; max-width: 50ch;
+}
+
+.about-copy a {
+  font-size: 13px; font-weight: 600;
+  color: var(--navy); text-decoration: none;
+  border-bottom: 1px solid var(--cream-300);
+  transition: border-color 120ms ease;
+}
+
+.about-copy a:hover { border-color: var(--navy); }
+
+/* About visual: wave art in a box */
+.about-visual {
+  border-radius: var(--r-lg);
+  height: 180px; overflow: hidden;
+  background-color: oklch(93% 0.01 85);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Cpath d='M15 1 L29 15 L15 29 L1 15 Z' fill='none' stroke='%23c2b8ab' stroke-width='.7'/%3E%3C/svg%3E");
+  background-size: 30px 30px;
+  border: 1px solid var(--cream-300);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+footer {
+  padding: 22px 40px;
+  background-color: oklch(96% 0.008 85);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='15'%3E%3Cpath d='M0 7.5 C10 2 20 2 30 7.5 C40 13 50 13 60 7.5' fill='none' stroke='%23d6ccbf' stroke-width='.6'/%3E%3C/svg%3E");
+  background-size: 60px 15px;
+  display: flex; justify-content: space-between;
+  align-items: center; gap: 12px; flex-wrap: wrap;
+}
+
+footer p { font-size: 12px; color: var(--ink-500); }
+
+.footer-links { display: flex; gap: 16px; }
+
+.footer-links a {
+  font-size: 12px; color: var(--ink-500); text-decoration: none;
+}
+
+.footer-links a:hover { color: var(--ink-700); }
+
+/* ── Animations ───────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.07); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%       { transform: translateY(-14px) rotate(4deg); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero h1      { animation: fadeInUp 0.8s cubic-bezier(.25,1,.5,1) 0.1s both; }
+.hero > p     { animation: fadeInUp 0.8s cubic-bezier(.25,1,.5,1) 0.25s both; }
+.hero-actions { animation: fadeInUp 0.8s cubic-bezier(.25,1,.5,1) 0.4s both; }
+.hero-eyebrow-dot { animation: blink 1.8s ease-in-out infinite; }
+
+.number-item strong { animation: pulse 2.2s ease-in-out infinite; }
+
+.service-card:nth-child(1) { animation: slideInUp 0.7s cubic-bezier(.25,1,.5,1) 0.1s both; }
+.service-card:nth-child(2) { animation: slideInUp 0.7s cubic-bezier(.25,1,.5,1) 0.22s both; }
+.service-card:nth-child(3) { animation: slideInUp 0.7s cubic-bezier(.25,1,.5,1) 0.34s both; }
+
+.floating-decor {
+  position: absolute;
+  border-radius: 14px;
+  background: linear-gradient(135deg, oklch(72% 0.11 190 / 0.18), oklch(42% 0.15 270 / 0.18));
+  border: 1px solid oklch(88% 0.012 80 / 0.5);
+  animation: float 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.service-img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  display: block;
+  border: 1px solid var(--cream-200);
+}
+
+.about-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--r-lg);
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Ana menü">
+  <a href="#" class="nav-brand" aria-label="Meridyen Danışmanlık ana sayfa">
+    <div class="nav-brand-mark" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 1L2 4.5v5L7 13l5-3.5v-5L7 1Z" fill="white" opacity="0.95"/>
+      </svg>
+    </div>
+    <span class="nav-brand-name">Meridyen</span>
+  </a>
+  <ul class="nav-links" role="list">
+    <li><a href="#">Hizmetler</a></li>
+    <li><a href="#">Hakkımızda</a></li>
+    <li><a href="#">Blog</a></li>
+    <li><a href="#">İletişim</a></li>
+  </ul>
+  <a href="#" class="nav-cta">Teklif Alın</a>
+</nav>
+
+<main>
+
+  <section class="hero" aria-labelledby="hero-heading">
+    <!-- Floating decorative elements — animate continuously for demo -->
+    <div class="floating-decor" style="width:52px;height:52px;right:60px;top:40px;animation-delay:0s" aria-hidden="true"></div>
+    <div class="floating-decor" style="width:36px;height:36px;right:140px;top:120px;animation-delay:-2s;animation-duration:5s" aria-hidden="true"></div>
+    <div class="hero-eyebrow" aria-hidden="true">
+      <span class="hero-eyebrow-dot"></span>
+      Kurumsal Danışmanlık
+    </div>
+    <h1 id="hero-heading">
+      Doğru stratejilerle<br>
+      <em>sürdürülebilir</em> büyüme
+    </h1>
+    <p>
+      Yönetim danışmanlığı, dijital dönüşüm ve uyum hizmetleriyle
+      kurumunuzun potansiyelini tam anlamıyla ortaya çıkarıyoruz.
+    </p>
+    <div class="hero-actions">
+      <a href="#" class="btn-brand">Hizmetleri İnceleyin</a>
+      <a href="#" class="btn-ghost">Referanslarımız</a>
+    </div>
+  </section>
+
+  <!-- Wave separator 1 -->
+  <div class="wave-sep" role="separator" aria-hidden="true">
+    <svg viewBox="0 0 1200 32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0 16 C150 4 350 28 600 16 C850 4 1050 28 1200 16" fill="none" stroke="#d9cfc3" stroke-width="1.2"/>
+      <path d="M0 22 C150 10 350 34 600 22 C850 10 1050 34 1200 22" fill="none" stroke="#e5ddd5" stroke-width=".8"/>
+    </svg>
+  </div>
+
+  <section class="services" aria-labelledby="services-heading">
+    <div class="section-label" aria-hidden="true">Uzmanlık Alanlarımız</div>
+    <h2 class="section-title" id="services-heading">Size özel çözümler</h2>
+    <div class="service-grid">
+      <article class="service-card">
+        <img src="https://placehold.co/280x110/e8e0d6/7a6f64?text=Dijital+Dönüşüm" alt="Dijital dönüşüm" class="service-img">
+        <div class="service-icon" aria-hidden="true">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <h3>Dijital Dönüşüm</h3>
+        <p>İş süreçlerinizi modernize edin, verimliliği artırın ve rekabette öne geçin.</p>
+      </article>
+      <article class="service-card">
+        <img src="https://placehold.co/280x110/e8e0d6/7a6f64?text=Uyum+%26+Regülasyon" alt="Uyum ve regülasyon" class="service-img">
+        <div class="service-icon" aria-hidden="true">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h3>Uyum &amp; Regülasyon</h3>
+        <p>GDPR, KVKK ve sektörel düzenlemelere tam uyum için kapsamlı destek.</p>
+      </article>
+      <article class="service-card">
+        <img src="https://placehold.co/280x110/e8e0d6/7a6f64?text=Süreç+Optimizasyonu" alt="Süreç optimizasyonu" class="service-img">
+        <div class="service-icon" aria-hidden="true">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <h3>Süreç Optimizasyonu</h3>
+        <p>Operasyonel maliyetleri düşürün, süreç kalitesini ve hızını artırın.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Wave separator 2 -->
+  <div class="wave-sep" role="separator" aria-hidden="true">
+    <svg viewBox="0 0 1200 32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0 16 C200 4 400 28 600 16 C800 4 1000 28 1200 16" fill="none" stroke="#cec4b7" stroke-width="1.1"/>
+    </svg>
+  </div>
+
+  <div class="numbers" role="list" aria-label="Şirket istatistikleri">
+    <div class="number-item" role="listitem">
+      <strong>340+</strong>
+      <span>Tamamlanan Proje</span>
+    </div>
+    <div class="number-item" role="listitem">
+      <strong>18 yıl</strong>
+      <span>Sektör Deneyimi</span>
+    </div>
+    <div class="number-item" role="listitem">
+      <strong>%94</strong>
+      <span>Müşteri Memnuniyeti</span>
+    </div>
+  </div>
+
+  <!-- Wave separator 3 -->
+  <div class="wave-sep" role="separator" aria-hidden="true">
+    <svg viewBox="0 0 1200 32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0 16 C200 28 400 4 600 16 C800 28 1000 4 1200 16" fill="none" stroke="#d9cfc3" stroke-width="1"/>
+      <path d="M0 22 C200 34 400 10 600 22 C800 34 1000 10 1200 22" fill="none" stroke="#e5ddd5" stroke-width=".7"/>
+    </svg>
+  </div>
+
+  <section class="about" aria-labelledby="about-heading">
+    <div class="about-copy">
+      <h2 id="about-heading">Neden Meridyen?</h2>
+      <p>
+        18 yılı aşkın deneyimimizle finans, sağlık ve kamu sektörünün lider
+        kuruluşlarına hizmet verdik. Her projede bağımsız bakış açımızı ve
+        ölçülebilir sonuç odağımızı ön planda tutuyoruz.
+      </p>
+      <p>
+        Ekibimiz sektör uzmanları, veri analistleri ve teknoloji danışmanlarından oluşmaktadır.
+      </p>
+      <a href="#">Ekibimizle tanışın &rarr;</a>
+    </div>
+    <div class="about-visual">
+      <img src="https://placehold.co/440x180/ded5ca/7a6f64?text=Meridyen+Ekibi" alt="Meridyen Danışmanlık ekibi" class="about-img">
+    </div>
+  </section>
+
+</main>
+
+<!-- Wave footer separator -->
+<div class="wave-sep" role="separator" aria-hidden="true">
+  <svg viewBox="0 0 1200 32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0 16 C150 4 350 28 600 16 C850 4 1050 28 1200 16" fill="none" stroke="#cec4b7" stroke-width="1.2"/>
+    <path d="M0 22 C150 10 350 34 600 22 C850 10 1050 34 1200 22" fill="none" stroke="#dbd2c7" stroke-width=".7"/>
+  </svg>
+</div>
+
+<footer>
+  <p>&copy; 2025 Meridyen Danışmanlık A.Ş. &mdash; Örnek web sitesi</p>
+  <nav class="footer-links" aria-label="Sayfa alt menüsü">
+    <a href="#">Gizlilik</a>
+    <a href="#">Kullanım Şartları</a>
+    <a href="#">İletişim</a>
+  </nav>
+</footer>
+
+<script>
+(function () {
+    var defaultConfig = JSON.stringify({
+        themeColor: '#38bdf8',
+        position: 'bottom-right',
+        language: 'tr',
+        isAiEnabled: false,
+        poweredByVisible: true
+    });
+
+    var hashConfig = window.location.hash.slice(1);
+    var configStr = defaultConfig;
+    if (hashConfig) {
+        try {
+            JSON.parse(decodeURIComponent(hashConfig));
+            configStr = decodeURIComponent(hashConfig);
+        } catch (e) { /* geçersiz hash, varsayılan kullan */ }
+    }
+
+    var script = document.createElement('script');
+    script.setAttribute('data-key', '');
+    script.setAttribute('data-config', configStr);
+    script.src = '/js/widget.js';
+    document.body.appendChild(script);
+})();
+</script>
+
+</body>
+</html>

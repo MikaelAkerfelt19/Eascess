@@ -24,7 +24,7 @@ public class LicenseApiController : ControllerBase
         var result = await _licenseService.ValidateAsync(key, domain);
 
         if (!result.Valid)
-            return Ok(new { valid = false, reason = "invalid" });
+            return Ok(new { valid = false, reason = result.Reason ?? "invalid" });
 
         return Ok(new
         {

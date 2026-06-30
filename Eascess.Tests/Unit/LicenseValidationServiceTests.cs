@@ -109,6 +109,36 @@ public class LicenseValidationServiceTests
         _domainRepoMock.Verify(r => r.FirstOrDefaultAsync(It.IsAny<Expression<Func<Domain, bool>>>()), Times.Never);
     }
 
+    [Fact]
+    public async Task ValidateAsync_DomainPlanLimitiniAsiyor_ReturnsPlanExpired()
+    {
+        // Kullanıcı üst planda iken 2 domain eklemiş, ardından MaxDomains=1 olan
+        // Ücretsiz plana düşmüş. Limiti aşan (daha yeni eklenen) domain plan_expired alır.
+        var key = Guid.NewGuid();
+        var older = new Domain
+        {
+            Id = 1, UserId = "user-1", LicenseKey = Guid.NewGuid(), DomainUrl = "old.com",
+            IsDeleted = false, IsVerified = true, CreatedAt = DateTime.UtcNow.AddDays(-5)
+        };
+        var matched = new Domain
+        {
+            Id = 2, UserId = "user-1", LicenseKey = key, DomainUrl = "example.com",
+            IsDeleted = false, IsVerified = true, CreatedAt = DateTime.UtcNow
+        };
+
+        _domainRepoMock
+            .Setup(r => r.FirstOrDefaultAsync(It.IsAny<Expression<Func<Domain, bool>>>()))
+            .ReturnsAsync(matched);
+        _domainRepoMock
+            .Setup(r => r.FindAsync(It.IsAny<Expression<Func<Domain, bool>>>()))
+            .ReturnsAsync(new[] { older, matched });
+
+        var result = await _sut.ValidateAsync(key, "example.com");
+
+        Assert.False(result.Valid);
+        Assert.Equal("plan_expired", result.Reason);
+    }
+
     // ─── DomainIsRegisteredAsync ─────────────────────────────────────────────
 
     [Fact]
@@ -161,5 +191,9 @@ public class LicenseValidationServiceTests
         _domainRepoMock
             .Setup(r => r.FirstOrDefaultAsync(It.IsAny<Expression<Func<Domain, bool>>>()))
             .ReturnsAsync(domain);
+        // Plan kotası sıralaması için kullanıcının domain listesi
+        _domainRepoMock
+            .Setup(r => r.FindAsync(It.IsAny<Expression<Func<Domain, bool>>>()))
+            .ReturnsAsync(new[] { domain });
     }
 }

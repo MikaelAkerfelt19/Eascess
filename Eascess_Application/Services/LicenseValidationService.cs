@@ -32,6 +32,22 @@ public class LicenseValidationService : ILicenseValidationService
             return new LicenseValidationResult(false, "invalid");
 
         var plan = await _planService.GetUserActivePlanAsync(match.UserId);
+
+        // Plan kotası uygulaması: kullanıcı daha üst bir planda iken (örn. deneme/Pro)
+        // birden çok domain eklemiş, ardından düşük plana düşmüş olabilir. Bu durumda
+        // yalnızca planın izin verdiği kadar (en eski eklenen) domain çalışmaya devam eder;
+        // limiti aşan domainler "plan_expired" alır.
+        var userDomains = await _domainRepo.FindAsync(
+            d => d.UserId == match.UserId && d.IsDeleted != true);
+
+        var rank = (userDomains ?? Enumerable.Empty<Domain>())
+            .OrderBy(d => d.CreatedAt).ThenBy(d => d.Id)
+            .ToList()
+            .FindIndex(d => d.Id == match.Id);
+
+        if (rank >= plan.MaxDomains)
+            return new LicenseValidationResult(false, "plan_expired", plan.Name.ToLowerInvariant());
+
         return new LicenseValidationResult(true, null, plan.Name.ToLowerInvariant(), null);
     }
 

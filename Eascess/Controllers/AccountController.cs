@@ -109,14 +109,16 @@ public class AccountController : Controller
                 AutoRenew = false,
                 IsDeleted = false,
             });
-            // Deneme sonrası kalıcı Ücretsiz plan
+            // Deneme sonrası kalıcı Ücretsiz plan.
+            // IsActive=true ama StartDate=now+14 olduğu için deneme süresince henüz
+            // "geçerli" sayılmaz; Pro deneme bitince otomatik olarak öne çıkar.
             await _subscriptionRepo.AddAsync(new UserSubscription
             {
                 UserId = user.Id,
                 PlanId = 1, // Ücretsiz plan
                 StartDate = now.AddDays(14),
                 EndDate = now.AddYears(100),
-                IsActive = false, // Pro sona erince aktif olacak
+                IsActive = true,
                 AutoRenew = false,
                 IsDeleted = false,
             });

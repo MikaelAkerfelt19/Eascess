@@ -36,8 +36,8 @@ public class PlanServiceTests
             StartDate = DateTime.UtcNow.AddDays(-5),
             EndDate   = DateTime.UtcNow.AddDays(9),
         };
-        _subRepo.Setup(r => r.FirstOrDefaultAsync(It.IsAny<Expression<Func<UserSubscription, bool>>>()))
-                .ReturnsAsync(sub);
+        _subRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<UserSubscription, bool>>>()))
+                .ReturnsAsync(new[] { sub });
 
         var plan = await _sut.GetUserActivePlanAsync("u1");
 
@@ -89,8 +89,8 @@ public class PlanServiceTests
             StartDate = DateTime.UtcNow.AddDays(-1),
             EndDate   = DateTime.UtcNow.AddDays(30),
         };
-        _subRepo.Setup(r => r.FirstOrDefaultAsync(It.IsAny<Expression<Func<UserSubscription, bool>>>()))
-                .ReturnsAsync(sub);
+        _subRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<UserSubscription, bool>>>()))
+                .ReturnsAsync(new[] { sub });
         _planRepo.Setup(r => r.GetByIdAsync(99)).ReturnsAsync((Plan?)null);
 
         var plan = await _sut.GetUserActivePlanAsync("u1");

@@ -1,0 +1,133 @@
+@using Eascess_Domain.Entities
+@{
+    ViewData["Title"] = "Abonelik";
+    ViewData["Active"] = "subscription";
+    Layout = "~/Views/Shared/_AppLayout.cshtml";
+
+    var current   = (Plan)ViewBag.CurrentPlan;
+    var allPlans  = ViewBag.AllPlans as IReadOnlyList<Plan> ?? new List<Plan>();
+    var aiUsed    = (int)(ViewBag.AiUsed ?? 0);
+    var domCount  = (int)(ViewBag.DomainCount ?? 0);
+    var aiQuota   = current.MonthlyAiQuota;
+    var aiPct     = aiQuota > 0 ? Math.Min(100, (int)Math.Round(aiUsed * 100.0 / aiQuota)) : 0;
+    var domPct    = current.MaxDomains > 0 ? Math.Min(100, (int)Math.Round(domCount * 100.0 / current.MaxDomains)) : 0;
+    var trialEnds = ViewBag.TrialEndsAt as DateTime?;
+}
+
+<!-- Topbar -->
+<div class="ea-topbar">
+    <div>
+        <div class="ea-topbar-eyebrow">Hesap</div>
+        <h1 class="ea-topbar-title">Abonelik &amp; Plan</h1>
+    </div>
+    <div class="ea-topbar-actions">
+        <a asp-controller="Home" asp-action="Pricing" target="_blank" class="ea-btn ea-btn-ghost">
+            Fiyatlandırmayı Gör
+        </a>
+    </div>
+</div>
+
+@if (trialEnds.HasValue)
+{
+    var daysLeft = Math.Max(0, (int)Math.Ceiling((trialEnds.Value - DateTime.UtcNow).TotalDays));
+    var urgent = daysLeft <= 3;
+    var bg  = urgent ? "background:oklch(95% 0.06 25);border:1px solid oklch(80% 0.1 25)" : "background:oklch(96% 0.04 145);border:1px solid oklch(82% 0.1 145)";
+    var col = urgent ? "var(--danger,#dc2626)" : "oklch(30% 0.12 145)";
+    <div style="@bg;border-radius:var(--r-md);padding:14px 20px;display:flex;align-items:center;gap:12px">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="@col" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+        </svg>
+        <span style="font-size:14px;color:@col;flex:1">
+            <strong>14 Günlük Ücretsiz Deneme</strong> — Bitimine <strong>@daysLeft gün</strong> kaldı. Pro özellikleri şu an aktif; deneme bitince <strong>Ücretsiz</strong> plana düşersiniz.
+        </span>
+    </div>
+}
+
+<!-- Mevcut plan & kullanım -->
+<div class="ea-card" style="padding:24px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:12px">
+            <div style="background:@(current.Id == 1 ? "var(--cream-200)" : "var(--indigo-700)");color:@(current.Id == 1 ? "var(--ink-700)" : "white");padding:6px 16px;border-radius:999px;font-size:13px;font-weight:700">
+                @current.Name
+            </div>
+            <div style="color:var(--ink-500);font-size:13px">Mevcut planınız</div>
+        </div>
+        <div style="font-size:14px;color:var(--ink-700)">
+            <strong style="font-size:20px;color:var(--ink-900)">@current.MonthlyPrice.ToString("0") ₺</strong> / ay
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <!-- AI kotası -->
+        <div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+                <span style="font-size:13px;color:var(--ink-600);font-weight:600">YZ Alt Metin Kotası (bu ay)</span>
+                <span style="font-size:13px;color:var(--ink-500)">@aiUsed / @aiQuota</span>
+            </div>
+            <div style="height:8px;background:var(--cream-300);border-radius:999px;overflow:hidden">
+                <div style="height:100%;width:@aiPct%;background:@(aiPct >= 90 ? "var(--danger)" : aiPct >= 70 ? "var(--warning)" : "var(--indigo-700)");border-radius:999px;transition:width .3s"></div>
+            </div>
+        </div>
+        <!-- Domain kotası -->
+        <div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+                <span style="font-size:13px;color:var(--ink-600);font-weight:600">Domain Kullanımı</span>
+                <span style="font-size:13px;color:var(--ink-500)">@domCount / @current.MaxDomains</span>
+            </div>
+            <div style="height:8px;background:var(--cream-300);border-radius:999px;overflow:hidden">
+                <div style="height:100%;width:@domPct%;background:@(domPct >= 90 ? "var(--danger)" : domPct >= 70 ? "var(--warning)" : "var(--teal-600)");border-radius:999px;transition:width .3s"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Plan karşılaştırma -->
+<div>
+    <h2 style="font-size:16px;font-weight:700;color:var(--ink-900);margin:4px 0 14px">Planlar</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px">
+        @foreach (var p in allPlans)
+        {
+            var isCurrent = p.Id == current.Id;
+            var isUpgrade = p.MonthlyPrice > current.MonthlyPrice;
+            <div class="ea-card" style="padding:22px;@(isCurrent ? "border:2px solid var(--indigo-700)" : "")">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                    <span style="font-size:15px;font-weight:700;color:var(--ink-900)">@p.Name</span>
+                    @if (isCurrent)
+                    {
+                        <span class="ea-badge ea-badge-ok"><span class="ea-badge-dot"></span> Aktif</span>
+                    }
+                </div>
+                <div style="margin-bottom:16px">
+                    <span style="font-size:28px;font-weight:700;color:var(--ink-900)">@p.MonthlyPrice.ToString("0") ₺</span>
+                    <span style="font-size:13px;color:var(--ink-500)"> / ay</span>
+                </div>
+                <ul style="list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:8px">
+                    <li style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-700)">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--teal-600)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                        @p.MaxDomains domain
+                    </li>
+                    <li style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-700)">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--teal-600)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                        Aylık @p.MonthlyAiQuota YZ alt metin
+                    </li>
+                </ul>
+                @if (isCurrent)
+                {
+                    <button class="ea-btn ea-btn-ghost" style="width:100%;justify-content:center" disabled>Mevcut Plan</button>
+                }
+                else if (isUpgrade)
+                {
+                    <a asp-controller="Home" asp-action="Pricing" target="_blank" class="ea-btn ea-btn-brand" style="width:100%;justify-content:center">Yükselt</a>
+                }
+                else
+                {
+                    <a asp-controller="Home" asp-action="Pricing" target="_blank" class="ea-btn ea-btn-ghost" style="width:100%;justify-content:center">Detaylar</a>
+                }
+            </div>
+        }
+    </div>
+    <p style="font-size:12px;color:var(--ink-500);margin-top:14px">
+        Ödeme entegrasyonu yakında. Plan yükseltme talepleriniz için
+        <a asp-controller="Support" asp-action="Create" style="color:var(--indigo-700);font-weight:600;text-decoration:none">destek talebi</a> açabilirsiniz.
+    </p>
+</div>

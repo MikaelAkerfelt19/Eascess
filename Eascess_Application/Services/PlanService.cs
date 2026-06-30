@@ -26,10 +26,19 @@ public class PlanService : IPlanService
 
     public async Task<Plan> GetUserActivePlanAsync(string userId)
     {
-        var sub = await _subscriptionRepo.FirstOrDefaultAsync(
-            s => s.UserId == userId && s.IsActive && !s.IsDeleted && s.EndDate >= DateTime.UtcNow);
+        var now = DateTime.UtcNow;
 
-        var planId = sub?.PlanId ?? FreePlanId;
+        // Şu an geçerli (başlamış ve bitmemiş) aktif abonelikler içinde en yüksek
+        // kademeyi seç. Deneme süresince Pro (PlanId=2), deneme bitince Ücretsiz
+        // (PlanId=1) abonelik öne çıkar — yüksek PlanId daha üst kademe demektir.
+        var subs = await _subscriptionRepo.FindAsync(
+            s => s.UserId == userId && s.IsActive && !s.IsDeleted
+                 && s.StartDate <= now && s.EndDate >= now);
+
+        var planId = subs.OrderByDescending(s => s.PlanId)
+                         .Select(s => (int?)s.PlanId)
+                         .FirstOrDefault() ?? FreePlanId;
+
         var plan = await _planRepo.GetByIdAsync(planId);
 
         // Fallback: plan bulunamazsa varsayılan değerler döndür
@@ -51,5 +60,11 @@ public class PlanService : IPlanService
             l => domainIds.Contains(l.DomainId) && l.RequestDate >= monthStart);
 
         return logs.Count();
+    }
+
+    public async Task<IReadOnlyList<Plan>> GetAllActivePlansAsync()
+    {
+        var plans = await _planRepo.FindAsync(p => p.IsActive && !p.IsDeleted);
+        return plans.OrderBy(p => p.MonthlyPrice).ToList();
     }
 }

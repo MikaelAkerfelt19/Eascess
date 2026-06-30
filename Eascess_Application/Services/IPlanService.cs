@@ -14,4 +14,10 @@ public interface IPlanService
     /// Kullanıcının bu ay kaç AI taraması kullandığını döndürür.
     /// </summary>
     Task<int> GetMonthlyAiUsageAsync(string userId);
+
+    /// <summary>
+    /// Aktif (silinmemiş) tüm planları fiyat sırasına göre döndürür.
+    /// Abonelik karşılaştırma sayfası için kullanılır.
+    /// </summary>
+    Task<IReadOnlyList<Plan>> GetAllActivePlansAsync();
 }

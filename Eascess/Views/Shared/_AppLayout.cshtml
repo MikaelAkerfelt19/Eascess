@@ -55,13 +55,21 @@
             <span>Tarama Raporları</span>
         </a>
 
-        <a asp-controller="Domains" asp-action="Index"
+        <a asp-controller="WidgetSettings" asp-action="Index"
            class="ea-nav-item @(ViewData["Active"]?.ToString() == "widget" ? "active" : "")">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="4"/>
                 <rect x="3" y="13" width="8" height="8" rx="4"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>
             </svg>
             <span>Widget Stüdyo</span>
+        </a>
+
+        <a asp-controller="Subscription" asp-action="Index"
+           class="ea-nav-item @(ViewData["Active"]?.ToString() == "subscription" ? "active" : "")">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>
+            </svg>
+            <span>Abonelik</span>
         </a>
 
         <a asp-controller="Support" asp-action="Index"

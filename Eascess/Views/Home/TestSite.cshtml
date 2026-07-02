@@ -7,31 +7,29 @@
     var rateLimited = ViewBag.RateLimited as bool? ?? false;
 }
 
-<section style="max-width:720px;margin:80px auto;padding:0 24px">
+<section class="ea-test">
 
     <!-- Başlık -->
-    <div style="text-align:center;margin-bottom:40px" data-ea-reveal="fade-up">
-        <div style="display:inline-flex;align-items:center;gap:6px;background:oklch(96% 0.04 190);color:var(--teal-600,#0d9488);padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:16px">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2l1.5 5.5L19 9l-5.5 1.5L12 16l-1.5-5.5L5 9l5.5-1.5z"/></svg>
-            ÜCRETSİZ WCAG ANALİZİ
+    <div class="ea-test-head" data-ea-reveal="fade-up">
+        <div class="ea-mkt-eyebrow-pill">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2l1.5 5.5L19 9l-5.5 1.5L12 16l-1.5-5.5L5 9l5.5-1.5z"/></svg>
+            Ücretsiz WCAG analizi
         </div>
-        <h1 style="font-family:var(--font-display,serif);font-size:clamp(2rem,5vw,3rem);line-height:1.15;margin:0 0 16px;color:var(--ink-900)">
-            Sitenizin Erişilebilirliğini<br>Hemen Test Edin
-        </h1>
-        <p style="font-size:17px;color:var(--ink-600);margin:0">WCAG 2.2 kurallarına göre otomatik analiz — kayıt gerekmez.</p>
+        <h1>Sitenizin erişilebilirliğini<br><em>hemen</em> test edin</h1>
+        <p>WCAG 2.2 kurallarına göre otomatik analiz. Kayıt gerekmez.</p>
     </div>
 
     <!-- Form -->
-    <div class="ea-card" style="padding:24px 28px" data-ea-reveal="fade-up" data-ea-delay="0.1s">
+    <div class="ea-test-form-card" data-ea-reveal="fade-up" data-ea-delay="0.1s">
         <form method="post" asp-action="TestSite">
             @Html.AntiForgeryToken()
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <div class="ea-test-form">
                 <input type="url" name="url" value="@scannedUrl" placeholder="https://example.com"
-                       required class="ea-input" style="flex:1;min-width:240px"
+                       required class="ea-input" aria-label="Test edilecek site adresi"
                        oninvalid="this.setCustomValidity('Lütfen geçerli bir URL girin (https://...)')"
                        oninput="this.setCustomValidity('')" />
                 <button type="submit" class="ea-btn ea-btn-brand" style="white-space:nowrap">
-                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                     Analiz Et
                 </button>
             </div>
@@ -39,20 +37,21 @@
             {
                 foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
                 {
-                    <p style="color:var(--danger,#dc2626);font-size:13px;margin:8px 0 0">@err.ErrorMessage</p>
+                    <p class="ea-test-error">@err.ErrorMessage</p>
                 }
             }
         </form>
-        <p style="font-size:12px;color:var(--ink-600);margin:10px 0 0">Günde en fazla 5 tarama · Sonuçlar kaydedilmez</p>
+        <p class="ea-test-meta">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Günde en fazla 5 tarama · Sonuçlar kaydedilmez
+        </p>
     </div>
 
     @if (rateLimited)
     {
-        <div class="ea-card" style="padding:20px 24px;margin-top:16px;background:oklch(97% 0.03 25);border:1px solid oklch(80% 0.08 25)">
-            <p style="margin:0;color:var(--ink-700)">
-                <strong>Günlük limit aşıldı.</strong> Bugün için 5 tarama hakkınızı kullandınız.
-                Sınırsız tarama için <a asp-controller="Account" asp-action="Register" style="color:var(--indigo-700)">ücretsiz hesap açın</a>.
-            </p>
+        <div class="ea-callout ea-callout--danger">
+            <strong>Günlük limit aşıldı.</strong> Bugün için 5 tarama hakkınızı kullandınız.
+            Sınırsız tarama için <a asp-controller="Account" asp-action="Register">ücretsiz hesap açın</a>.
         </div>
     }
 
@@ -60,48 +59,57 @@
     {
         @if (!result.Success)
         {
-            <div class="ea-card" style="padding:20px 24px;margin-top:16px;background:oklch(97% 0.03 25);border:1px solid oklch(80% 0.08 25)">
-                <p style="margin:0;color:var(--ink-700)"><strong>Tarama başarısız:</strong> @result.ErrorMessage</p>
+            <div class="ea-callout ea-callout--danger">
+                <strong>Tarama başarısız:</strong> @result.ErrorMessage
             </div>
         }
         else
         {
-            <!-- Skor kartı -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px" data-ea-reveal="fade-up">
-                @{
-                    var scoreColor = result.Score >= 80 ? "oklch(35% 0.12 145)" : result.Score >= 60 ? "oklch(40% 0.12 75)" : "var(--danger,#dc2626)";
-                    var scoreBg    = result.Score >= 80 ? "oklch(96% 0.04 145)" : result.Score >= 60 ? "oklch(97% 0.05 75)" : "oklch(97% 0.05 25)";
-                }
-                <div class="ea-card" style="padding:20px;text-align:center;background:@scoreBg">
-                    <div style="font-size:40px;font-weight:800;color:@scoreColor;line-height:1">@result.Score</div>
-                    <div style="font-size:12px;color:var(--ink-500);margin-top:4px;font-weight:600">WCAG Skoru / 100</div>
-                </div>
-                <div class="ea-card" style="padding:20px;text-align:center">
-                    <div style="font-size:36px;font-weight:700;color:var(--danger,#dc2626);line-height:1">@result.CriticalCount</div>
-                    <div style="font-size:12px;color:var(--ink-500);margin-top:4px;font-weight:600">Kritik Sorun</div>
-                </div>
-                <div class="ea-card" style="padding:20px;text-align:center">
-                    <div style="font-size:36px;font-weight:700;color:oklch(50% 0.12 75);line-height:1">@result.WarningCount</div>
-                    <div style="font-size:12px;color:var(--ink-500);margin-top:4px;font-weight:600">Uyarı</div>
-                </div>
-            </div>
+            var ringColor = result.Score >= 80 ? "var(--success-deep)" : result.Score >= 60 ? "var(--warning-deep)" : "var(--danger-deep)";
 
-            <!-- Sorun listesi -->
-            @if (result.TopIssues.Any())
-            {
-                <div class="ea-card" style="padding:0;overflow:hidden;margin-top:12px">
-                    <div style="padding:16px 20px;border-bottom:1px solid var(--cream-300)">
-                        <strong style="font-size:14px;color:var(--ink-900)">Bulunan Sorunlar</strong>
-                        <span style="font-size:12px;color:var(--ink-500);margin-left:8px">İlk @result.TopIssues.Count gösteriliyor</span>
+            <!-- Sonuç paneli -->
+            <div class="ea-test-result" data-ea-reveal="fade-up">
+                <div class="ea-test-result__head">
+                    <div class="ea-score-ring" style="--score:@result.Score; --ring:@ringColor" role="img" aria-label="WCAG skoru: 100 üzerinden @result.Score">
+                        <div class="ea-score-ring__inner">
+                            <div>
+                                <div class="ea-score-ring__value">@result.Score</div>
+                                <div class="ea-score-ring__label">/ 100</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="ea-test-result__counts">
+                            <div>
+                                <div class="ea-test-count__value ea-test-count__value--danger">@result.CriticalCount</div>
+                                <div class="ea-test-count__label">Kritik Sorun</div>
+                            </div>
+                            <div>
+                                <div class="ea-test-count__value ea-test-count__value--warning">@result.WarningCount</div>
+                                <div class="ea-test-count__label">Uyarı</div>
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(scannedUrl))
+                        {
+                            <div class="ea-test-result__url">@scannedUrl</div>
+                        }
+                    </div>
+                </div>
+
+                @if (result.TopIssues.Any())
+                {
+                    <div class="ea-issues__head">
+                        <span class="ea-issues__title">Bulunan Sorunlar</span>
+                        <span class="ea-issues__meta">İlk @result.TopIssues.Count gösteriliyor</span>
                     </div>
                     <div>
                         @foreach (var issue in result.TopIssues)
                         {
-                            var (ibg, ifg) = issue.Severity switch
+                            var sevClass = issue.Severity switch
                             {
-                                "Critical" => ("oklch(97% 0.04 25)", "var(--danger,#dc2626)"),
-                                "Warning"  => ("oklch(98% 0.04 75)", "oklch(40% 0.12 75)"),
-                                _          => ("var(--cream-50,#fafaf9)", "var(--ink-600)"),
+                                "Critical" => "ea-sev--critical",
+                                "Warning"  => "ea-sev--warning",
+                                _          => "ea-sev--info",
                             };
                             var label = issue.Severity switch
                             {
@@ -109,30 +117,30 @@
                                 "Warning"  => "Uyarı",
                                 _          => "Bilgi",
                             };
-                            <div style="padding:14px 20px;border-bottom:1px solid var(--cream-200);display:flex;gap:12px;align-items:flex-start">
-                                <span style="display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;background:@ibg;color:@ifg;white-space:nowrap;flex-shrink:0">@label</span>
+                            <div class="ea-issue-row">
+                                <span class="ea-sev @sevClass">@label</span>
                                 <div>
-                                    <div style="font-size:13px;font-weight:600;color:var(--ink-800);margin-bottom:2px">@issue.Code</div>
-                                    <div style="font-size:13px;color:var(--ink-600)">@issue.Description</div>
+                                    <div class="ea-issue-row__code">@issue.Code</div>
+                                    <div class="ea-issue-row__desc">@issue.Description</div>
                                 </div>
                             </div>
                         }
                     </div>
-                </div>
-            }
-            else
-            {
-                <div class="ea-card" style="padding:24px;text-align:center;margin-top:12px">
-                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="oklch(55% 0.12 145)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 8px;display:block"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
-                    <p style="color:var(--ink-700);font-weight:600;margin:0">Harika! Otomatik kontrollerimizde sorun bulunamadı.</p>
-                </div>
-            }
+                }
+                else
+                {
+                    <div class="ea-test-clean">
+                        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="var(--success-deep)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+                        <p>Harika! Otomatik kontrollerimizde sorun bulunamadı.</p>
+                    </div>
+                }
+            </div>
 
             <!-- CTA -->
-            <div class="ea-card" style="padding:24px;margin-top:12px;background:var(--ink-900);border:none;color:white;text-align:center">
-                <div style="font-size:15px;font-weight:600;margin-bottom:8px">Tam raporu ve sürekli izlemeyi ücretsiz deneyin</div>
-                <div style="font-size:13px;color:oklch(80% 0.02 260);margin-bottom:16px">14 gün Pro · Kredi kartı gerekmez</div>
-                <a asp-controller="Account" asp-action="Register" class="ea-btn" style="background:white;color:var(--ink-900);font-weight:700">Ücretsiz Başla</a>
+            <div class="ea-test-cta" data-ea-reveal="fade-up" data-ea-delay="0.1s">
+                <div class="ea-test-cta__title">Tam raporu ve sürekli izlemeyi deneyin</div>
+                <div class="ea-test-cta__desc">14 gün Pro · Kredi kartı gerekmez</div>
+                <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn--white" style="font-weight:700">Ücretsiz Başla</a>
             </div>
         }
     }

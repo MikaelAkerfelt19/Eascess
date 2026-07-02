@@ -9,12 +9,10 @@ namespace Eascess.Middleware;
 public class DynamicCorsMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly IWebHostEnvironment _env;
 
-    public DynamicCorsMiddleware(RequestDelegate next, IWebHostEnvironment env)
+    public DynamicCorsMiddleware(RequestDelegate next)
     {
         _next = next;
-        _env = env;
     }
 
     public async Task InvokeAsync(HttpContext context, ILicenseValidationService licenseService)
@@ -30,26 +28,25 @@ public class DynamicCorsMiddleware
 
         if (string.IsNullOrEmpty(origin))
         {
-            // Origin header'ı yok: Postman/curl isteği
-            // Development'ta geç, Production'da CORS header'ı ekleme
-            if (!_env.IsDevelopment())
-            {
-                await _next(context);
-                return;
-            }
-
+            // Origin header'ı yok (Postman/curl/sunucu-sunucu): CORS header'ı eklemeden geç
             await _next(context);
             return;
         }
+
+        // Yanıt origin'e göre değiştiği için Vary her durumda eklenmeli —
+        // aksi halde ara cache'ler izinli origin'in yanıtını izinsize servis edebilir.
+        context.Response.Headers.Append("Vary", "Origin");
 
         var isRegistered = await licenseService.DomainIsRegisteredAsync(origin);
 
         if (isRegistered)
         {
+            // Widget /api/widget/log ve /api/scan/alt-text uçlarına JSON POST atar;
+            // preflight'ın geçmesi için POST da izinli olmalıdır.
             context.Response.Headers.Append("Access-Control-Allow-Origin", origin);
-            context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, OPTIONS");
+            context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
             context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type, Authorization");
-            context.Response.Headers.Append("Vary", "Origin");
+            context.Response.Headers.Append("Access-Control-Max-Age", "3600");
         }
 
         // OPTIONS preflight isteğini bitir

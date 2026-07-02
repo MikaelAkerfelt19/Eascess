@@ -47,13 +47,13 @@
 <div class="ea-card" style="padding:24px">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
         <div style="display:flex;align-items:center;gap:12px">
-            <div style="background:@(current.Id == 1 ? "var(--cream-200)" : "var(--indigo-700)");color:@(current.Id == 1 ? "var(--ink-700)" : "white");padding:6px 16px;border-radius:999px;font-size:13px;font-weight:700">
+            <div style="background:@(current.Id == 1 ? "var(--cream-200)" : "var(--indigo-700)");color:@(current.Id == 1 ? "var(--ink-700)" : "white");padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700">
                 @current.Name
             </div>
             <div style="color:var(--ink-500);font-size:13px">Mevcut planınız</div>
         </div>
         <div style="font-size:14px;color:var(--ink-700)">
-            <strong style="font-size:20px;color:var(--ink-900)">@current.MonthlyPrice.ToString("0") ₺</strong> / ay
+            <strong style="font-size:20px;color:var(--ink-900)">@current.MonthlyPrice.ToString("0") ₺</strong> / ay@(current.MonthlyPrice > 0 ? " + KDV" : "")
         </div>
     </div>
 
@@ -99,7 +99,7 @@
                 </div>
                 <div style="margin-bottom:16px">
                     <span style="font-size:28px;font-weight:700;color:var(--ink-900)">@p.MonthlyPrice.ToString("0") ₺</span>
-                    <span style="font-size:13px;color:var(--ink-500)"> / ay</span>
+                    <span style="font-size:13px;color:var(--ink-500)"> / ay@(p.MonthlyPrice > 0 ? " + KDV" : "")</span>
                 </div>
                 <ul style="list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:8px">
                     <li style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-700)">
@@ -117,7 +117,8 @@
                 }
                 else if (isUpgrade)
                 {
-                    <a asp-controller="Home" asp-action="Pricing" target="_blank" class="ea-btn ea-btn-brand" style="width:100%;justify-content:center">Yükselt</a>
+                    @* Ödeme entegrasyonu hazır olana dek yükseltme talepleri destek üzerinden alınır *@
+                    <a asp-controller="Support" asp-action="Create" class="ea-btn ea-btn-brand" style="width:100%;justify-content:center">Yükseltme Talebi Aç</a>
                 }
                 else
                 {

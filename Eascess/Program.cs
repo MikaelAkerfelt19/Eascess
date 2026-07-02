@@ -126,6 +126,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// /api rotaları için JSON hata gövdesi (widget fetch'leri HTML hata sayfası parse edemez)
+app.UseMiddleware<ApiExceptionMiddleware>();
+
 // Güvenlik başlıkları
 app.Use(async (ctx, next) =>
 {

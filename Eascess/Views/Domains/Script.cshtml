@@ -23,6 +23,11 @@
     </div>
 </div>
 
+@if (TempData["Success"] is string successMsg)
+{
+    <div class="ea-alert ea-alert--success">✓ @successMsg</div>
+}
+
 <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:18px;align-items:start">
 
     <!-- Adım kartları -->

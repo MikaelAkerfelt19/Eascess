@@ -12,7 +12,10 @@
       "Bash(cd \"C:\\\\Users\\\\Demir Kaan\\\\source\\\\repos\\\\Eascess.Web\" && dotnet build Eascess/Eascess_Web.csproj 2>&1 | tail -12)",
       "Bash(cd \"C:\\\\Users\\\\Demir Kaan\\\\source\\\\repos\\\\Eascess.Web\" && dotnet ef database update --project Eascess_Infrastructure --startup-project Eascess 2>&1)",
       "Bash(cd \"C:\\\\Users\\\\Demir Kaan\\\\source\\\\repos\\\\Eascess.Web\" && dotnet build Eascess_Infrastructure/Eascess_Infrastructure.csproj 2>&1 | tail -10)",
-      "Bash(cd \"C:\\\\Users\\\\Demir Kaan\\\\source\\\\repos\\\\Eascess.Web\" && dotnet build --no-restore 2>&1 | tail -30)"
+      "Bash(cd \"C:\\\\Users\\\\Demir Kaan\\\\source\\\\repos\\\\Eascess.Web\" && dotnet build --no-restore 2>&1 | tail -30)",
+      "Skill(impeccable)",
+      "PowerShell(dotnet build *)",
+      "PowerShell(npx --yes skills list 2>&1 | Where-Object { $_ -notmatch 'Cloning|Installing' } | Select-Object -Last 30)"
     ]
   }
 }

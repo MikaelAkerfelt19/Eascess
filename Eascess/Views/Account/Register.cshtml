@@ -1,17 +1,14 @@
 @model Eascess.Models.RegisterViewModel
 @{
     ViewData["Title"] = "Hesap Oluştur";
+    ViewData["AuthMode"] = "register";
     Layout = "_AuthLayout";
 }
 
 <div class="auth-card">
 
-    <div class="auth-brand">
-        <img src="~/image/Eascess_logo.png" alt="Eascess" class="auth-brand-logo" />
-    </div>
-
     <h1 class="auth-heading">Hesabınızı oluşturun</h1>
-    <p class="auth-subheading">Web'i herkes için erişilebilir yapın</p>
+    <p class="auth-subheading">30 saniyede hazır; kredi kartı gerekmez</p>
 
     @if (ViewData["PromoMessage"] != null)
     {

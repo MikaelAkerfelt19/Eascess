@@ -1,14 +1,11 @@
 @model Eascess.Models.LoginViewModel
 @{
     ViewData["Title"] = "Giriş Yap";
+    ViewData["AuthMode"] = "login";
     Layout = "_AuthLayout";
 }
 
 <div class="auth-card">
-
-    <div class="auth-brand">
-        <img src="~/image/Eascess_logo.png" alt="Eascess" class="auth-brand-logo" />
-    </div>
 
     <h1 class="auth-heading">Tekrar hoş geldiniz</h1>
     <p class="auth-subheading">Erişilebilirlik panelinize giriş yapın</p>
@@ -43,7 +40,8 @@
                 <input type="checkbox" asp-for="RememberMe" />
                 Beni hatırla
             </label>
-            <a asp-controller="Support" asp-action="Index" class="auth-link">Şifremi unuttum?</a>
+            @* Support sayfası [Authorize] gerektirir; giriş yapamayan kullanıcı için e-posta yolu sunulur *@
+            <a href="mailto:destek@eascess.io?subject=%C5%9Eifre%20s%C4%B1f%C4%B1rlama%20talebi" class="auth-link">Şifremi unuttum?</a>
         </div>
 
         <button type="submit" class="btn-auth">Giriş Yap</button>

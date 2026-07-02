@@ -13,17 +13,20 @@ public class AccountController : Controller
     private readonly SignInManager<AppUser> _signInManager;
     private readonly IRepository<UserSubscription> _subscriptionRepo;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<AccountController> _logger;
 
     public AccountController(
         UserManager<AppUser> userManager,
         SignInManager<AppUser> signInManager,
         IRepository<UserSubscription> subscriptionRepo,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ILogger<AccountController> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _subscriptionRepo = subscriptionRepo;
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     // ── Login ────────────────────────────────────────────────────────────────
@@ -98,31 +101,40 @@ public class AccountController : Controller
 
         if (result.Succeeded)
         {
-            // Deneme süresince Pro plan (id=2); deneme bitince Ücretsiz'e (id=1) düşer
-            await _subscriptionRepo.AddAsync(new UserSubscription
+            // Abonelik satırları oluşturulamazsa kayıt akışı yine tamamlanır;
+            // PlanService abonelik bulamadığında Ücretsiz plana düşer.
+            try
             {
-                UserId = user.Id,
-                PlanId = 2, // Pro plan — 14 günlük deneme
-                StartDate = now,
-                EndDate = now.AddDays(14),
-                IsActive = true,
-                AutoRenew = false,
-                IsDeleted = false,
-            });
-            // Deneme sonrası kalıcı Ücretsiz plan.
-            // IsActive=true ama StartDate=now+14 olduğu için deneme süresince henüz
-            // "geçerli" sayılmaz; Pro deneme bitince otomatik olarak öne çıkar.
-            await _subscriptionRepo.AddAsync(new UserSubscription
+                // Deneme süresince Pro plan (id=2); deneme bitince Ücretsiz'e (id=1) düşer
+                await _subscriptionRepo.AddAsync(new UserSubscription
+                {
+                    UserId = user.Id,
+                    PlanId = 2, // Pro plan — 14 günlük deneme
+                    StartDate = now,
+                    EndDate = now.AddDays(14),
+                    IsActive = true,
+                    AutoRenew = false,
+                    IsDeleted = false,
+                });
+                // Deneme sonrası kalıcı Ücretsiz plan.
+                // IsActive=true ama StartDate=now+14 olduğu için deneme süresince henüz
+                // "geçerli" sayılmaz; Pro deneme bitince otomatik olarak öne çıkar.
+                await _subscriptionRepo.AddAsync(new UserSubscription
+                {
+                    UserId = user.Id,
+                    PlanId = 1, // Ücretsiz plan
+                    StartDate = now.AddDays(14),
+                    EndDate = now.AddYears(100),
+                    IsActive = true,
+                    AutoRenew = false,
+                    IsDeleted = false,
+                });
+                await _unitOfWork.SaveChangesAsync();
+            }
+            catch (Exception ex)
             {
-                UserId = user.Id,
-                PlanId = 1, // Ücretsiz plan
-                StartDate = now.AddDays(14),
-                EndDate = now.AddYears(100),
-                IsActive = true,
-                AutoRenew = false,
-                IsDeleted = false,
-            });
-            await _unitOfWork.SaveChangesAsync();
+                _logger.LogError(ex, "Kayıt sırasında deneme aboneliği oluşturulamadı. UserId={UserId}", user.Id);
+            }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
             return RedirectToAction("Index", "Dashboard");

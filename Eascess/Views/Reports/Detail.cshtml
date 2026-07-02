@@ -19,6 +19,11 @@
     </div>
 </div>
 
+@if (TempData["ScanSuccess"] is string okMsg)
+{
+    <div class="ea-alert ea-alert--success">✓ @okMsg</div>
+}
+
 <!-- Özet kartı -->
 <div class="ea-card" style="padding:24px;margin-bottom:14px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:20px">

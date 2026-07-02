@@ -101,7 +101,7 @@
             </div>
             <div style="flex:1;min-width:0">
                 <div class="ea-user-name">@(User.Identity?.Name ?? "Kullanıcı")</div>
-                <div class="ea-user-meta">@(ViewBag.PlanName ?? "Ücretsiz") plan</div>
+                <div class="ea-user-meta">@await Component.InvokeAsync("UserPlanName") plan</div>
             </div>
             <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
                 @Html.AntiForgeryToken()

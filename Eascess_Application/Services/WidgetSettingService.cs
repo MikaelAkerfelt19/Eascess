@@ -74,8 +74,8 @@ public class WidgetSettingService : IWidgetSettingService
         setting.Position   = IsValidPosition(dto.Position)   ? dto.Position   : "bottom-right";
         setting.Language   = IsValidLanguage(dto.Language)   ? dto.Language   : "tr";
         setting.IsAiEnabled = dto.IsAiEnabled;
-        setting.LogoUrl = string.IsNullOrWhiteSpace(dto.LogoUrl) ? null : dto.LogoUrl.Trim();
-        setting.WidgetTitle = string.IsNullOrWhiteSpace(dto.WidgetTitle) ? null : dto.WidgetTitle.Trim();
+        setting.LogoUrl = NormalizeLogoUrl(dto.LogoUrl);
+        setting.WidgetTitle = NormalizeWidgetTitle(dto.WidgetTitle);
         setting.PoweredByVisible = dto.PoweredByVisible;
         setting.UpdatedAt = DateTime.UtcNow;
 
@@ -92,6 +92,29 @@ public class WidgetSettingService : IWidgetSettingService
         p is not null && ValidPositions.Contains(p);
     private static bool IsValidLanguage(string? l) =>
         l is not null && ValidLanguages.Contains(l);
+
+    // LogoUrl ve WidgetTitle widget.js tarafından müşteri sitesinin DOM'una gömülür;
+    // tırnak/açılı ayraç içeren değerler HTML attribute'undan kaçıp XSS'e yol açar.
+    private static string? NormalizeLogoUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return null;
+        var trimmed = url.Trim();
+        if (trimmed.Length > 500) return null;
+
+        var isHttpOrRooted = trimmed.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                          || trimmed.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                          || trimmed.StartsWith('/');
+
+        return isHttpOrRooted && !Regex.IsMatch(trimmed, @"[""'<>\s\\]") ? trimmed : null;
+    }
+
+    private static string? NormalizeWidgetTitle(string? title)
+    {
+        if (string.IsNullOrWhiteSpace(title)) return null;
+        var cleaned = Regex.Replace(title.Trim(), @"[<>""']", "");
+        if (cleaned.Length > 30) cleaned = cleaned[..30];
+        return cleaned.Length == 0 ? null : cleaned;
+    }
 
     public async Task CreateDefaultAsync(int domainId)
     {

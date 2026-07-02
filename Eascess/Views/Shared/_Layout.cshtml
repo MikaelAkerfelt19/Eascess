@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="ea-mkt">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,6 +10,15 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+
+    @{
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        string? NavCurrent(string action) =>
+            string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase)
+            && string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase)
+                ? "page" : null;
+    }
 
     <a href="#main-content" class="ea-skip-link">İçeriğe geç</a>
 
@@ -23,11 +32,11 @@
         </a>
 
         <div class="ea-navbar__links">
-            <a asp-controller="Home" asp-action="Index">Ürün</a>
-            <a asp-controller="Home" asp-action="Wcag">WCAG 2.2</a>
-            <a asp-controller="Home" asp-action="Pricing">Fiyatlandırma</a>
-            <a asp-controller="Home" asp-action="TestSite">Sitenizi Test Edin</a>
-            <a asp-controller="Home" asp-action="Docs">Belgeler</a>
+            <a asp-controller="Home" asp-action="Index" aria-current="@NavCurrent("Index")">Ürün</a>
+            <a asp-controller="Home" asp-action="Wcag" aria-current="@NavCurrent("Wcag")">WCAG 2.2</a>
+            <a asp-controller="Home" asp-action="Pricing" aria-current="@NavCurrent("Pricing")">Fiyatlandırma</a>
+            <a asp-controller="Home" asp-action="TestSite" aria-current="@NavCurrent("TestSite")">Sitenizi Test Edin</a>
+            <a asp-controller="Home" asp-action="Docs" aria-current="@NavCurrent("Docs")">Belgeler</a>
         </div>
 
         <div class="ea-navbar__actions">
@@ -53,7 +62,41 @@
     </main>
 
     <footer class="ea-footer">
-        &copy; 2026 Eascess, web erişilebilirliği platformu
+        <div class="ea-footer__grid">
+            <div>
+                <div class="ea-footer__brand-row">
+                    <img src="~/image/Eascess_logo.png" alt="" />
+                    <span class="ea-footer__brand-name">Eascess</span>
+                </div>
+                <p class="ea-footer__tagline">
+                    Tek satır kodla WCAG 2.2 uyumlu erişilebilirlik: widget, yapay zeka
+                    destekli alt metin ve sürekli denetim, tek platformda.
+                </p>
+            </div>
+            <nav aria-label="Ürün bağlantıları">
+                <h2 class="ea-footer__heading">Ürün</h2>
+                <div class="ea-footer__links">
+                    <a asp-controller="Home" asp-action="Index">Genel Bakış</a>
+                    <a asp-controller="Home" asp-action="Wcag">WCAG 2.2 Rehberi</a>
+                    <a asp-controller="Home" asp-action="Pricing">Fiyatlandırma</a>
+                    <a asp-controller="Home" asp-action="TestSite">Sitenizi Test Edin</a>
+                </div>
+            </nav>
+            <nav aria-label="Kaynak bağlantıları">
+                <h2 class="ea-footer__heading">Kaynaklar</h2>
+                <div class="ea-footer__links">
+                    <a asp-controller="Home" asp-action="Docs">Belgeler</a>
+                    <a asp-controller="Account" asp-action="Login">Giriş Yap</a>
+                    <a asp-controller="Account" asp-action="Register">Ücretsiz Başla</a>
+                </div>
+            </nav>
+        </div>
+        <div class="ea-footer__legal">
+            <div class="ea-footer__legal-inner">
+                <span>&copy; 2026 Eascess. Tüm hakları saklıdır.</span>
+                <span>Web erişilebilirliği platformu. Varsayılan hedef: WCAG 2.2 AAA.</span>
+            </div>
+        </div>
     </footer>
 
     <script src="~/js/site.js" asp-append-version="true" defer></script>

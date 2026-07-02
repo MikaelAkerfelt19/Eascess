@@ -29,19 +29,23 @@ public class PlanService : IPlanService
         var now = DateTime.UtcNow;
 
         // Şu an geçerli (başlamış ve bitmemiş) aktif abonelikler içinde en yüksek
-        // kademeyi seç. Deneme süresince Pro (PlanId=2), deneme bitince Ücretsiz
-        // (PlanId=1) abonelik öne çıkar — yüksek PlanId daha üst kademe demektir.
+        // kademeyi seç. Kademe, PlanId sırasına değil plan fiyatına göre belirlenir —
+        // PlanId'ye güvenmek, planlar tablosuna farklı sırayla plan eklenirse bozulur.
         var subs = await _subscriptionRepo.FindAsync(
             s => s.UserId == userId && s.IsActive && !s.IsDeleted
                  && s.StartDate <= now && s.EndDate >= now);
 
-        var planId = subs.OrderByDescending(s => s.PlanId)
-                         .Select(s => (int?)s.PlanId)
-                         .FirstOrDefault() ?? FreePlanId;
+        var planIds = subs.Select(s => s.PlanId).Distinct().ToList();
+        if (planIds.Count == 0)
+            planIds.Add(FreePlanId);
 
-        var plan = await _planRepo.GetByIdAsync(planId);
+        var plans = await _planRepo.FindAsync(p => planIds.Contains(p.Id));
+        var plan = plans
+            .OrderByDescending(p => p.MonthlyPrice)
+            .ThenByDescending(p => p.Id)
+            .FirstOrDefault();
 
-        // Fallback: plan bulunamazsa varsayılan değerler döndür
+        // Fallback: plan bulunamazsa (ör. seed eksik) varsayılan değerler döndür
         return plan ?? new Plan { Id = FreePlanId, Name = "Ücretsiz", MaxDomains = 1, MonthlyAiQuota = 50 };
     }
 

@@ -10,10 +10,86 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        var isLogin = (ViewData["AuthMode"] as string) == "login";
+    }
+
+    <a href="#main-content" class="ea-skip-link">İçeriğe geç</a>
+
     <div class="auth-wrapper">
-        <main>
-            @RenderBody()
+
+        <!-- Üst çubuk: marka ana sayfaya döner; sağda karşıt eylem -->
+        <header class="auth-topbar">
+            <a class="ea-navbar__brand" asp-controller="Home" asp-action="Index" aria-label="Eascess ana sayfa">
+                <div class="ea-navbar__logo">
+                    <img src="~/image/Eascess_logo.png" alt="" />
+                </div>
+                <span class="ea-navbar__brand-name">Eascess</span>
+            </a>
+            @if (isLogin)
+            {
+                <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn-brand">Ücretsiz Başla · 14 gün</a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="ea-btn ea-btn-ghost" style="background:white">Giriş Yap</a>
+            }
+        </header>
+
+        <main class="auth-shell" id="main-content">
+
+            <!-- Sol: marka anlatısı — ana sayfa hero diliyle -->
+            <div class="auth-side" aria-hidden="false">
+                @if (isLogin)
+                {
+                    <div class="ea-mkt-eyebrow-pill">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+                        Eascess Panel
+                    </div>
+                    <h2 class="auth-side__title">Kaldığınız yerden <em>devam edin</em></h2>
+                    <p class="auth-side__sub">
+                        Domainleriniz, tarama raporlarınız ve widget ayarlarınız sizi bekliyor.
+                    </p>
+                }
+                else
+                {
+                    <div class="ea-mkt-eyebrow-pill">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 2l1.5 5.5L19 9l-5.5 1.5L12 16l-1.5-5.5L5 9l5.5-1.5z"/></svg>
+                        14 gün ücretsiz · Kredi kartı gerekmez
+                    </div>
+                    <h2 class="auth-side__title">Web'i herkes için <em>erişilebilir</em> yapın</h2>
+                    <p class="auth-side__sub">
+                        Tek script etiketiyle kurulum; dakikalar içinde ilk WCAG 2.2 denetiminiz hazır.
+                    </p>
+                    <ul class="auth-side__points">
+                        @foreach (var p in new[] {
+                            "14 gün boyunca tüm Pro özellikler",
+                            "Kurulum: tek satır kod",
+                            "WCAG 2.2 AAA hedefli erişilebilirlik widget'ı",
+                            "İstediğiniz an iptal",
+                        })
+                        {
+                            <li>
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--teal-600)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                                @p
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+
+            <!-- Sağ: form kartı -->
+            <div class="auth-card-col">
+                @RenderBody()
+            </div>
+
         </main>
+
+        <footer class="auth-legal">
+            <span>&copy; 2026 Eascess</span>
+            <span>Web erişilebilirliği platformu · Varsayılan hedef: WCAG 2.2 AAA</span>
+        </footer>
+
     </div>
 
     <script src="~/js/site.js" asp-append-version="true" defer></script>

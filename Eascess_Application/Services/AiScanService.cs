@@ -54,12 +54,20 @@ public class AiScanService : IAiScanService
         if (setting is not null && !setting.IsAiEnabled)
             throw new InvalidOperationException("AI_DISABLED");
 
-        // 3. Kota kontrolü — kullanıcının planından dinamik olarak alınır
+        // 3. Kota kontrolü — kullanıcının planından dinamik olarak alınır.
+        // Kota kullanıcı bazlıdır: kullanıcının TÜM domainlerindeki kullanım toplanır;
+        // domain başına sayılırsa çok domainli kullanıcı kotayı domain sayısı kadar katlar.
         var plan = await _planService.GetUserActivePlanAsync(domain.UserId);
         var monthlyQuota = plan.MonthlyAiQuota;
         var monthStart = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+
+        var userDomains = await _domainRepo.FindAsync(
+            d => d.UserId == domain.UserId && d.IsDeleted != true);
+        var domainIds = (userDomains ?? Enumerable.Empty<Domain>()).Select(d => d.Id).ToHashSet();
+        domainIds.Add(domain.Id);
+
         var usageLogs = await _usageLogRepo.FindAsync(
-            l => l.DomainId == domain.Id && l.RequestDate >= monthStart);
+            l => domainIds.Contains(l.DomainId) && l.RequestDate >= monthStart);
         var usedThisMonth = usageLogs.Count();
         var quotaRemaining = monthlyQuota - usedThisMonth;
 

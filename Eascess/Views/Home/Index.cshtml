@@ -2,18 +2,14 @@
     ViewData["Title"] = "Erişilebilirlik, nazikçe sunuldu.";
 }
 
-<!-- Hero -->
-<section class="ea-hero">
-
-    <!-- Dekoratif aydınlık topları -->
-    <div class="ea-orb" style="top:-100px;right:-80px;width:480px;height:480px;background:var(--brand-grad);filter:blur(120px);opacity:.18"></div>
-    <div class="ea-orb" style="bottom:-120px;left:-40px;width:360px;height:360px;background:radial-gradient(circle,oklch(72% 0.11 190 / 0.25),transparent 70%);filter:blur(80px)"></div>
-
-    <!-- Sol: başlık ve açıklama -->
+<!-- Hero — ilk slayt: ortalı başlık -->
+<section class="ea-hero ea-hero--center">
     <div class="ea-hero__left">
+       
+
         <h1 class="ea-hero__title">
-            Erişilebilirlik,<br>
-            <span>nazikçe sunuldu.</span>
+            Herkes,<br>
+            <em>Erişebilsin</em> diye.
         </h1>
 
         <p class="ea-hero__desc">
@@ -21,23 +17,26 @@
             boşluk kontrolü sağlayın; üstelik kendini sürekli yenileyen bir WCAG 2.2 denetimiyle.
         </p>
 
+        <code class="ea-hero__snippet" aria-label="Tek satırlık entegrasyon kodu örneği">
+            <span class="tk-tag">&lt;script</span>&nbsp;<span class="tk-attr">src=</span>"cdn.eascess.io/widget.js"&nbsp;<span class="tk-attr">data-key=</span>"…"<span class="tk-tag">&gt;</span>
+        </code>
+
         <div class="ea-hero__actions">
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <a asp-controller="Dashboard" asp-action="Index" class="ea-btn ea-btn-brand" style="font-size:15px;padding:14px 22px;min-height:52px">
+                <a asp-controller="Dashboard" asp-action="Index" class="ea-btn ea-btn-brand ea-btn--lg">
                     Panele Git
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
             }
             else
             {
-                <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn-brand" style="font-size:15px;padding:14px 22px;min-height:52px">
+                <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn-brand ea-btn--lg">
                     Widget'ı Yükle
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
-                <a asp-controller="Account" asp-action="Login" class="ea-btn ea-btn-ghost" style="font-size:15px;padding:14px 22px;min-height:52px;background:white">
+                <a asp-controller="Account" asp-action="Login" class="ea-btn ea-btn-ghost ea-btn--lg" style="background:white">
                     Giriş Yap
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
             }
         </div>
@@ -47,7 +46,7 @@
             @foreach (var stat in new[] {
                 new { V = "2.3m",  L = "Sunulan oturum" },
                 new { V = "AAA",   L = "Varsayılan hedef" },
-                new { V = "4.1kb", L = "Gzip, sıfır bağımlılık" },
+                new { V = "7kb",   L = "Gzip, sıfır bağımlılık" },
                 new { V = "<40ms", L = "Yükleme süresi" },
             })
             {
@@ -57,12 +56,60 @@
                 </div>
             }
         </div>
-    </div>
 
-    <!-- Sağ: widget demo -->
-    <div class="ea-hero__right" style="position:relative;padding-top:10px">
-        <div class="ea-demo__eyebrow" style="margin-bottom:10px">İnteraktif Demo</div>
-        <div class="ea-demo__frame-wrap" style="margin:0">
+        <div class="ea-hero__scroll-hint" aria-hidden="true">
+            Kaydırın
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
+        </div>
+    </div>
+</section>
+
+<!-- Demo slaytı — kaydırınca gelir -->
+<section id="canli-demo" class="ea-demo-section">
+    <div class="ea-demo-section__layout">
+
+        <!-- Sol: bilgi & neler denenebilir -->
+        <div class="ea-demo-info" data-ea-reveal="slide-right" data-ea-delay="0.1s">
+            <div class="ea-demo__eyebrow">İnteraktif Demo</div>
+            <h2 class="ea-demo-section__title">Widget'ı canlı deneyin</h2>
+            <p class="ea-demo-info__lead">
+                Sağdaki örnek site gerçek bir Eascess widget'ı çalıştırıyor.
+                Araç çubuğunu açın ve aşağıdaki ayarların sayfayı anında nasıl
+                dönüştürdüğünü görün; hiçbir şey kaydedilmez.
+            </p>
+
+            <ul class="ea-demo-info__list">
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z"/></svg>
+                    <div>
+                        <strong>Kontrast &amp; renk modları</strong>
+                        <span>Yüksek kontrast, koyu ve sepya temalarla okunabilirliği artırın.</span>
+                    </div>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                    <div>
+                        <strong>Yazı tipi &amp; boyut</strong>
+                        <span>Metni büyütün, disleksi dostu yazı tipine geçin, boşlukları açın.</span>
+                    </div>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <div>
+                        <strong>Hareket &amp; odak</strong>
+                        <span>Animasyonları azaltın, okuma maskesi ve bağlantı vurgusunu deneyin.</span>
+                    </div>
+                </li>
+            </ul>
+
+            <a asp-controller="Home" asp-action="TestSite" class="ea-demo-info__link">
+                Kendi sitenizde test edin
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+
+        <!-- Sağ: canlı demo (büyük) -->
+        <div class="ea-demo__frame-wrap" data-ea-reveal="scale-in" data-ea-delay="0.2s">
             <div class="ea-demo__browser-bar">
                 <div class="ea-demo__dots">
                     <span></span><span></span><span></span>
@@ -73,19 +120,18 @@
                     src="/widget-demo.html"
                     title="Eascess widget canlı demo"
                     sandbox="allow-scripts allow-same-origin"
-                    loading="lazy"
-                    style="height:420px"></iframe>
+                    loading="lazy"></iframe>
         </div>
-    </div>
 
+    </div>
 </section>
 
 <!-- Özellikler -->
-<section class="ea-features">
+<section id="ozellikler" class="ea-features">
     <div class="ea-features-head" data-ea-reveal="fade-up" data-ea-duration="1.0s">
         <div class="ea-features-eyebrow">Neden Eascess?</div>
         <h2 class="ea-features-title">
-            Entegrasyon <span>dakikalar içinde</span>
+            Zor problemi biz çözdük, <em>size tek satır kaldı</em>
         </h2>
     </div>
 
@@ -154,9 +200,56 @@
     </div>
 </section>
 
+<!-- Entegrasyon adımları -->
+<section id="nasil-calisir" class="ea-steps">
+    <div class="ea-steps__layout">
+        <div data-ea-reveal="fade-up">
+            <div class="ea-steps__eyebrow">Entegrasyon</div>
+            <h2 class="ea-steps__title">Üç adımda <em>canlıda</em></h2>
+
+            <div class="ea-steps__list">
+                <div class="ea-steps__item">
+                    <div class="ea-steps__num" aria-hidden="true">01</div>
+                    <div>
+                        <h3 class="ea-steps__item-title">Sitenizi ekleyin</h3>
+                        <p class="ea-steps__item-desc">Panelden domaininizi kaydedin. Benzersiz lisans anahtarınız anında oluşturulur.</p>
+                    </div>
+                </div>
+                <div class="ea-steps__item">
+                    <div class="ea-steps__num" aria-hidden="true">02</div>
+                    <div>
+                        <h3 class="ea-steps__item-title">Script'i yapıştırın</h3>
+                        <p class="ea-steps__item-desc">Kapanış <code>&lt;/body&gt;</code> etiketinden önce tek satırı ekleyin. Build adımı yok, paket yok, bağımlılık yok.</p>
+                    </div>
+                </div>
+                <div class="ea-steps__item">
+                    <div class="ea-steps__num" aria-hidden="true">03</div>
+                    <div>
+                        <h3 class="ea-steps__item-title">Yayındasınız</h3>
+                        <p class="ea-steps__item-desc">Widget saniyeler içinde görünür; WCAG taramaları ve raporlar arka planda çalışmaya başlar.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div data-ea-reveal="scale-in" data-ea-delay="0.15s">
+            <div class="ea-codewin">
+                <div class="ea-codewin__bar">
+                    <span class="ea-codewin__name">index.html</span>
+                    <button type="button" class="ea-codewin__copy" data-ea-copy="#ea-embed-code">Kopyala</button>
+                </div>
+                <pre class="ea-codewin__body" id="ea-embed-code"><span class="tk-dim">&lt;!-- &lt;/body&gt; kapanışından hemen önce --&gt;</span>
+<span class="tk-tag">&lt;script</span>
+  <span class="tk-attr">src</span>=<span class="tk-str">"https://cdn.eascess.io/widget.js"</span>
+  <span class="tk-attr">data-key</span>=<span class="tk-str">"EA-XXXX-XXXX-XXXX"</span>
+  <span class="tk-attr">defer</span><span class="tk-tag">&gt;</span><span class="tk-tag">&lt;/script&gt;</span></pre>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- AI Alt Metin Bölümü -->
-<section class="ea-ai-cta">
+<section id="ai-alt-metin" class="ea-ai-cta">
     <div class="ea-ai-cta__layout">
         <div class="ea-ai-cta__copy" data-ea-reveal="fade-up">
             <div class="ea-ai-cta__badge">
@@ -173,9 +266,9 @@
                 alt metinleri anında oluşturur. Görme engelli kullanıcılarınız
                 için tek tıkla eksiksiz erişilebilirlik.
             </p>
-            <a asp-controller="Account" asp-action="Register" asp-route-ref="ai-alt-text" class="ea-btn ea-btn-brand" style="min-height:48px;padding:12px 24px">
+            <a asp-controller="Account" asp-action="Register" asp-route-ref="ai-alt-text" class="ea-btn ea-btn-brand ea-btn--lg">
                 Ücretsiz Dene
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:7px" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                 </svg>
             </a>

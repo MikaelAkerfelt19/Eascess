@@ -89,10 +89,84 @@
                 <div style="font-size:13px;font-weight:600;color:var(--ink-700);margin-bottom:12px">Marka Özelleştirme</div>
 
                 <div style="margin-bottom:12px">
-                    <label class="ea-label" asp-for="LogoUrl">Logo URL <span style="font-weight:400;color:var(--ink-500)">(isteğe bağlı)</span></label>
-                    <input type="url" asp-for="LogoUrl" class="ea-input" placeholder="https://example.com/logo.png"
-                           oninput="updateBrandPreview()" />
-                    <p style="font-size:12px;color:var(--ink-500);margin:4px 0 0">Widget başlık alanında görünen logo. Önerilen: 22px yükseklik, şeffaf PNG.</p>
+                    <label class="ea-label">FAB Butonu İkonu</label>
+
+                    <!-- Radio: Varsayılan / Özel -->
+                    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+                        <label id="logo-opt-default-wrap"
+                               style="display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--teal-600);border-radius:var(--r-sm);cursor:pointer;font-size:13px;background:oklch(96% 0.04 190);transition:all .15s">
+                            <input type="radio" name="logoMode" value="default" id="logo-opt-default"
+                                   style="accent-color:var(--teal-600)"
+                                   @(string.IsNullOrEmpty(Model.LogoUrl) ? "checked" : "")
+                                   onchange="setLogoMode('default')">
+                            Varsayılan İkon
+                        </label>
+                        <label id="logo-opt-custom-wrap"
+                               style="display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid @(!string.IsNullOrEmpty(Model.LogoUrl) ? "var(--teal-600)" : "var(--cream-300)");border-radius:var(--r-sm);cursor:pointer;font-size:13px;background:@(!string.IsNullOrEmpty(Model.LogoUrl) ? "oklch(96% 0.04 190)" : "white");transition:all .15s">
+                            <input type="radio" name="logoMode" value="custom" id="logo-opt-custom"
+                                   style="accent-color:var(--teal-600)"
+                                   @(!string.IsNullOrEmpty(Model.LogoUrl) ? "checked" : "")
+                                   onchange="setLogoMode('custom')">
+                            Özel Logo
+                        </label>
+                    </div>
+
+                    <!-- LogoUrl hidden field -->
+                    <input type="hidden" asp-for="LogoUrl" id="LogoUrl" />
+
+                    <!-- Özel logo paneli -->
+                    <div id="logo-custom-panel" style="display:@(!string.IsNullOrEmpty(Model.LogoUrl) ? "block" : "none");border:1px solid var(--cream-300);border-radius:var(--r-sm);padding:12px;background:white;margin-bottom:10px">
+                        <!-- Sekme seçici -->
+                        <div style="display:flex;gap:0;margin-bottom:8px;border:1px solid var(--cream-300);border-radius:var(--r-sm);overflow:hidden;width:fit-content">
+                            <button type="button" id="logo-tab-url" onclick="switchLogoTab('url')"
+                                    style="padding:5px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:var(--ink-900);color:white">
+                                URL
+                            </button>
+                            <button type="button" id="logo-tab-file" onclick="switchLogoTab('file')"
+                                    style="padding:5px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:white;color:var(--ink-600)">
+                                Dosyadan Yükle
+                            </button>
+                        </div>
+
+                        <!-- URL girişi -->
+                        <div id="logo-panel-url">
+                            <input type="text" id="logo-url-input" class="ea-input"
+                                   placeholder="https://example.com/logo.png"
+                                   value="@Model.LogoUrl"
+                                   oninput="onLogoUrlInput(this.value)" />
+                        </div>
+
+                        <!-- Dosya yükleme -->
+                        <div id="logo-panel-file" style="display:none">
+                            <div id="logo-drop-zone"
+                                 style="border:2px dashed var(--cream-300);border-radius:var(--r-sm);padding:16px;text-align:center;cursor:pointer;transition:border-color .2s"
+                                 onclick="document.getElementById('logo-file-input').click()"
+                                 ondragover="event.preventDefault();this.style.borderColor='var(--teal-500)'"
+                                 ondragleave="this.style.borderColor='var(--cream-300)'"
+                                 ondrop="handleLogoDrop(event)">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink-400)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <div style="font-size:13px;color:var(--ink-600)">Dosya seçin veya sürükleyin</div>
+                                <div style="font-size:11px;color:var(--ink-400);margin-top:2px">PNG, JPG, SVG — maks. 2 MB</div>
+                            </div>
+                            <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                                   style="display:none" onchange="uploadLogoFile(this)" />
+                            <div id="logo-upload-status" style="font-size:12px;margin-top:6px;display:none"></div>
+                        </div>
+                    </div>
+
+                    <!-- FAB Önizleme + Logoyu Kaldır -->
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+                        <span style="font-size:12px;color:var(--ink-500)">Önizleme:</span>
+                        <div id="fab-preview"
+                             style="width:52px;height:52px;border-radius:50%;background:@Model.ThemeColor;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -6px rgba(15,23,42,.38),0 4px 8px -4px rgba(15,23,42,.2),inset 0 0 0 1px rgba(255,255,255,.18);flex-shrink:0;overflow:hidden;transition:background .2s,box-shadow .2s">
+                        </div>
+                        <button type="button" id="logo-clear-btn" onclick="clearLogo()"
+                                style="font-size:12px;color:var(--danger);background:none;border:none;cursor:pointer;display:@(!string.IsNullOrEmpty(Model.LogoUrl) ? "inline" : "none")">
+                            Logoyu Kaldır
+                        </button>
+                    </div>
+
+                    <p style="font-size:12px;color:var(--ink-500);margin:0">Varsayılan: beyaz soru işareti ikonu. Önerilen: kare veya yuvarlak, şeffaf PNG.</p>
                 </div>
 
                 <div style="margin-bottom:12px">
@@ -112,7 +186,6 @@
                                style="opacity:0;width:0;height:0"
                                id="pb-toggle" />
                         <span id="pb-slider"
-                              onclick="togglePoweredBy()"
                               style="position:absolute;inset:0;border-radius:26px;cursor:pointer;transition:.3s;background:@(Model.PoweredByVisible ? "var(--indigo-700)" : "var(--cream-300)")">
                             <span style="position:absolute;height:20px;width:20px;left:@(Model.PoweredByVisible ? "23px" : "3px");bottom:3px;background:white;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)" id="pb-thumb"></span>
                         </span>
@@ -131,7 +204,6 @@
                            style="opacity:0;width:0;height:0"
                            id="ai-toggle" />
                     <span id="ai-slider"
-                          onclick="toggleAi()"
                           style="position:absolute;inset:0;border-radius:26px;cursor:pointer;transition:.3s;background:@(Model.IsAiEnabled ? "var(--indigo-700)" : "var(--cream-300)")">
                         <span style="position:absolute;height:20px;width:20px;left:@(Model.IsAiEnabled ? "23px" : "3px");bottom:3px;background:white;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)" id="ai-thumb"></span>
                     </span>
@@ -174,6 +246,9 @@
         const colorText    = document.getElementById('color-text');
         const previewFrame = document.getElementById('preview-iframe');
 
+        // FAB önizleme için evrensel erişilebilirlik figürü (widget.js ile birebir aynı)
+        const FAB_DEFAULT_SVG = '<svg viewBox="0 0 24 24" fill="#fff" width="26" height="26" aria-hidden="true" style="filter:drop-shadow(0 1px 1px rgba(0,0,0,.2))"><path d="M20.5 6c-2.61.7-5.67 1-8.5 1s-5.89-.3-8.5-1L3 8c1.86.5 4 .83 6 1v13h2v-6h2v6h2V9c2-.17 4.14-.5 6-1l-.5-2zM12 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>';
+
         function getCurrentConfig() {
             return {
                 themeColor:       colorInput.value,
@@ -197,6 +272,7 @@
         function syncColor(val) {
             if (/^#[0-9a-fA-F]{6}$/.test(val)) {
                 colorInput.value = val;
+                updateFabPreviewColor();
                 pushConfigToPreview();
             }
         }
@@ -204,6 +280,7 @@
         function setColor(c) {
             colorInput.value = c;
             colorText.value  = c;
+            updateFabPreviewColor();
             pushConfigToPreview();
         }
 
@@ -215,41 +292,161 @@
         // Tüm form girdilerine listener bağla
         colorInput?.addEventListener('input', function () {
             colorText.value = colorInput.value;
+            updateFabPreviewColor();
             pushConfigToPreview();
         });
         document.querySelectorAll('input[name="Position"]').forEach(r =>
             r.addEventListener('change', pushConfigToPreview)
         );
         document.getElementById('Language')?.addEventListener('change', pushConfigToPreview);
-        document.getElementById('LogoUrl')?.addEventListener('input', pushConfigToPreview);
         document.getElementById('WidgetTitle')?.addEventListener('input', pushConfigToPreview);
 
-        // Toggle switch'ler
+        // Toggle switch'ler — görseller checkbox'ın 'change' olayından güncellenir.
+        // Not: label tıklaması checkbox'ı zaten çevirir; onclick ile ikinci kez
+        // çevirmek kaydedilen değerin hiç değişmemesine yol açıyordu.
         const aiToggle = document.getElementById('ai-toggle');
         const aiSlider = document.getElementById('ai-slider');
         const aiThumb  = document.getElementById('ai-thumb');
 
-        function toggleAi() {
-            aiToggle.checked = !aiToggle.checked;
+        aiToggle?.addEventListener('change', function () {
             const on = aiToggle.checked;
             aiSlider.style.background = on ? 'var(--indigo-700)' : 'var(--cream-300)';
             aiThumb.style.left = on ? '23px' : '3px';
             pushConfigToPreview();
-        }
+        });
 
         const pbToggle = document.getElementById('pb-toggle');
         const pbSlider = document.getElementById('pb-slider');
         const pbThumb  = document.getElementById('pb-thumb');
 
-        function togglePoweredBy() {
-            pbToggle.checked = !pbToggle.checked;
+        pbToggle?.addEventListener('change', function () {
             const on = pbToggle.checked;
             pbSlider.style.background = on ? 'var(--indigo-700)' : 'var(--cream-300)';
             pbThumb.style.left = on ? '23px' : '3px';
             pushConfigToPreview();
+        });
+
+        // ── Logo modu (Varsayılan / Özel) ─────────────────────────
+        function setLogoMode(mode) {
+            const isCustom = mode === 'custom';
+            document.getElementById('logo-custom-panel').style.display = isCustom ? '' : 'none';
+
+            const defWrap = document.getElementById('logo-opt-default-wrap');
+            const cusWrap = document.getElementById('logo-opt-custom-wrap');
+            defWrap.style.borderColor = isCustom ? 'var(--cream-300)' : 'var(--teal-600)';
+            defWrap.style.background  = isCustom ? 'white' : 'oklch(96% 0.04 190)';
+            cusWrap.style.borderColor = isCustom ? 'var(--teal-600)' : 'var(--cream-300)';
+            cusWrap.style.background  = isCustom ? 'oklch(96% 0.04 190)' : 'white';
+
+            if (!isCustom) {
+                document.getElementById('LogoUrl').value = '';
+                const urlInput = document.getElementById('logo-url-input');
+                if (urlInput) urlInput.value = '';
+                updateFabPreview('');
+            } else {
+                updateFabPreview(document.getElementById('LogoUrl')?.value || '');
+            }
+            pushConfigToPreview();
         }
 
-        // updateBrandPreview artık pushConfigToPreview ile kapsanıyor
-        function updateBrandPreview() { pushConfigToPreview(); }
+        // ── FAB önizleme ──────────────────────────────────────────
+        function updateFabPreviewColor() {
+            const fab = document.getElementById('fab-preview');
+            if (fab) fab.style.background = colorInput?.value || '#38bdf8';
+        }
+
+        function updateFabPreview(url) {
+            const fab     = document.getElementById('fab-preview');
+            const clearBtn = document.getElementById('logo-clear-btn');
+            if (!fab) return;
+            fab.style.background = colorInput?.value || '#38bdf8';
+            if (url) {
+                fab.innerHTML = '<img src="' + url + '" alt="" style="width:38px;height:38px;object-fit:cover;border-radius:50%"'
+                    + ' onerror="this.parentElement.innerHTML=\'' + FAB_DEFAULT_SVG.replace(/'/g, "\\'").replace(/"/g, '\\"') + '\'">';
+                if (clearBtn) clearBtn.style.display = '';
+            } else {
+                fab.innerHTML = FAB_DEFAULT_SVG;
+                if (clearBtn) clearBtn.style.display = 'none';
+            }
+        }
+
+        function onLogoUrlInput(val) {
+            document.getElementById('LogoUrl').value = val;
+            updateFabPreview(val);
+            pushConfigToPreview();
+        }
+
+        // ── Logo sekme geçişi ──────────────────────────────────────
+        function switchLogoTab(tab) {
+            const isUrl = tab === 'url';
+            document.getElementById('logo-panel-url').style.display  = isUrl ? '' : 'none';
+            document.getElementById('logo-panel-file').style.display = isUrl ? 'none' : '';
+            document.getElementById('logo-tab-url').style.background  = isUrl ? 'var(--ink-900)' : 'white';
+            document.getElementById('logo-tab-url').style.color       = isUrl ? 'white' : 'var(--ink-600)';
+            document.getElementById('logo-tab-file').style.background = isUrl ? 'white' : 'var(--ink-900)';
+            document.getElementById('logo-tab-file').style.color      = isUrl ? 'var(--ink-600)' : 'white';
+        }
+
+        function clearLogo() {
+            document.getElementById('LogoUrl').value = '';
+            const urlInput = document.getElementById('logo-url-input');
+            if (urlInput) urlInput.value = '';
+            document.getElementById('logo-opt-default').checked = true;
+            setLogoMode('default');
+        }
+
+        // ── Dosya sürükle-bırak ───────────────────────────────────
+        function handleLogoDrop(e) {
+            e.preventDefault();
+            document.getElementById('logo-drop-zone').style.borderColor = 'var(--cream-300)';
+            const file = e.dataTransfer.files[0];
+            if (file) processLogoFile(file);
+        }
+
+        function uploadLogoFile(input) {
+            if (input.files[0]) processLogoFile(input.files[0]);
+        }
+
+        function processLogoFile(file) {
+            if (!file.type.startsWith('image/')) return setLogoStatus('Geçersiz dosya türü.', 'error');
+            if (file.size > 2 * 1024 * 1024) return setLogoStatus('Dosya 2 MB\'dan büyük olamaz.', 'error');
+
+            setLogoStatus('Yükleniyor…', 'info');
+
+            const form = new FormData();
+            form.append('file', file);
+
+            fetch('@Url.Action("UploadLogo", "WidgetSettings")', {
+                method: 'POST', body: form,
+                headers: { 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.url) {
+                    document.getElementById('LogoUrl').value = data.url;
+                    const urlInput = document.getElementById('logo-url-input');
+                    if (urlInput) urlInput.value = data.url;
+                    updateFabPreview(data.url);
+                    pushConfigToPreview();
+                    setLogoStatus('Yükleme başarılı.', 'success');
+                } else {
+                    setLogoStatus(data.error || 'Yükleme başarısız.', 'error');
+                }
+            })
+            .catch(() => setLogoStatus('Yükleme başarısız.', 'error'));
+        }
+
+        function setLogoStatus(msg, type) {
+            const el = document.getElementById('logo-upload-status');
+            el.style.display = '';
+            el.style.color   = type === 'error' ? 'var(--danger)' : type === 'success' ? 'var(--success)' : 'var(--ink-600)';
+            el.textContent   = msg;
+        }
+
+        // ── Sayfa yüklenince başlat ────────────────────────────────
+        (function () {
+            const url = document.getElementById('LogoUrl')?.value || '';
+            updateFabPreview(url);
+        })();
     </script>
 }

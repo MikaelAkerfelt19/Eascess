@@ -5,15 +5,15 @@
 <!-- Başlık -->
 <section class="ea-mkt-section--hero" data-ea-reveal="fade-up">
     <div class="ea-mkt-eyebrow-pill">
-        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l1.5 5.5L19 9l-5.5 1.5L12 16l-1.5-5.5L5 9l5.5-1.5z"/></svg>
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 2l1.5 5.5L19 9l-5.5 1.5L12 16l-1.5-5.5L5 9l5.5-1.5z"/></svg>
         Şeffaf fiyatlandırma
     </div>
-    <h1 class="ea-mkt-title">Doğru planı seçin</h1>
-    <p class="ea-mkt-subtitle">Küçük sitelerden kurumsal altyapıya kadar her ölçek için uygun fiyatlandırma.</p>
+    <h1 class="ea-mkt-title">Doğru planı <em>seçin</em></h1>
+    <p class="ea-mkt-subtitle">Küçük sitelerden kurumsal altyapıya kadar her ölçek için uygun fiyatlandırma. Sürpriz yok, gizli ücret yok.</p>
 </section>
 
 <!-- Planlar -->
-<section class="ea-mkt-section--plans" data-ea-reveal="fade-up" data-ea-delay="0.1s">
+<section id="planlar" class="ea-mkt-section--plans" data-ea-reveal="fade-up" data-ea-delay="0.1s" style="padding-top:24px">
     <div class="ea-pricing-grid ea-mkt-inner">
 
         <!-- Ücretsiz -->
@@ -21,7 +21,6 @@
             <div class="ea-pricing-tier">Ücretsiz</div>
             <div class="ea-pricing-price">₺0</div>
             <div class="ea-pricing-period">/ ay, sonsuza kadar</div>
-            <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn-ghost ea-pricing-cta">Ücretsiz Başla</a>
             <div class="ea-pricing-features">
                 @foreach (var f in new[] {
                     "1 domain",
@@ -33,20 +32,68 @@
                 })
                 {
                     <div class="ea-pricing-feature">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--success-deep)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
                         @f
                     </div>
                 }
             </div>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Subscription" asp-action="Index" class="ea-btn ea-btn-ghost ea-pricing-cta">Aboneliğimi Görüntüle</a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn-ghost ea-pricing-cta">Ücretsiz Başla</a>
+            }
         </div>
 
-        <!-- Pro (öne çıkan) -->
-        <div class="ea-card ea-pricing-card ea-pricing-card--featured">
-            <div class="ea-pricing-badge">En Popüler</div>
-            <div class="ea-pricing-tier ea-pricing-tier--featured">Pro</div>
+        <!-- Pro -->
+        <div class="ea-card ea-pricing-card">
+            <div class="ea-pricing-tier">Pro</div>
             <div class="ea-pricing-price">₺299</div>
-            <div class="ea-pricing-period">/ ay (KDV dahil)</div>
-            <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn-brand ea-pricing-cta">14 Gün Ücretsiz Dene</a>
+            <div class="ea-pricing-period">/ ay + KDV</div>
+            <div class="ea-pricing-features">
+                @foreach (var f in new[] {
+                    "3 domain",
+                    "Aylık 500 AI görsel taraması",
+                    "Sürekli otomatik yeniden tarama",
+                    "Widget özelleştirme (tema, konum, dil)",
+                    "Detaylı sayfa bazlı raporlar",
+                    "WCAG 2.2 A / AA / AAA denetim",
+                })
+                {
+                    <div class="ea-pricing-feature">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--success-deep)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                        @f
+                    </div>
+                }
+                @* Ultra'ya taşınan özellikler — üstü çizili, Ultra rozeti ile *@
+                @foreach (var f in new[] { "E-posta bildirimleri", "Öncelikli destek" })
+                {
+                    <div class="ea-pricing-feature ea-pricing-feature--excluded">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--ink-400)" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>
+                        <s>@f</s>
+                        <span class="ea-pricing-feature__ultra-tag" aria-hidden="true">Ultra</span>
+                        <span class="ea-sr-only">(yalnızca Ultra planında)</span>
+                    </div>
+                }
+            </div>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Subscription" asp-action="Index" class="ea-btn ea-btn-ghost ea-pricing-cta">Aboneliğimi Görüntüle</a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn-ghost ea-pricing-cta">14 Gün Ücretsiz Dene</a>
+            }
+        </div>
+
+        <!-- Ultra (öne çıkan) -->
+        <div class="ea-card ea-pricing-card ea-pricing-card--featured">
+            <div class="ea-pricing-badge">En Çok Tercih Edilen</div>
+            <div class="ea-pricing-tier ea-pricing-tier--featured">Ultra</div>
+            <div class="ea-pricing-price">₺500</div>
+            <div class="ea-pricing-period">/ ay + KDV</div>
             <div class="ea-pricing-features">
                 @foreach (var f in new[] {
                     "10 domain",
@@ -60,11 +107,19 @@
                 })
                 {
                     <div class="ea-pricing-feature">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--indigo-700)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--indigo-700)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
                         @f
                     </div>
                 }
             </div>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Subscription" asp-action="Index" class="ea-btn ea-btn-brand ea-pricing-cta">Planımı Yönet</a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn-brand ea-pricing-cta">Ultra ile Başla</a>
+            }
         </div>
 
         <!-- Kurumsal -->
@@ -72,12 +127,11 @@
             <div class="ea-pricing-tier ea-pricing-tier--dark">Kurumsal</div>
             <div class="ea-pricing-price ea-pricing-price--dark">Teklif</div>
             <div class="ea-pricing-period ea-pricing-period--dark">ihtiyacınıza özel</div>
-            <a href="mailto:hello@eascess.io" class="ea-btn ea-btn--white ea-pricing-cta">Bizimle İletişime Geçin</a>
             <div class="ea-pricing-features">
                 @foreach (var f in new[] {
                     "Sınırsız domain",
                     "Sınırsız AI görsel taraması",
-                    "Pro planın tüm özellikleri",
+                    "Ultra planın tüm özellikleri",
                     "SSO / SAML entegrasyonu",
                     "Özel SLA garantisi",
                     "Özel hesap yöneticisi",
@@ -86,76 +140,127 @@
                 })
                 {
                     <div class="ea-pricing-feature ea-pricing-feature--dark">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--teal-500)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--teal-500)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
                         @f
                     </div>
                 }
             </div>
+            <a href="mailto:hello@eascess.io" class="ea-btn ea-btn--white ea-pricing-cta">Bizimle İletişime Geçin</a>
+        </div>
+    </div>
+</section>
+
+<!-- Yıllık planlar -->
+<section id="yillik" class="ea-mkt-section--plans" data-ea-reveal="fade-up">
+    <div class="ea-mkt-inner--md">
+        <h2 class="ea-mkt-h2 ea-mkt-h2--center">Yıllık ödeyin, <em>2 ay hediye</em></h2>
+        <p class="ea-yearly-sub">12 ay kullanın, 10 ay ödeyin. Yıllık planlarda fiyatınız yıl boyunca sabitlenir.</p>
+        <div class="ea-yearly-grid">
+
+            <!-- Pro Yıllık -->
+            <div class="ea-card ea-pricing-card">
+                <div class="ea-pricing-tier">Pro Yıllık <span class="ea-yearly-save">2 ay hediye</span></div>
+                <div class="ea-pricing-price">₺3.000</div>
+                <div class="ea-pricing-period">/ yıl + KDV · aylık ₺250'ye denk gelir</div>
+                <div class="ea-pricing-features">
+                    <div class="ea-pricing-feature">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--success-deep)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                        Aylık Pro'nun tüm özellikleri
+                    </div>
+                    <div class="ea-pricing-feature">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--success-deep)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                        Aylığa göre ₺588 tasarruf
+                    </div>
+                </div>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-controller="Subscription" asp-action="Index" class="ea-btn ea-btn-ghost ea-pricing-cta">Yıllığa Geç</a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn-ghost ea-pricing-cta">Pro Yıllık ile Başla</a>
+                }
+            </div>
+
+            <!-- Ultra Yıllık -->
+            <div class="ea-card ea-pricing-card ea-pricing-card--featured" style="box-shadow:var(--sh-sm)">
+                <div class="ea-pricing-tier ea-pricing-tier--featured">Ultra Yıllık <span class="ea-yearly-save">2 ay hediye</span></div>
+                <div class="ea-pricing-price">₺5.000</div>
+                <div class="ea-pricing-period">/ yıl + KDV · aylık ₺417'ye denk gelir</div>
+                <div class="ea-pricing-features">
+                    <div class="ea-pricing-feature">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--indigo-700)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                        Aylık Ultra'nın tüm özellikleri
+                    </div>
+                    <div class="ea-pricing-feature">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--indigo-700)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                        Aylığa göre ₺1.000 tasarruf
+                    </div>
+                </div>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-controller="Subscription" asp-action="Index" class="ea-btn ea-btn-brand ea-pricing-cta">Yıllığa Geç</a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn-brand ea-pricing-cta">Ultra Yıllık ile Başla</a>
+                }
+            </div>
+
         </div>
     </div>
 </section>
 
 <!-- Özellik karşılaştırma tablosu -->
-<section class="ea-mkt-section--plans ea-mkt-section--alt" data-ea-reveal="fade-up">
+<section id="karsilastirma" class="ea-mkt-section--plans ea-mkt-section--alt" data-ea-reveal="fade-up">
     <div class="ea-mkt-inner--md">
         <h2 class="ea-mkt-h2 ea-mkt-h2--center">Plan Karşılaştırması</h2>
-        <div class="ea-card" style="padding:0;overflow:hidden">
+        <div class="ea-card" style="padding:0;overflow:hidden;border-radius:var(--r-lg)">
             <table class="ea-table">
                 <thead>
                     <tr>
-                        <th style="width:45%">Özellik</th>
+                        <th style="width:36%">Özellik</th>
                         <th style="text-align:center">Ücretsiz</th>
-                        <th style="text-align:center;color:var(--indigo-700)">Pro</th>
+                        <th style="text-align:center">Pro</th>
+                        <th style="text-align:center;color:var(--indigo-700)">Ultra</th>
                         <th style="text-align:center">Kurumsal</th>
                     </tr>
                 </thead>
                 <tbody>
                     @{
+                        // Sütun sırası: Ücretsiz, Pro, Ultra, Kurumsal (index 2 = Ultra, vurgulu)
                         var rows = new[] {
-                            new { Ozellik = "Domain sayısı",            Free = "1",        Pro = "10",        Ent = "Sınırsız" },
-                            new { Ozellik = "AI görsel taraması/ay",    Free = "50",       Pro = "2.000",     Ent = "Sınırsız" },
-                            new { Ozellik = "WCAG denetim",             Free = "✓",        Pro = "✓",         Ent = "✓" },
-                            new { Ozellik = "Erişilebilirlik widget'ı", Free = "✓",        Pro = "✓",         Ent = "✓" },
-                            new { Ozellik = "Widget özelleştirme",      Free = "—",        Pro = "✓",         Ent = "✓" },
-                            new { Ozellik = "Otomatik yeniden tarama",  Free = "—",        Pro = "✓",         Ent = "✓" },
-                            new { Ozellik = "Detaylı raporlar",         Free = "—",        Pro = "✓",         Ent = "✓" },
-                            new { Ozellik = "E-posta bildirimleri",     Free = "—",        Pro = "✓",         Ent = "✓" },
-                            new { Ozellik = "SSO / SAML",               Free = "—",        Pro = "—",         Ent = "✓" },
-                            new { Ozellik = "Fatura ile ödeme",         Free = "—",        Pro = "—",         Ent = "✓" },
-                            new { Ozellik = "Destek",                   Free = "Topluluk", Pro = "Öncelikli", Ent = "Özel" },
+                            new { Ozellik = "Domain sayısı",            Degerler = new[] { "1",        "3",        "10",        "Sınırsız" } },
+                            new { Ozellik = "AI görsel taraması/ay",    Degerler = new[] { "50",       "500",      "2.000",     "Sınırsız" } },
+                            new { Ozellik = "WCAG denetim",             Degerler = new[] { "✓",        "✓",        "✓",         "✓" } },
+                            new { Ozellik = "Erişilebilirlik widget'ı", Degerler = new[] { "✓",        "✓",        "✓",         "✓" } },
+                            new { Ozellik = "Widget özelleştirme",      Degerler = new[] { "—",        "✓",        "✓",         "✓" } },
+                            new { Ozellik = "Otomatik yeniden tarama",  Degerler = new[] { "—",        "✓",        "✓",         "✓" } },
+                            new { Ozellik = "Detaylı raporlar",         Degerler = new[] { "—",        "✓",        "✓",         "✓" } },
+                            new { Ozellik = "E-posta bildirimleri",     Degerler = new[] { "—",        "—",        "✓",         "✓" } },
+                            new { Ozellik = "SSO / SAML",               Degerler = new[] { "—",        "—",        "—",         "✓" } },
+                            new { Ozellik = "Fatura ile ödeme",         Degerler = new[] { "—",        "—",        "—",         "✓" } },
+                            new { Ozellik = "Destek",                   Degerler = new[] { "Topluluk", "Standart", "Öncelikli", "Özel" } },
                         };
                     }
                     @foreach (var r in rows)
                     {
                         <tr>
                             <td style="font-weight:500;color:var(--ink-800)">@r.Ozellik</td>
-                            <td style="text-align:center">
-                                @if (r.Free == "✓") {
-                                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Dahil"><path d="M20 6L9 17l-5-5"/></svg>
-                                } else if (r.Free == "—") {
-                                    <span style="color:var(--ink-400)" aria-label="Dahil değil">—</span>
-                                } else {
-                                    <span style="font-weight:600;color:var(--ink-700)">@r.Free</span>
-                                }
-                            </td>
-                            <td style="text-align:center">
-                                @if (r.Pro == "✓") {
-                                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--indigo-700)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Dahil"><path d="M20 6L9 17l-5-5"/></svg>
-                                } else if (r.Pro == "—") {
-                                    <span style="color:var(--ink-400)" aria-label="Dahil değil">—</span>
-                                } else {
-                                    <span style="font-weight:700;color:var(--indigo-700)">@r.Pro</span>
-                                }
-                            </td>
-                            <td style="text-align:center">
-                                @if (r.Ent == "✓") {
-                                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Dahil"><path d="M20 6L9 17l-5-5"/></svg>
-                                } else if (r.Ent == "—") {
-                                    <span style="color:var(--ink-400)" aria-label="Dahil değil">—</span>
-                                } else {
-                                    <span style="font-weight:600;color:var(--ink-700)">@r.Ent</span>
-                                }
-                            </td>
+                            @for (var c = 0; c < r.Degerler.Length; c++)
+                            {
+                                var v = r.Degerler[c];
+                                var accent = c == 2; // Ultra sütunu
+                                <td style="text-align:center">
+                                    @if (v == "✓") {
+                                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="@(accent ? "var(--indigo-700)" : "var(--success-deep)")" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Dahil"><path d="M20 6L9 17l-5-5"/></svg>
+                                    } else if (v == "—") {
+                                        <span style="color:var(--ink-400)" aria-label="Dahil değil">—</span>
+                                    } else {
+                                        <span style="font-weight:@(accent ? "700" : "600");color:@(accent ? "var(--indigo-700)" : "var(--ink-700)")">@v</span>
+                                    }
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>
@@ -165,33 +270,33 @@
 </section>
 
 <!-- SSS -->
-<section class="ea-mkt-section" data-ea-reveal="fade-up">
+<section id="sss" class="ea-mkt-section" data-ea-reveal="fade-up">
     <div class="ea-mkt-inner--narrow">
         <h2 class="ea-mkt-h2 ea-mkt-h2--center">Sık Sorulan Sorular</h2>
+        @{
+            var faqs = new[] {
+                new { S = "Ücretsiz plan ne kadar süre ücretsiz?", C = "Sonsuza kadar. Kredi kartı gerektirmez. Limitleri yeterli geldiği sürece ücretsiz planı kullanmaya devam edebilirsiniz." },
+                new { S = "14 günlük deneme sona erince ne olur?", C = "Deneme bitince otomatik ücretlendirme yapılmaz. İsterseniz Pro veya Ultra'ya geçebilir, isterseniz ücretsiz plana dönebilirsiniz." },
+                new { S = "AI görsel taraması nasıl çalışır?", C = "Widget kurulu sayfanızdaki görseller analiz edilerek eksik alt metinler Google Gemini ile otomatik üretilir ve ilgili img elementlerine enjekte edilir." },
+                new { S = "İptal ne zaman geçerli olur?", C = "İstediğiniz zaman iptal edebilirsiniz. İptal, mevcut faturalama döneminin sonunda devreye girer; o döneme ait ücret iade edilmez." },
+                new { S = "Faturalandırma nasıl yapılır?", C = "Kredi kartı ile aylık veya yıllık ödeme yapabilirsiniz; yıllık ödemede 2 ay hediyedir (12 ay kullanır, 10 ay ödersiniz). Tüm fiyatlara KDV dahil değildir. Kurumsal müşteriler için fatura ile ödeme seçeneği mevcuttur." },
+            };
+        }
         <div class="ea-faq-list">
-            @{
-                var faqs = new[] {
-                    new { S = "Ücretsiz plan ne kadar süre ücretsiz?", C = "Sonsuza kadar. Kredi kartı gerektirmez. Limitleri yeterli geldiği sürece ücretsiz planı kullanmaya devam edebilirsiniz." },
-                    new { S = "14 günlük deneme sona erince ne olur?", C = "Deneme bitince otomatik ücretlendirme yapılmaz. İsterseniz Pro'ya geçebilir, isterseniz ücretsiz plana dönebilirsiniz." },
-                    new { S = "AI görsel taraması nasıl çalışır?", C = "Widget kurulu sayfanızdaki görseller analiz edilerek eksik alt metinler Google Gemini 2.0 ile otomatik üretilir ve ilgili img elementlerine enjekte edilir." },
-                    new { S = "İptal ne zaman geçerli olur?", C = "İstediğiniz zaman iptal edebilirsiniz. İptal, mevcut faturalama döneminin sonuna kadar geçerli olmaz; o döneme ait ücret iade edilmez." },
-                    new { S = "Faturalandırma nasıl yapılır?", C = "Kredi kartı ile aylık veya yıllık (yıllık %20 indirimli) ödeme yapabilirsiniz. Kurumsal müşteriler için fatura ile ödeme seçeneği mevcuttur." },
-                };
-                int faqIdx = 0;
-            }
-            @foreach (var faq in faqs)
+            @for (var i = 0; i < faqs.Length; i++)
             {
-                <div class="ea-accordion-item">
-                    <button class="ea-accordion-trigger" onclick="toggleFaq(this)"
-                            aria-expanded="false" aria-controls="faq-body-@faqIdx">
-                        <span style="font-weight:600;color:var(--ink-900);flex:1;text-align:left">@faq.S</span>
-                        <svg class="faq-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;color:var(--ink-400);transition:transform 0.2s cubic-bezier(0.25,1,0.5,1)"><polyline points="6 9 12 15 18 9"/></svg>
+                <div class="ea-faq-item">
+                    <button type="button" class="ea-faq-trigger" onclick="toggleFaq(this)"
+                            aria-expanded="false" aria-controls="faq-panel-@i">
+                        @faqs[i].S
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
-                    <div class="ea-accordion-body" id="faq-body-@faqIdx" style="color:var(--ink-600);font-size:14px;line-height:1.6">
-                        @faq.C
+                    <div class="ea-faq-panel" id="faq-panel-@i">
+                        <div>
+                            <div class="ea-faq-body">@faqs[i].C</div>
+                        </div>
                     </div>
                 </div>
-                 faqIdx++;
             }
         </div>
     </div>
@@ -200,11 +305,9 @@
 @section Scripts {
     <script>
         function toggleFaq(btn) {
-            const body = btn.nextElementSibling;
-            const open = body.classList.toggle('open');
+            const panel = document.getElementById(btn.getAttribute('aria-controls'));
+            const open = panel.classList.toggle('open');
             btn.setAttribute('aria-expanded', open);
-            const chevron = btn.querySelector('.faq-chevron');
-            if (chevron) chevron.style.transform = open ? 'rotate(180deg)' : '';
         }
     </script>
 }

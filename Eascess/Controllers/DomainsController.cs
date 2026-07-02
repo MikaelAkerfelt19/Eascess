@@ -40,6 +40,7 @@ public class DomainsController : Controller
     {
         var userId = _userManager.GetUserId(User)!;
         var domains = await _domainRepo.FindAsync(d => d.UserId == userId && d.IsDeleted != true);
+        var baseUrl = $"{Request.Scheme}://{Request.Host}";
 
         var viewModel = domains
             .OrderByDescending(d => d.CreatedAt)
@@ -50,6 +51,7 @@ public class DomainsController : Controller
                 LicenseKey = d.LicenseKey,
                 IsVerified = d.IsVerified ?? false,
                 CreatedAt = d.CreatedAt,
+                AppBaseUrl = baseUrl,
             });
 
         return View(viewModel);
@@ -156,6 +158,7 @@ public class DomainsController : Controller
             LicenseKey = domain.LicenseKey,
             IsVerified = domain.IsVerified ?? false,
             CreatedAt = domain.CreatedAt,
+            AppBaseUrl = $"{Request.Scheme}://{Request.Host}",
         };
 
         ViewBag.WidgetSettings = await _widgetSettingService.GetByDomainAsync(id, userId);

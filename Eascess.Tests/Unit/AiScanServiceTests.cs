@@ -97,6 +97,33 @@ public class AiScanServiceTests
     }
 
     [Fact]
+    public async Task ProcessImages_KotaKullanıcıBazlıToplanır_DiğerDomainlerinKullanımıDaSayılır()
+    {
+        SetupValidDomain(); // istek domain Id=1, UserId=u1
+
+        // Kullanıcının ikinci bir domaini daha var
+        _domainRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<Domain, bool>>>()))
+            .ReturnsAsync(new List<Domain>
+            {
+                new() { Id = 1, UserId = "u1", DomainUrl = "a.local" },
+                new() { Id = 2, UserId = "u1", DomainUrl = "b.local" },
+            });
+
+        // Kota 100: domain 1'de 60 + domain 2'de 40 kullanım → toplam 100, kota dolu.
+        // Domain bazlı sayılsaydı (eski hatalı davranış) 60 < 100 olur ve istek geçerdi.
+        var logs = Enumerable.Range(0, 60).Select(_ => new AiUsageLog { DomainId = 1, RequestDate = DateTime.UtcNow })
+            .Concat(Enumerable.Range(0, 40).Select(_ => new AiUsageLog { DomainId = 2, RequestDate = DateTime.UtcNow }))
+            .ToList();
+        _usageLogRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<AiUsageLog, bool>>>()))
+            .ReturnsAsync((Expression<Func<AiUsageLog, bool>> pred) => logs.Where(pred.Compile()).ToList());
+
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _sut.ProcessImagesAsync(TestKey, new List<string> { "https://example.com/img.jpg" }));
+
+        Assert.Equal("QUOTA_EXCEEDED", ex.Message);
+    }
+
+    [Fact]
     public async Task ProcessImages_CacheHit_GeneratorÇağrılmaz()
     {
         SetupValidDomain();

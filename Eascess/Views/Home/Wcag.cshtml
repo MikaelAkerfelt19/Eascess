@@ -2,20 +2,12 @@
     ViewData["Title"] = "WCAG 2.2 Rehberi";
 }
 
-<!-- Sayfa başlığı -->
 <section class="ea-mkt-section--hero ea-mkt-section--bordered-b" data-ea-reveal="fade-up">
-    <div class="ea-mkt-inner--760">
-        <div class="ea-mkt-eyebrow-pill">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Web Content Accessibility Guidelines
-        </div>
-        <h1 style="font-family:var(--font-display);font-size:clamp(36px,5vw,60px);line-height:1;letter-spacing:-0.03em;margin:0 0 18px;font-weight:400;text-align:left">
-            WCAG 2.2 nedir<br>ve neden önemli?
-        </h1>
-        <p style="font-size:18px;color:var(--ink-600);line-height:1.6;max-width:620px;margin:0;text-align:left">
-            Web İçeriği Erişilebilirlik Kılavuzları (WCAG), web içeriğini engelli bireyler için daha erişilebilir kılmak amacıyla W3C tarafından yayımlanan uluslararası standarttır.
-        </p>
-    </div>
+    <h1 class="ea-mkt-title">WCAG 2.2 nedir ve <em>neden önemli?</em></h1>
+    <p class="ea-mkt-subtitle">
+        Web İçeriği Erişilebilirlik Kılavuzları (WCAG), web içeriğini engelli bireyler için
+        daha erişilebilir kılmak amacıyla W3C tarafından yayımlanan uluslararası standarttır.
+    </p>
 </section>
 
 <!-- Seviyeler -->
@@ -24,43 +16,53 @@
         <h2 class="ea-mkt-h2">Uyumluluk Seviyeleri</h2>
         <p class="ea-mkt-lead">WCAG üç kademeli uyumluluk seviyesi tanımlar. Eascess varsayılan olarak <strong>AAA</strong> hedefler.</p>
 
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+        <div class="ea-levels">
             <!-- Seviye A -->
-            <div class="ea-card" style="padding:28px;border-top:4px solid var(--teal-500)">
-                <div style="font-family:var(--font-display);font-size:42px;font-weight:400;color:var(--teal-600);letter-spacing:-0.02em;line-height:1;margin-bottom:10px">A</div>
-                <div style="font-size:16px;font-weight:600;color:var(--ink-900);margin-bottom:8px">Temel Uyumluluk</div>
-                <p style="font-size:14px;color:var(--ink-600);line-height:1.6;margin:0 0 20px">En temel erişilebilirlik gereksinimleri. Bu seviyeyi karşılamamak, bazı kullanıcıların içeriğe hiç erişememesi anlamına gelir.</p>
-                <ul style="margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:8px">
+            <div class="ea-level">
+                <div class="ea-level__letter ea-level__letter--a" aria-hidden="true">A</div>
+                <div class="ea-level__name">Temel Uyumluluk</div>
+                <p class="ea-level__desc">En temel erişilebilirlik gereksinimleri. Bu seviyeyi karşılamamak, bazı kullanıcıların içeriğe hiç erişememesi anlamına gelir.</p>
+                <ul class="ea-level__list">
                     @foreach (var item in new[] { "Metin olmayan içeriklere alternatif", "Yalnızca ses/video içerikleri için metin", "Renk tek başına bilgi taşımaz", "Klavye ile tam erişim" })
                     {
-                        <li style="font-size:13px;color:var(--ink-700)">@item</li>
+                        <li>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--teal-600)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                            @item
+                        </li>
                     }
                 </ul>
             </div>
 
             <!-- Seviye AA -->
-            <div class="ea-card" style="padding:28px;border-top:4px solid var(--indigo-700);position:relative">
-                <div style="position:absolute;top:16px;right:16px;background:var(--indigo-700);color:white;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px">Yasal standart</div>
-                <div style="font-family:var(--font-display);font-size:42px;font-weight:400;color:var(--indigo-700);letter-spacing:-0.02em;line-height:1;margin-bottom:10px">AA</div>
-                <div style="font-size:16px;font-weight:600;color:var(--ink-900);margin-bottom:8px">Orta Düzey Uyumluluk</div>
-                <p style="font-size:14px;color:var(--ink-600);line-height:1.6;margin:0 0 20px">Çoğu yasal düzenlemenin (EAA 2025, ADA, EN 301 549) gerektirdiği seviye. Tüm kamu ve ticari web siteleri için gereklidir.</p>
-                <ul style="margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:8px">
+            <div class="ea-level">
+                <span class="ea-level__badge ea-level__badge--law">Yasal standart</span>
+                <div class="ea-level__letter ea-level__letter--aa" aria-hidden="true">AA</div>
+                <div class="ea-level__name">Orta Düzey Uyumluluk</div>
+                <p class="ea-level__desc">Çoğu yasal düzenlemenin (EAA 2025, ADA, EN 301 549) gerektirdiği seviye. Tüm kamu ve ticari web siteleri için gereklidir.</p>
+                <ul class="ea-level__list">
                     @foreach (var item in new[] { "Minimum 4.5:1 kontrast oranı", "Klavye focus görünür olmalı", "Hata mesajları anlaşılır olmalı", "Başlık ve etiket tutarlılığı" })
                     {
-                        <li style="font-size:13px;color:var(--ink-700)">@item</li>
+                        <li>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--indigo-700)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                            @item
+                        </li>
                     }
                 </ul>
             </div>
 
             <!-- Seviye AAA -->
-            <div class="ea-card" style="padding:28px;border-top:4px solid var(--success)">
-                <div style="font-family:var(--font-display);font-size:42px;font-weight:400;color:var(--success);letter-spacing:-0.02em;line-height:1;margin-bottom:10px">AAA</div>
-                <div style="font-size:16px;font-weight:600;color:var(--ink-900);margin-bottom:8px">Gelişmiş Uyumluluk</div>
-                <p style="font-size:14px;color:var(--ink-600);line-height:1.6;margin:0 0 20px">Eascess'in varsayılan hedefi. En geniş kullanıcı kitlesine en iyi deneyimi sunar.</p>
-                <ul style="margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:8px">
+            <div class="ea-level ea-level--target">
+                <span class="ea-level__badge ea-level__badge--target">Eascess hedefi</span>
+                <div class="ea-level__letter ea-level__letter--aaa" aria-hidden="true">AAA</div>
+                <div class="ea-level__name">Gelişmiş Uyumluluk</div>
+                <p class="ea-level__desc">Eascess'in varsayılan hedefi. En geniş kullanıcı kitlesine en iyi deneyimi sunar.</p>
+                <ul class="ea-level__list">
                     @foreach (var item in new[] { "7:1 kontrast oranı", "İşaret dili desteği", "Okuma düzeyi erişilebilirliği", "Animasyonsuz alternatif sunar" })
                     {
-                        <li style="font-size:13px;color:var(--ink-700)">@item</li>
+                        <li>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--success-deep)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+                            @item
+                        </li>
                     }
                 </ul>
             </div>
@@ -68,28 +70,25 @@
     </div>
 </section>
 
-<!-- 4 İlke -->
+<!-- 4 İlke — POUR -->
 <section class="ea-mkt-section ea-mkt-section--alt ea-mkt-section--bordered-b" data-ea-reveal="fade-up">
     <div class="ea-mkt-inner">
-        <h2 class="ea-mkt-h2">4 Temel İlke — POUR</h2>
+        <h2 class="ea-mkt-h2">Dört Temel İlke: POUR</h2>
         <p class="ea-mkt-lead">WCAG tüm kriterleri bu dört ilke altında gruplandırır.</p>
 
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
+        <div class="ea-pour-grid">
             @foreach (var p in new[] {
-                new { Harf = "P", Tr = "Algılanabilir", En = "Perceivable", Desc = "Bilgi ve arayüz bileşenleri, kullanıcıların algılayabileceği biçimlerde sunulmalıdır. Yani ekrana bakamayan biri için ses, duyamayan biri için altyazı gibi alternatifler gereklidir.", Renk = "oklch(32% 0.11 190)" },
-                new { Harf = "O", Tr = "Çalıştırılabilir", En = "Operable", Desc = "Arayüz bileşenleri ve navigasyon işletilebilir olmalıdır. Mouse kullanamayan kullanıcılar yalnızca klavye ile her işlemi gerçekleştirebilmelidir.", Renk = "var(--indigo-700)" },
-                new { Harf = "U", Tr = "Anlaşılabilir", En = "Understandable", Desc = "Bilgi ve arayüzin çalışması anlaşılabilir olmalıdır. Form hataları açık ve çözüm önerisiyle birlikte gösterilmelidir.", Renk = "oklch(32% 0.14 155)" },
-                new { Harf = "R", Tr = "Sağlam", En = "Robust", Desc = "İçerik, yardımcı teknolojiler dahil çeşitli kullanıcı aracıları tarafından güvenilir biçimde yorumlanabilmelidir.", Renk = "oklch(35% 0.15 75)" },
+                new { Harf = "P", Tr = "Algılanabilir", En = "Perceivable", Desc = "Bilgi ve arayüz bileşenleri, kullanıcıların algılayabileceği biçimlerde sunulmalıdır. Ekrana bakamayan biri için ses, duyamayan biri için altyazı gibi alternatifler gereklidir.", Tint = "oklch(93% 0.035 190)" },
+                new { Harf = "O", Tr = "Çalıştırılabilir", En = "Operable", Desc = "Arayüz bileşenleri ve navigasyon işletilebilir olmalıdır. Fare kullanamayan kullanıcılar yalnızca klavye ile her işlemi gerçekleştirebilmelidir.", Tint = "oklch(93% 0.035 270)" },
+                new { Harf = "U", Tr = "Anlaşılabilir", En = "Understandable", Desc = "Bilgi ve arayüzün çalışması anlaşılabilir olmalıdır. Form hataları açık biçimde ve çözüm önerisiyle birlikte gösterilmelidir.", Tint = "oklch(93% 0.04 155)" },
+                new { Harf = "R", Tr = "Sağlam", En = "Robust", Desc = "İçerik, yardımcı teknolojiler dahil çeşitli kullanıcı aracıları tarafından güvenilir biçimde yorumlanabilmelidir.", Tint = "oklch(94% 0.04 75)" },
             })
             {
-                <div class="ea-card" style="padding:24px;display:flex;gap:20px;align-items:flex-start">
-                    <div class="ea-wcag-pour-icon" style="background:@p.Renk">
-                        <span style="font-family:var(--font-display);font-size:26px;color:white;font-weight:400">@p.Harf</span>
-                    </div>
-                    <div>
-                        <div style="font-size:16px;font-weight:600;color:var(--ink-900)">@p.Tr <span style="font-weight:400;color:var(--ink-400);font-size:13px">/ @p.En</span></div>
-                        <p style="font-size:13px;color:var(--ink-600);line-height:1.6;margin:6px 0 0">@p.Desc</p>
-                    </div>
+                <div class="ea-pour-cell" style="--pour-tint:@p.Tint">
+                    <span class="ea-pour-cell__ghost" aria-hidden="true">@p.Harf</span>
+                    <div class="ea-pour-cell__kicker">@p.En</div>
+                    <h3 class="ea-pour-cell__title">@p.Tr</h3>
+                    <p class="ea-pour-cell__desc">@p.Desc</p>
                 </div>
             }
         </div>
@@ -132,7 +131,7 @@
             </div>
             <div class="ea-wcag-cta__actions">
                 <a asp-controller="Account" asp-action="Register" class="ea-btn ea-btn--white">Ücretsiz Başla</a>
-                <a asp-controller="Home" asp-action="Docs" class="ea-btn ea-btn-ghost" style="border-color:rgba(255,255,255,.2);color:white">Belgeleri Gör</a>
+                <a asp-controller="Home" asp-action="Docs" class="ea-btn ea-btn-ghost" style="border-color:rgba(255,255,255,.25);color:white">Belgeleri Gör</a>
             </div>
         </div>
     </div>

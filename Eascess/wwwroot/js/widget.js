@@ -46,7 +46,13 @@
         fetch(apiUrl('/api/license/validate?key=' + LICENSE_KEY + '&domain=' + CURRENT_DOMAIN))
             .then(function (r) { return r.json(); })
             .then(function (result) {
-                if (!result.valid) { console.warn('[Eascess] Lisans geçersiz.'); return; }
+                if (!result.valid) {
+                    if (result.reason === 'plan_expired')
+                        console.warn('[Eascess] Plan limiti: bu domain mevcut plan kapsaminda degil. Widget devre disi birakildi — plani yukseltin.');
+                    else
+                        console.warn('[Eascess] Lisans geçersiz.');
+                    return;
+                }
                 fetchConfig();
             })
             .catch(function () {
@@ -58,7 +64,7 @@
     function fetchConfig() {
         fetch(apiUrl('/api/widget/config?key=' + LICENSE_KEY))
             .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
-            .then(function (cfg) { buildWidget(cfg); })
+            .then(function (cfg) { buildWidget(sanitizeConfig(cfg)); })
             .catch(function () {
                 if (CURRENT_DOMAIN === 'localhost' || CURRENT_DOMAIN === '127.0.0.1')
                     buildWidget({ themeColor: '#38bdf8', position: 'bottom-right', language: 'tr', isAiEnabled: false });
@@ -409,6 +415,7 @@
             aiAltText:'AI Alt Metin Üret', aiScanning:' görsel taranıyor...',
             aiDone:' görsel için alt metin oluşturuldu',
             aiNone:'Alt metni eksik görsel bulunamadı', aiError:'AI tarama şu an kullanılamıyor',
+            aiQuota:'Aylık AI tarama kotanız doldu', aiDisabled:'Bu site için AI tarama devre dışı',
             sectionDisplay:'Görünüm', sectionLayout:'Metin Düzeni',
             sectionNavigation:'Gezinti & Odak', sectionAccessibility:'Erişilebilirlik Modları',
             sectionColors:'Renk Ayarları',
@@ -432,6 +439,7 @@
             aiAltText:'AI Alt Text Generate', aiScanning:' images scanning...',
             aiDone:' images got alt text',
             aiNone:'No images missing alt text found', aiError:'AI scan is currently unavailable',
+            aiQuota:'Monthly AI scan quota exceeded', aiDisabled:'AI scan is disabled for this site',
             sectionDisplay:'Display', sectionLayout:'Text Layout',
             sectionNavigation:'Navigation & Focus', sectionAccessibility:'Accessibility Modes',
             sectionColors:'Color Settings',
@@ -457,72 +465,118 @@
         var l = function (k) { return t(cfg, k); };
         var fDisp = prefs.fontSize === 0 ? '100%' : (100 + prefs.fontSize * 10) + '%';
 
+        // Eascess "Warm Cream" tokens as hex (oklch fallback-safe for older embedded browsers)
+        var origin = (cfg.position || 'bottom-right').split('-').join(' ');
         var css = '<style>' +
-'*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}' +
-'#ea-toggle{position:fixed;' + posStyle + 'width:52px;height:52px;border-radius:50%;background:' + color + ';border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.2),0 0 0 3px rgba(255,255,255,.9);transition:transform .2s,box-shadow .2s;z-index:2147483647}' +
-'#ea-toggle:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(0,0,0,.28),0 0 0 4px rgba(255,255,255,.95)}' +
-'#ea-toggle:focus-visible{outline:3px solid #fff;outline-offset:3px}' +
-'#ea-toggle svg{width:26px;height:26px;fill:#fff;pointer-events:none}' +
-'#ea-panel{position:fixed;' + posStyle + 'width:320px;background:#faf8f4;border:1px solid #ddd5c8;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);overflow:hidden;transform:scale(.95) translateY(8px);opacity:0;pointer-events:none;transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .18s ease;z-index:2147483647;max-height:90vh;overflow-y:auto}' +
+'@keyframes ea-fab-in{from{opacity:0;transform:scale(.55) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}' +
+'*{box-sizing:border-box;margin:0;padding:0;font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}' +
+
+// ── Tetikleyici buton (FAB) ──
+'#ea-toggle{position:fixed;' + posStyle + 'width:56px;height:56px;border-radius:50%;background:' + color + ';border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px -6px rgba(15,23,42,.4),0 5px 10px -4px rgba(15,23,42,.22),inset 0 0 0 1px rgba(255,255,255,.18);transition:transform .28s cubic-bezier(.22,1,.36,1),box-shadow .28s cubic-bezier(.22,1,.36,1);z-index:2147483647;animation:ea-fab-in .55s cubic-bezier(.16,1,.3,1) both;-webkit-tap-highlight-color:transparent}' +
+'#ea-toggle:hover{transform:scale(1.09) translateY(-1px);box-shadow:0 16px 38px -6px ' + color + '99,0 6px 14px -4px rgba(15,23,42,.3),inset 0 0 0 1px rgba(255,255,255,.3)}' +
+'#ea-toggle:active{transform:scale(1.02) translateY(0)}' +
+'#ea-toggle:focus-visible{outline:3px solid #fff;outline-offset:3px;box-shadow:0 10px 26px -6px rgba(15,23,42,.4),0 0 0 6px ' + color + '55}' +
+'#ea-toggle svg{width:30px;height:30px;fill:#fff;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2))}' +
+'#ea-toggle img{width:40px;height:40px;object-fit:cover;border-radius:50%;pointer-events:none}' +
+
+// ── Panel ──
+'#ea-panel{position:fixed;' + posStyle + 'width:332px;max-width:calc(100vw - 32px);background:#faf8f3;border:1px solid #dcd4c6;border-radius:20px;box-shadow:0 24px 60px -14px rgba(15,23,42,.28),0 10px 24px -10px rgba(15,23,42,.14);overflow:hidden;transform:scale(.94) translateY(12px);opacity:0;pointer-events:none;transform-origin:' + origin + ';transition:transform .34s cubic-bezier(.16,1,.3,1),opacity .26s ease;z-index:2147483647;max-height:min(90vh,640px);overflow-y:auto;overscroll-behavior:contain}' +
 '#ea-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}' +
-'.ea-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.1rem .85rem;border-bottom:1px solid #e8e0d4;background:#f4f0eb}' +
-'.ea-head-title{font-size:.95rem;font-weight:700;color:#1a1b26}' +
-'.ea-head-actions{display:flex;gap:.4rem}' +
-'.ea-head-btn{background:#ece5da;border:none;border-radius:8px;color:#6b6d88;font-size:.72rem;font-weight:600;padding:.35rem .65rem;cursor:pointer;transition:background .15s,color .15s}' +
-'.ea-head-btn:hover{background:#ddd5c8;color:#1a1b26}' +
+
+// ── Başlık ──
+'.ea-head{display:flex;align-items:center;gap:.65rem;padding:.95rem 1.1rem;border-bottom:1px solid #ebe5da;background:#f4f0e9}' +
+'.ea-brandmark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#35b9bd,#423c89);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 8px -2px rgba(66,60,137,.45)}' +
+'.ea-brandmark svg{width:19px;height:19px;fill:#fff}' +
+'.ea-head-title{font-size:.97rem;font-weight:700;color:#1b1e25;letter-spacing:-.01em;line-height:1.2;flex:1}' +
+'.ea-head-actions{display:flex;gap:.4rem;flex-shrink:0}' +
+'.ea-head-btn{background:#ece6db;border:1px solid #dcd4c6;border-radius:9px;color:#464c58;font-size:.72rem;font-weight:600;padding:.4rem .68rem;cursor:pointer;transition:background .18s,color .18s,border-color .18s}' +
+'.ea-head-btn:hover{background:#e3dccf;color:#1b1e25;border-color:#cfc6b6}' +
 '.ea-head-btn:focus-visible{outline:2px solid ' + color + ';outline-offset:2px}' +
-'.ea-section{padding:.85rem 1.1rem;border-bottom:1px solid #f0e8de}' +
-'.ea-section:last-child{border-bottom:none}' +
-'.ea-section-label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:#9a9ab8;margin-bottom:.6rem}' +
+
+// ── Bölümler ──
+'.ea-section{padding:.9rem 1.1rem}' +
+'.ea-section+.ea-section{border-top:1px solid #efe9df}' +
+'.ea-section-label{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#868d99;margin-bottom:.7rem}' +
+
+// ── Yazı boyutu ──
 '.ea-font-ctrl{display:flex;align-items:center;gap:.5rem}' +
-'.ea-font-btn{width:34px;height:34px;border-radius:8px;background:#ece5da;border:1px solid #ddd5c8;color:#1a1b26;font-size:1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0}' +
-'.ea-font-btn:hover{background:#ddd5c8}' +
+'.ea-font-btn{width:36px;height:36px;border-radius:10px;background:#f4f0e9;border:1px solid #dcd4c6;color:#1b1e25;font-size:1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s,border-color .18s,transform .1s;flex-shrink:0}' +
+'.ea-font-btn:hover{background:#fff;border-color:' + color + '}' +
+'.ea-font-btn:active{transform:scale(.93)}' +
 '.ea-font-btn:focus-visible{outline:2px solid ' + color + ';outline-offset:2px}' +
-'.ea-font-display{flex:1;text-align:center;font-size:.85rem;font-weight:600;color:#1a1b26;background:#f4f0eb;border:1px solid #e8e0d4;border-radius:8px;padding:.4rem}' +
-'.ea-seg{display:flex;background:#ece5da;border-radius:10px;padding:3px;gap:2px}' +
-'.ea-seg-btn{flex:1;padding:.4rem;border:none;border-radius:7px;color:#6b6d88;font-size:.75rem;font-weight:600;cursor:pointer;background:transparent;transition:background .15s,color .15s}' +
-'.ea-seg-btn.active{background:' + color + ';color:#fff}' +
+'.ea-font-display{flex:1;text-align:center;font-size:.85rem;font-weight:600;color:#1b1e25;background:#fff;border:1px solid #ebe5da;border-radius:10px;padding:.45rem}' +
+
+// ── Segmentli kontrol ──
+'.ea-seg{display:flex;background:#efe9df;border:1px solid #e3dccf;border-radius:11px;padding:3px;gap:2px}' +
+'.ea-seg-btn{flex:1;padding:.42rem;border:none;border-radius:8px;color:#464c58;font-size:.75rem;font-weight:600;cursor:pointer;background:transparent;transition:color .18s,box-shadow .18s}' +
+'.ea-seg-btn:hover{color:#1b1e25}' +
+'.ea-seg-btn.active{background:' + color + ';color:#fff;box-shadow:0 2px 6px -1px ' + color + '66}' +
 '.ea-seg-btn:focus-visible{outline:2px solid ' + color + ';outline-offset:2px}' +
-'.ea-seg-label{font-size:.78rem;color:#6b6d88;margin-bottom:.3rem;margin-top:.5rem}' +
-'.ea-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem 0}' +
-'.ea-row-label{font-size:.84rem;color:#3d3f55;display:flex;align-items:center;gap:.5rem;cursor:pointer}' +
-'.ea-row-label svg{width:16px;height:16px;fill:#9a9ab8;flex-shrink:0}' +
-'.ea-switch{position:relative;width:40px;height:22px;flex-shrink:0}' +
+'.ea-seg-label{font-size:.78rem;color:#464c58;margin-bottom:.35rem;margin-top:.6rem;font-weight:500}' +
+
+// ── Anahtar satırları ──
+'.ea-row{display:flex;align-items:center;justify-content:space-between;margin:0 -.5rem;padding:.5rem;border-radius:10px;transition:background .15s}' +
+'.ea-row:hover{background:#f4f0e9}' +
+'.ea-row-label{font-size:.84rem;color:#2a2e37;display:flex;align-items:center;gap:.6rem;cursor:pointer;flex:1}' +
+'.ea-row-label svg{width:17px;height:17px;fill:#868d99;flex-shrink:0;transition:fill .15s}' +
+'.ea-row:hover .ea-row-label svg{fill:#464c58}' +
+'.ea-switch{position:relative;width:42px;height:23px;flex-shrink:0}' +
 '.ea-switch input{opacity:0;width:0;height:0;position:absolute}' +
-'.ea-slider{position:absolute;inset:0;border-radius:22px;cursor:pointer;background:#ddd5c8;transition:.25s}' +
-'.ea-slider::before{content:"";position:absolute;height:16px;width:16px;left:3px;bottom:3px;border-radius:50%;background:#fff;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.18)}' +
+'.ea-slider{position:absolute;inset:0;border-radius:23px;cursor:pointer;background:#d3cab9;transition:background .25s cubic-bezier(.22,1,.36,1)}' +
+'.ea-slider::before{content:"";position:absolute;height:17px;width:17px;left:3px;bottom:3px;border-radius:50%;background:#fff;transition:transform .25s cubic-bezier(.22,1,.36,1);box-shadow:0 1px 3px rgba(15,23,42,.28)}' +
 'input:checked+.ea-slider{background:' + color + '}' +
-'input:checked+.ea-slider::before{transform:translateX(18px)}' +
+'input:checked+.ea-slider::before{transform:translateX(19px)}' +
 '.ea-switch input:focus-visible+.ea-slider{outline:2px solid ' + color + ';outline-offset:2px}' +
-'.ea-palette-row{margin-bottom:.55rem}' +
-'.ea-palette-label{font-size:.78rem;color:#6b6d88;margin-bottom:.3rem;display:flex;align-items:center;justify-content:space-between}' +
-'.ea-palette-swatches{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}' +
-'.ea-swatch{width:24px;height:24px;border-radius:50%;border:2px solid #ddd5c8;cursor:pointer;transition:transform .15s,border-color .15s;flex-shrink:0}' +
-'.ea-swatch:hover{transform:scale(1.15);border-color:#9a9ab8}' +
-'.ea-swatch.selected{border-color:' + color + ';transform:scale(1.1);box-shadow:0 0 0 2px rgba(0,0,0,.1)}' +
-'.ea-palette-reset{background:#ece5da;border:1px solid #ddd5c8;color:#6b6d88;font-size:.72rem;padding:.2rem .45rem;border-radius:6px;cursor:pointer;transition:background .15s}' +
-'.ea-palette-reset:hover{background:#ddd5c8;color:#1a1b26}' +
-'.ea-ai-btn{width:100%;padding:.6rem;border:none;border-radius:10px;background:linear-gradient(135deg,' + color + ',#8b5cf6);color:#fff;font-size:.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.4rem;transition:opacity .15s,transform .1s}' +
-'.ea-ai-btn:hover{opacity:.9;transform:scale(1.01)}' +
+
+// ── Renk paletleri ──
+'.ea-palette-row{margin-bottom:.6rem}' +
+'.ea-palette-row:last-child{margin-bottom:0}' +
+'.ea-palette-label{font-size:.78rem;color:#464c58;margin-bottom:.35rem;display:flex;align-items:center;justify-content:space-between;font-weight:500}' +
+'.ea-palette-swatches{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}' +
+'.ea-swatch{width:25px;height:25px;border-radius:50%;border:2px solid #dcd4c6;cursor:pointer;transition:transform .18s cubic-bezier(.22,1,.36,1),box-shadow .18s;flex-shrink:0;padding:0}' +
+'.ea-swatch:hover{transform:scale(1.18)}' +
+'.ea-swatch.selected{border-color:#fff;transform:scale(1.12);box-shadow:0 0 0 2px ' + color + ',0 2px 6px -1px rgba(15,23,42,.3)}' +
+'.ea-palette-reset{background:#ece6db;border:1px solid #dcd4c6;color:#636a77;font-size:.85rem;line-height:1;padding:.25rem .5rem;border-radius:7px;cursor:pointer;transition:background .15s,color .15s}' +
+'.ea-palette-reset:hover{background:#e3dccf;color:#1b1e25}' +
+
+// ── AI butonu (marka degrade CTA) ──
+'.ea-ai-btn{width:100%;padding:.72rem;border:none;border-radius:12px;background:linear-gradient(135deg,' + color + ',#423c89);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.45rem;transition:transform .15s cubic-bezier(.22,1,.36,1),box-shadow .2s,opacity .15s;box-shadow:0 4px 12px -2px rgba(66,60,137,.35)}' +
+'.ea-ai-btn:hover{transform:translateY(-1px);box-shadow:0 9px 20px -4px rgba(66,60,137,.45)}' +
+'.ea-ai-btn:active{transform:translateY(0)}' +
 '.ea-ai-btn:focus-visible{outline:2px solid ' + color + ';outline-offset:2px}' +
-'.ea-ai-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}' +
-'.ea-ai-btn svg{width:16px;height:16px;fill:#fff;flex-shrink:0}' +
-'.ea-ai-status{font-size:.72rem;color:#3d3f55;text-align:center;margin-top:.4rem;min-height:1rem}' +
-'.ea-powered{text-align:center;padding:.7rem;font-size:.65rem;color:#b0aec8;border-top:1px solid #f0e8de}' +
-'.ea-powered a{color:#9a9ab8;text-decoration:none}' +
-'.ea-powered a:hover{color:#555770}' +
-'#ea-panel::-webkit-scrollbar{width:4px}' +
-'#ea-panel::-webkit-scrollbar-thumb{background:#ddd5c8;border-radius:2px}' +
+'.ea-ai-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}' +
+'.ea-ai-btn svg{width:17px;height:17px;fill:#fff;flex-shrink:0}' +
+'.ea-ai-status{font-size:.73rem;color:#464c58;text-align:center;margin-top:.5rem;min-height:1rem}' +
+
+// ── Alt bilgi ──
+'.ea-powered{text-align:center;padding:.75rem;font-size:.66rem;color:#868d99;border-top:1px solid #efe9df;background:#f4f0e9}' +
+'.ea-powered a{color:#423c89;text-decoration:none;font-weight:600}' +
+'.ea-powered a:hover{text-decoration:underline}' +
+
+// ── Kaydırma çubuğu ──
+'#ea-panel::-webkit-scrollbar{width:6px}' +
+'#ea-panel::-webkit-scrollbar-thumb{background:#d3cab9;border-radius:3px}' +
+'#ea-panel::-webkit-scrollbar-thumb:hover{background:#c2b8a5}' +
+
+// ── Hareket azaltma tercihi ──
+'@media (prefers-reduced-motion:reduce){#ea-toggle,#ea-panel,.ea-slider,.ea-slider::before,.ea-ai-btn,.ea-swatch,.ea-seg-btn,.ea-row,.ea-font-btn,.ea-head-btn{animation:none!important;transition:none!important}}' +
 '</style>';
+
+        // Evrensel erişilebilirlik figürü (Material "accessibility")
+        var a11ySvg = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" style="pointer-events:none"><path d="M20.5 6c-2.61.7-5.67 1-8.5 1s-5.89-.3-8.5-1L3 8c1.86.5 4 .83 6 1v13h2v-6h2v6h2V9c2-.17 4.14-.5 6-1l-.5-2zM12 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>';
+        var brandSvg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 6c-2.61.7-5.67 1-8.5 1s-5.89-.3-8.5-1L3 8c1.86.5 4 .83 6 1v13h2v-6h2v6h2V9c2-.17 4.14-.5 6-1l-.5-2zM12 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>';
+        var fabContent = cfg.logoUrl
+            ? '<img src="' + cfg.logoUrl + '" alt="" aria-hidden="true" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'\'"><span style="display:none;pointer-events:none">' + a11ySvg + '</span>'
+            : a11ySvg;
 
         var html =
 '<button id="ea-toggle" aria-label="' + l('open') + '" aria-expanded="false" aria-controls="ea-panel">' +
-  '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-4h2v2h-2zm1.07-9.75C9.86 6.29 8 8.08 8 10h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4.93-3.75z"/></svg>' +
+  fabContent +
 '</button>' +
 '<div id="ea-panel" role="dialog" aria-label="' + l('title') + '" aria-modal="true">' +
 
   '<div class="ea-head">' +
-    (cfg.logoUrl ? '<img src="' + cfg.logoUrl + '" alt="" aria-hidden="true" style="height:22px;object-fit:contain;border-radius:4px;margin-right:.5rem" onerror="this.style.display=\'none\'">' : '') +
+    '<span class="ea-brandmark" aria-hidden="true">' + brandSvg + '</span>' +
     '<span class="ea-head-title">' + (cfg.widgetTitle || l('title')) + '</span>' +
     '<div class="ea-head-actions">' +
       '<button class="ea-head-btn" id="ea-reset" type="button">' + l('reset') + '</button>' +
@@ -857,7 +911,16 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ licenseKey: LICENSE_KEY, images: urls }),
         })
-        .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+        .then(function (r) {
+            if (!r.ok) {
+                // Backend hata kodunu (QUOTA_EXCEEDED / AI_DISABLED) yakala
+                return r.json().then(
+                    function (err) { throw err; },
+                    function () { throw {}; }
+                );
+            }
+            return r.json();
+        })
         .then(function (data) {
             var count = 0;
             (data.results || []).forEach(function (item) {
@@ -875,8 +938,11 @@
             status.textContent = count + t(cfg, 'aiDone');
             btn.disabled = false;
         })
-        .catch(function () {
-            status.textContent = t(cfg, 'aiError');
+        .catch(function (err) {
+            var key = 'aiError';
+            if (err && err.code === 'QUOTA_EXCEEDED') key = 'aiQuota';
+            else if (err && err.code === 'AI_DISABLED') key = 'aiDisabled';
+            status.textContent = t(cfg, key);
             btn.disabled = false;
         });
     }
@@ -892,7 +958,9 @@
             language:         VALID_LANGUAGES.indexOf(cfg.language) !== -1 ? cfg.language : 'tr',
             isAiEnabled:      cfg.isAiEnabled === true,
             poweredByVisible: cfg.poweredByVisible !== false,
-            logoUrl:          typeof cfg.logoUrl === 'string' && /^https?:\/\//.test(cfg.logoUrl) ? cfg.logoUrl : undefined,
+            logoUrl:          typeof cfg.logoUrl === 'string'
+                                  && (/^https?:\/\//.test(cfg.logoUrl) || /^\//.test(cfg.logoUrl))
+                                  && !/["'<>\s\\]/.test(cfg.logoUrl) ? cfg.logoUrl : undefined,
             widgetTitle:      typeof cfg.widgetTitle === 'string' ? cfg.widgetTitle.slice(0, 30).replace(/[<>"']/g, '') : undefined,
         };
     }

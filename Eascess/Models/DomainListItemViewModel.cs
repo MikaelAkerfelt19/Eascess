@@ -8,6 +8,9 @@ public class DomainListItemViewModel
     public bool IsVerified { get; set; }
     public DateTime CreatedAt { get; set; }
 
+    /// <summary>Widget'ın sunulduğu uygulama kökü — controller tarafından Request'ten doldurulur.</summary>
+    public string AppBaseUrl { get; set; } = "https://app.eascess.io";
+
     /// <summary>Müşterinin sitesine yapıştıracağı script etiketi</summary>
-    public string ScriptTag => $"<script src=\"https://cdn.eascess.io/widget.js\" data-key=\"{LicenseKey}\" data-api=\"https://app.eascess.io\" defer></script>";
+    public string ScriptTag => $"<script src=\"{AppBaseUrl}/js/widget.js\" data-key=\"{LicenseKey}\" data-api=\"{AppBaseUrl}\" defer></script>";
 }

@@ -24,6 +24,11 @@
     </div>
 </div>
 
+@if (TempData["Success"] is string successMsg)
+{
+    <div class="ea-alert ea-alert--success">✓ @successMsg</div>
+}
+
 @if (ViewBag.TrialDaysLeft is int trialDays)
 {
     var urgency = trialDays <= 3 ? "background:oklch(95% 0.06 25);border:1px solid oklch(80% 0.1 25)" : "background:oklch(96% 0.04 145);border:1px solid oklch(82% 0.1 145)";
@@ -35,7 +40,7 @@
         <span style="font-size:14px;color:@color;flex:1">
             <strong>14 Günlük Ücretsiz Denemeniz</strong> — Bitimine <strong>@trialDays gün</strong> kaldı. Pro özellikler aktif.
         </span>
-        <a asp-controller="Home" asp-action="Pricing" style="font-size:13px;font-weight:600;color:@color;text-decoration:none;white-space:nowrap">Pro'ya Geç →</a>
+        <a asp-controller="Subscription" asp-action="Index" style="font-size:13px;font-weight:600;color:@color;text-decoration:none;white-space:nowrap">Pro'ya Geç →</a>
     </div>
 }
 
@@ -96,7 +101,7 @@
         </div>
         @if (!isPro)
         {
-            <a asp-controller="Home" asp-action="Pricing" style="font-size:13px;color:var(--indigo-700);font-weight:600;text-decoration:none">Planı yükselt →</a>
+            <a asp-controller="Subscription" asp-action="Index" style="font-size:13px;color:var(--indigo-700);font-weight:600;text-decoration:none">Planı yükselt →</a>
         }
     </div>
     <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:200px">
@@ -182,10 +187,10 @@
                             <td style="color:var(--ink-600)">@d.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
                             <td style="text-align:right">
                                 <div style="display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap">
-                                    <form asp-controller="Scan" asp-action="Start" asp-route-id="@d.Id" method="post" style="display:inline">
+                                    <form asp-controller="Scan" asp-action="Start" asp-route-id="@d.Id" method="post" style="display:inline"
+                                          onsubmit="var b=this.querySelector('button');if(b.disabled)return false;b.disabled=true;b.textContent='…';">
                                         @Html.AntiForgeryToken()
-                                        <button type="submit" class="ea-btn ea-btn-ghost" style="padding:6px 10px;min-height:32px;font-size:12px"
-                                                onclick="this.disabled=true;this.textContent='…';this.form.submit();">
+                                        <button type="submit" class="ea-btn ea-btn-ghost" style="padding:6px 10px;min-height:32px;font-size:12px">
                                             Tara
                                         </button>
                                     </form>

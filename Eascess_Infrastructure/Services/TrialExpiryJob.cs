@@ -70,17 +70,20 @@ public sealed class TrialExpiryJob : BackgroundService
             trial.IsActive = false;
             subscriptionRepo.Update(trial);
 
-            // Aynı kullanıcının bekleyen Ücretsiz planını aktive et
+            // Aynı kullanıcının bekleyen Ücretsiz planını aktive et.
+            // Not: kayıt sırasında Ücretsiz plan IsActive=true + ileri tarihli
+            // StartDate ile oluşturulur; bu yüzden IsActive'e göre filtrelenmez —
+            // aksi halde bulunamaz ve her gece mükerrer kayıt oluşur.
             var freeSub = await subscriptionRepo.FirstOrDefaultAsync(
                 s => s.UserId == trial.UserId
                   && s.PlanId == FreePlanId
-                  && !s.IsActive
                   && !s.IsDeleted);
 
             if (freeSub is not null)
             {
                 freeSub.IsActive = true;
-                freeSub.StartDate = now;
+                if (freeSub.StartDate > now)
+                    freeSub.StartDate = now;
                 subscriptionRepo.Update(freeSub);
                 _logger.LogInformation("Kullanıcı {UserId} Ücretsiz plana geçirildi", trial.UserId);
             }

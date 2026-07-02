@@ -23,10 +23,10 @@
             <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px"><path d="M3 3v18h18v-2H5V3H3zm4 14h2V9H7v8zm4 0h2V5h-2v12zm4 0h2v-6h-2v6z"/></svg>
             Analitikler
         </a>
-        <form asp-controller="Scan" asp-action="Start" asp-route-id="@domainId" method="post">
+        <form asp-controller="Scan" asp-action="Start" asp-route-id="@domainId" method="post"
+              onsubmit="var b=this.querySelector('button');if(b.disabled)return false;b.disabled=true;b.textContent='Taranıyor…';">
             @Html.AntiForgeryToken()
-            <button type="submit" class="ea-btn ea-btn-brand"
-                    onclick="this.disabled=true;this.textContent='Taranıyor…';this.form.submit();">
+            <button type="submit" class="ea-btn ea-btn-brand">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 Şimdi Tara
             </button>

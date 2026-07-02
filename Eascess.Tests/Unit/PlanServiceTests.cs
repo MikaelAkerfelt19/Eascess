@@ -17,13 +17,16 @@ public class PlanServiceTests
     private readonly Mock<IRepository<Domain>>           _domainRepo = new();
     private readonly PlanService _sut;
 
-    private static readonly Plan FreePlan = new() { Id = 1, Name = "Ücretsiz", MaxDomains = 1, MonthlyAiQuota = 50 };
-    private static readonly Plan ProPlan  = new() { Id = 2, Name = "Pro",      MaxDomains = 10, MonthlyAiQuota = 2000 };
+    private static readonly Plan FreePlan = new() { Id = 1, Name = "Ücretsiz", MaxDomains = 1, MonthlyAiQuota = 50, MonthlyPrice = 0 };
+    private static readonly Plan ProPlan  = new() { Id = 2, Name = "Pro",      MaxDomains = 10, MonthlyAiQuota = 2000, MonthlyPrice = 499 };
 
     public PlanServiceTests()
     {
-        _planRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(FreePlan);
-        _planRepo.Setup(r => r.GetByIdAsync(2)).ReturnsAsync(ProPlan);
+        // PlanService planları FindAsync ile çeker; mock, gerçek predicate'i
+        // bellek içi plan listesine uygular.
+        _planRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<Plan, bool>>>()))
+                 .ReturnsAsync((Expression<Func<Plan, bool>> predicate) =>
+                     new[] { FreePlan, ProPlan }.Where(predicate.Compile()).ToList());
         _sut = new PlanService(_subRepo.Object, _planRepo.Object, _usageRepo.Object, _domainRepo.Object);
     }
 
@@ -91,7 +94,6 @@ public class PlanServiceTests
         };
         _subRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<UserSubscription, bool>>>()))
                 .ReturnsAsync(new[] { sub });
-        _planRepo.Setup(r => r.GetByIdAsync(99)).ReturnsAsync((Plan?)null);
 
         var plan = await _sut.GetUserActivePlanAsync("u1");
 

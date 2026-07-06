@@ -8,11 +8,13 @@ public class WidgetService : IWidgetService
 {
     private readonly IRepository<Domain> _domainRepo;
     private readonly IRepository<WidgetSetting> _widgetSettingRepo;
+    private readonly IPlanService _planService;
 
-    public WidgetService(IRepository<Domain> domainRepo, IRepository<WidgetSetting> widgetSettingRepo)
+    public WidgetService(IRepository<Domain> domainRepo, IRepository<WidgetSetting> widgetSettingRepo, IPlanService planService)
     {
         _domainRepo = domainRepo;
         _widgetSettingRepo = widgetSettingRepo;
+        _planService = planService;
     }
 
     public async Task<WidgetConfigDto?> GetConfigByLicenseKeyAsync(Guid licenseKey)
@@ -22,6 +24,21 @@ public class WidgetService : IWidgetService
             return null;
 
         var setting = await _widgetSettingRepo.FirstOrDefaultAsync(w => w.DomainId == domain.Id && w.IsActive);
+
+        // Widget özelleştirme Pro ve üzeri planlara özeldir. Plan kapsam dışına
+        // düşen (ör. Pro'dan Ücretsiz'e inen) kullanıcının widget'ı, kayıtlı
+        // özelleştirme dursa bile varsayılan görünümle servis edilir.
+        var plan = await _planService.GetUserActivePlanAsync(domain.UserId);
+        if (!plan.HasWidgetCustomization)
+        {
+            return new WidgetConfigDto
+            {
+                DomainUrl = domain.DomainUrl,
+                IsAiEnabled = setting?.IsAiEnabled ?? true,
+                // ThemeColor / Position / Language / LogoUrl / WidgetTitle /
+                // PoweredByVisible → DTO varsayılanları
+            };
+        }
 
         return new WidgetConfigDto
         {

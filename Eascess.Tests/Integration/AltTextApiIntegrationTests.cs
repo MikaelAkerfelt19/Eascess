@@ -47,6 +47,17 @@ public class AltTextApiIntegrationTests : IClassFixture<AltTextApiTestFactory>
                 Position = "bottom-right",
                 Language = "tr"
             });
+
+            // Ücretsiz planın AI kotası 0 — AI taraması için aktif Pro aboneliği gerekir
+            db.UserSubscriptions.Add(new UserSubscription
+            {
+                UserId = "test-user",
+                PlanId = 2,
+                StartDate = DateTime.UtcNow.AddDays(-1),
+                EndDate = DateTime.UtcNow.AddYears(1),
+                IsActive = true,
+                IsDeleted = false
+            });
         });
     }
 

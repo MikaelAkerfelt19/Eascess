@@ -115,9 +115,10 @@ public partial class EaccessDbContext : IdentityDbContext<AppUser>
             entity.HasKey(e => e.Id).HasName("PK__Plans__3214EC07DD689DB1");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.HasData(
-                new Plan { Id = 1, Name = "Ücretsiz", MonthlyPrice = 0,   MaxDomains = 1,   MonthlyAiQuota = 50,     IsActive = true, IsDeleted = false },
-                new Plan { Id = 2, Name = "Pro",      MonthlyPrice = 299, MaxDomains = 10,  MonthlyAiQuota = 2000,   IsActive = true, IsDeleted = false },
-                new Plan { Id = 3, Name = "Kurumsal", MonthlyPrice = 0,   MaxDomains = 999, MonthlyAiQuota = 999999, IsActive = true, IsDeleted = false }
+                new Plan { Id = 1, Name = "Ücretsiz", MonthlyPrice = 0,    MaxDomains = 1,   MonthlyAiQuota = 0,      IsActive = true, IsDeleted = false },
+                new Plan { Id = 2, Name = "Pro",      MonthlyPrice = 600,  MaxDomains = 3,   MonthlyAiQuota = 500,    IsActive = true, IsDeleted = false },
+                new Plan { Id = 3, Name = "Kurumsal", MonthlyPrice = 0,    MaxDomains = 999, MonthlyAiQuota = 999999, IsActive = true, IsDeleted = false },
+                new Plan { Id = 4, Name = "Ultra",    MonthlyPrice = 1000, MaxDomains = 10,  MonthlyAiQuota = 2000,   IsActive = true, IsDeleted = false }
             );
         });
 

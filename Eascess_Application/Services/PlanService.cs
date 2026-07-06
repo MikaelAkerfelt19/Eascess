@@ -46,7 +46,7 @@ public class PlanService : IPlanService
             .FirstOrDefault();
 
         // Fallback: plan bulunamazsa (ör. seed eksik) varsayılan değerler döndür
-        return plan ?? new Plan { Id = FreePlanId, Name = "Ücretsiz", MaxDomains = 1, MonthlyAiQuota = 50 };
+        return plan ?? new Plan { Id = FreePlanId, Name = "Ücretsiz", MaxDomains = 1, MonthlyAiQuota = 0 };
     }
 
     public async Task<int> GetMonthlyAiUsageAsync(string userId)

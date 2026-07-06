@@ -124,23 +124,70 @@ olarak servis edilmeye devam ediyor.)
 
 ---
 
-## Açık Sorular / Ürün Kararı Bekleyen Konular
+## Açık Sorular — Verilen Ürün Kararları (2026-07-06)
 
-Bu maddeler hata değil; testler sırasında ortaya çıkan ve ürün kararı gerektiren durumlar:
+v2'de "açık soru" olarak raporlanan 4 konunun tamamı karara bağlandı ve v3'te uygulandı:
 
-1. **Limit üstü mevcut domainler:** Pro'dan (3 domain) Ücretsiz'e (1 domain) düşen bir
-   kullanıcının mevcut 3 domain'i silinmiyor; yalnızca **yeni** ekleme engelleniyor.
-   Fazla domainlerin widget'ları çalışmaya devam ediyor. İstenirse downgrade'de en eski
-   domain hariç diğerleri pasifleştirilebilir.
-2. **Yüklü logo dosyaları:** İndirgenen kullanıcının logosu artık servis edilmiyor ama
-   dosya diskte ve kayıt DB'de duruyor (yeniden yükseltmede geri gelsin diye bilinçli
-   tercih). Kalıcı silme istenirse ayrıca uygulanmalı.
-3. **Deneme bitişi anı:** `u09-pro-expiring-soon` bitişten 1 saat önce hâlâ Pro
-   sayılıyor (`EndDate >= now` kuralı) — bitiş günü *dahil* davranışı bilinçli mi,
-   onaylanmalı.
-4. **Kurumsal fiyatı 0:** Kademe sıralaması artık `TierRank` ile yapılıyor; ileride
-   yeni plan eklenirse `PlanIds` + `TierRank` + fiyatlandırma sayfası birlikte
-   güncellenmeli (test matrisi uyumsuzluğu yakalar).
+| # | Soru | Karar | Durum |
+|---|------|-------|-------|
+| 1 | Limit üstü mevcut domainler ne olacak? | **Ücretsiz'e düşen kullanıcının TÜM domainleri silinir; yeniden bağlaması gerekir.** | v3'te uygulandı |
+| 2 | Yüklü logo dosyaları ne olacak? | **60 gün bekletilir.** Kullanıcı bu sürede ücretli plana dönerse logolar kalır; dönmezse dosya ve kayıt kalıcı silinir. | v3'te uygulandı |
+| 3 | Deneme bitişi anı? | **Gün bazlı: deneme 14. günün sonunda gece 00:00 UTC'de biter.** Aynı gün kayıt olan herkesin denemesi aynı anda sona erer. | v3'te uygulandı |
+| 4 | İleride yeni plan eklenirse? | **Yeni plan eklenmeyecek.** Yine de eklenirse diye `PlanIds.cs` başına, güncellenmesi gereken 5 noktayı sayan kalıcı bir not bırakıldı; başka bir değişiklik yapılmadı. | v3'te not bırakıldı |
+
+---
+
+## v3 — Ürün Kararlarının Uygulanması ve Yeni Varyasyonlar (2026-07-06)
+
+### Yapılan değişiklikler
+
+1. **`DowngradeCleanupService` + `DowngradeCleanupJob` (00:05 UTC):** Eski
+   `TrialExpiryJob`'ın yerini aldı ve kapsamı genişletti. Her gece:
+   - Süresi dolan **tüm** ücretli abonelikler (yalnızca Pro denemesi değil) pasifleştirilir,
+     bekleyen Ücretsiz plan aktive edilir.
+   - Ücretsiz'e düşen kullanıcının **tüm domainleri soft-delete edilir**, widget ayarları
+     pasifleştirilir (karar #1). Kullanıcının başka geçerli ücretli planı varsa
+     (ör. Ultra aktifken Pro bitti) domainlere dokunulmaz.
+   - Son ücretli abonelik bitişinin üzerinden **60 gün** geçen kullanıcıların logo
+     dosyaları diskten ve kayıttan kalıcı silinir (karar #2). Ücretli plana dönen
+     kullanıcı atlanır — logoları korunur.
+2. **`TrialPolicy` (Domain katmanı):** Deneme bitişi tek merkezde:
+   `TrialEndUtc(kayıtAnı) = kayıtGünü + 14 gün, saat 00:00 UTC` (karar #3).
+   Kayıt akışı (`AccountController.Register`) `TrialEndsAt`, Pro deneme aboneliği
+   bitişi ve Ücretsiz planın başlangıcını bu değerden alıyor.
+3. **Yeni plan notu:** `PlanIds.cs` doküman yorumuna, olası bir plan ekleme durumunda
+   birlikte güncellenmesi gereken 5 nokta (sabitler, TierRank/özellik kapıları,
+   fiyatlandırma sayfası, migration+seed, test matrisleri) yazıldı (karar #4).
+
+### Yeni test varyasyonları (`DowngradeCleanupTests` + `TrialPolicyTests`)
+
+| Senaryo | Kurgu | Beklenen | Sonuç |
+|---------|-------|----------|-------|
+| `v01-pro-expired` | Pro dün bitti, 2 domain | Tüm domainler silinir, widget ayarları pasifleşir, Pro pasif/Ücretsiz aktif | ✓ |
+| `v02-ultra-keeps` | Ultra aktif + Pro dün bitti | Plan Ultra kalır, domainler **kalır**, logosu işlenmez | ✓ |
+| `v03-logo-purge` | Ücretli abonelik 61 gün önce bitti, logo dolu | Logo kalıcı silinir | ✓ |
+| `v04-logo-waiting` | Ücretli abonelik 10 gün önce bitti, logo dolu | Bekleme sürüyor — logo kalır | ✓ |
+| `v05-returned` | Eski abonelik 61 gün önce bitti AMA kullanıcı Pro'ya geri döndü | Logo korunur | ✓ |
+| Trial politikası | Kayıt 06.07 15:42 | Bitiş 20.07 **00:00** (tam gece yarısı) | ✓ |
+| Trial politikası | Aynı gün sabah/gece kayıt | İkisinin de bitişi aynı an | ✓ |
+
+### v3 çalıştırma çıktısı
+
+```
+Başarılı!  - Başarısız: 0, Başarılı: 113, Atlanan: 0, Toplam: 113, Süre: 2 s
+```
+
+(113 = v2'deki 104 test + 7 downgrade temizlik senaryosu + 2 deneme politikası testi.
+v1–v2'deki 38'lik plan matrisi değişmeden geçmeye devam ediyor.)
+
+### v3 notları
+
+- v2'deki BULGU-1 düzeltmesi (config teslim noktasında plan kontrolü) v3'te de gerekli
+  kalıyor: deneme gece 00:00'da biter, temizlik 00:05'te çalışır — aradaki 5 dakikalık
+  pencerede ve job'ın herhangi bir sebeple gecikmesi durumunda widget yine varsayılana
+  döner. İki katman birbirini tamamlar.
+- Plan matrisindeki `u19`/`u20` kullanıcıları "düşmüş ama temizlik henüz çalışmamış"
+  ara durumu temsil eder; üretimde bu durum en fazla bir gece sürer.
 
 ---
 
@@ -150,3 +197,4 @@ Bu maddeler hata değil; testler sırasında ortaya çıkan ve ürün kararı ge
 |-------|-------|-------|-----|
 | v1 | 2026-07-06 | 37/38 | BULGU-1: indirgenen kullanıcıda widget özelleştirmesi aktif kalıyordu |
 | v2 | 2026-07-06 | 38/38 (tam paket 104/104) | BULGU-1 düzeltildi: config teslim noktasında plan kontrolü |
+| v3 | 2026-07-06 | 113/113 | 4 ürün kararı uygulandı: downgrade'de domain silme, 60 günlük logo bekleme, gece 00:00 deneme bitişi, yeni plan notu |

@@ -1,4 +1,5 @@
 using Eascess.Models;
+using Eascess_Domain.Constants;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -96,13 +97,15 @@ public class AccountController : Controller
             return View(model);
 
         var now = DateTime.UtcNow;
+        // Deneme gün bazlıdır ve 14. günün sonunda gece 00:00 UTC'de biter
+        var trialEnd = TrialPolicy.TrialEndUtc(now);
         var user = new AppUser
         {
             UserName = model.Email,
             Email = model.Email,
             FullName = model.FullName,
             TrialStartedAt = now,
-            TrialEndsAt = now.AddDays(14),
+            TrialEndsAt = trialEnd,
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -113,25 +116,25 @@ public class AccountController : Controller
             // PlanService abonelik bulamadığında Ücretsiz plana düşer.
             try
             {
-                // Deneme süresince Pro plan (id=2); deneme bitince Ücretsiz'e (id=1) düşer
+                // Deneme süresince Pro plan; deneme bitince Ücretsiz'e düşer
                 await _subscriptionRepo.AddAsync(new UserSubscription
                 {
                     UserId = user.Id,
-                    PlanId = 2, // Pro plan — 14 günlük deneme
+                    PlanId = PlanIds.Pro, // 14 günlük deneme — 14. günün sonunda 00:00 UTC'de biter
                     StartDate = now,
-                    EndDate = now.AddDays(14),
+                    EndDate = trialEnd,
                     IsActive = true,
                     AutoRenew = false,
                     IsDeleted = false,
                 });
                 // Deneme sonrası kalıcı Ücretsiz plan.
-                // IsActive=true ama StartDate=now+14 olduğu için deneme süresince henüz
-                // "geçerli" sayılmaz; Pro deneme bitince otomatik olarak öne çıkar.
+                // IsActive=true ama StartDate ileri tarihli olduğu için deneme süresince
+                // henüz "geçerli" sayılmaz; Pro deneme bitince otomatik olarak öne çıkar.
                 await _subscriptionRepo.AddAsync(new UserSubscription
                 {
                     UserId = user.Id,
-                    PlanId = 1, // Ücretsiz plan
-                    StartDate = now.AddDays(14),
+                    PlanId = PlanIds.Free,
+                    StartDate = trialEnd,
                     EndDate = now.AddYears(100),
                     IsActive = true,
                     AutoRenew = false,

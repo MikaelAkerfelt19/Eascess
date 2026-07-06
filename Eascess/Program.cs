@@ -101,7 +101,11 @@ builder.Services.AddHostedService<MonthlyReportJob>();
 // Public scan & trial reminder (ADIM 9)
 builder.Services.AddScoped<IPublicScanService, PublicScanService>();
 builder.Services.AddHostedService<TrialReminderJob>();
-builder.Services.AddHostedService<TrialExpiryJob>();
+
+// Plan düşüşü temizliği: süresi dolan ücretli abonelikler, domain silme,
+// 60 günlük logo bekleme (TrialExpiryJob'ın genişletilmiş hali)
+builder.Services.AddScoped<IDowngradeCleanupService, DowngradeCleanupService>();
+builder.Services.AddHostedService<DowngradeCleanupJob>();
 
 // Pro ve üzeri planlar için otomatik yeniden tarama (fiyatlandırma vaadi)
 builder.Services.AddHostedService<AutoRescanJob>();

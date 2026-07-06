@@ -2,11 +2,13 @@ using Eascess_Application.Services;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Eascess.Controllers.Api;
 
 [ApiController]
 [Route("api/widget")]
+[EnableRateLimiting("public-api")]
 public class WidgetApiController : ControllerBase
 {
     private readonly IWidgetService _widgetService;

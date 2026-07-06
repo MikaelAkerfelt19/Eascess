@@ -2,6 +2,7 @@ using Eascess_Domain.Constants;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Eascess.Controllers.Api;
 
@@ -9,6 +10,7 @@ public record WidgetLogRequest(Guid LicenseKey, string Event, string? Feature);
 
 [ApiController]
 [Route("api/widget")]
+[EnableRateLimiting("public-api")]
 public class WidgetLogApiController : ControllerBase
 {
     private static readonly HashSet<string> AllowedEvents =

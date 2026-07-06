@@ -26,6 +26,10 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.SignIn.RequireConfirmedAccount = false;
+    // Brute-force koruması: 5 hatalı denemede 5 dakika kilit
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.AllowedForNewUsers = true;
 })
 .AddEntityFrameworkStores<EaccessDbContext>()
 .AddDefaultTokenProviders();
@@ -100,16 +104,33 @@ builder.Services.AddHostedService<TrialReminderJob>();
 builder.Services.AddHostedService<TrialExpiryJob>();
 builder.Services.AddMemoryCache();
 
-// Rate limiting — AI endpoint: IP başına dakikada 10 istek
+// Rate limiting — public API endpoint'leri IP bazlı sınırlandırılır.
+// Not: AddFixedWindowLimiter tüm istemcilerin paylaştığı TEK limit oluşturur;
+// IP başına limit için partitioned policy gerekir.
 builder.Services.AddRateLimiter(options =>
 {
-    options.AddFixedWindowLimiter("ai-scan", limiter =>
-    {
-        limiter.PermitLimit = 10;
-        limiter.Window = TimeSpan.FromMinutes(1);
-        limiter.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        limiter.QueueLimit = 0;
-    });
+    // AI endpoint: IP başına dakikada 10 istek
+    options.AddPolicy("ai-scan", ctx =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+            }));
+
+    // Lisans doğrulama / widget config / widget log: IP başına dakikada 60 istek
+    options.AddPolicy("public-api", ctx =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 60,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+            }));
+
     options.RejectionStatusCode = 429;
 });
 

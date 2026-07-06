@@ -1,10 +1,12 @@
 using Eascess_Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Eascess.Controllers.Api;
 
 [ApiController]
 [Route("api/license")]
+[EnableRateLimiting("public-api")]
 public class LicenseApiController : ControllerBase
 {
     private readonly ILicenseValidationService _licenseService;

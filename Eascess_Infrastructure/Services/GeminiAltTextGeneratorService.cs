@@ -110,7 +110,9 @@ public class GeminiAltTextGeneratorService : IAltTextGeneratorService
 
     private async Task<string?> CallGeminiAsync(string base64Image, string mimeType, CancellationToken ct)
     {
-        var url = $"{_options.ApiEndpoint.TrimEnd('/')}/{_options.Model}:generateContent?key={_options.ApiKey}";
+        // API anahtarı query string yerine header ile gönderilir —
+        // URL'ler log/proxy kayıtlarına düştüğü için anahtar sızıntısına yol açabilir.
+        var url = $"{_options.ApiEndpoint.TrimEnd('/')}/{_options.Model}:generateContent";
 
         var payload = new GeminiRequest
         {
@@ -134,7 +136,13 @@ public class GeminiAltTextGeneratorService : IAltTextGeneratorService
             }
         };
 
-        using var response = await _httpClient.PostAsJsonAsync(url, payload, ct);
+        using var request = new HttpRequestMessage(HttpMethod.Post, url)
+        {
+            Content = JsonContent.Create(payload)
+        };
+        request.Headers.Add("x-goog-api-key", _options.ApiKey);
+
+        using var response = await _httpClient.SendAsync(request, ct);
 
         if (!response.IsSuccessStatusCode)
         {

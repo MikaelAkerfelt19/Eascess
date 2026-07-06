@@ -48,11 +48,12 @@ public class AccountController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
+        // lockoutOnFailure: brute-force koruması — ardışık hatalı denemede hesap geçici kilitlenir
         var result = await _signInManager.PasswordSignInAsync(
             model.Email,
             model.Password,
             model.RememberMe,
-            lockoutOnFailure: false);
+            lockoutOnFailure: true);
 
         if (result.Succeeded)
         {
@@ -60,6 +61,13 @@ public class AccountController : Controller
                 return Redirect(returnUrl);
 
             return RedirectToAction("Index", "Dashboard");
+        }
+
+        if (result.IsLockedOut)
+        {
+            ModelState.AddModelError(string.Empty,
+                "Çok fazla hatalı deneme yapıldı. Hesabınız geçici olarak kilitlendi, lütfen birkaç dakika sonra tekrar deneyin.");
+            return View(model);
         }
 
         ModelState.AddModelError(string.Empty, "E-posta adresi veya şifre hatalı.");

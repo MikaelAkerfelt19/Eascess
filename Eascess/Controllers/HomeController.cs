@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net;
+using System.Net.Sockets;
 using Eascess.Models;
 using Eascess_Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -58,7 +59,7 @@ namespace Eascess.Controllers
             _cache.Set(cacheKey, count + 1, DateTime.UtcNow.Date.AddDays(1));
 
             var trimmedUrl = url.Trim();
-            if (!IsSafeUrl(trimmedUrl))
+            if (!await IsSafeUrlAsync(trimmedUrl))
             {
                 ModelState.AddModelError(string.Empty, "Geçersiz veya erişilemeyen URL. Lütfen genel bir web adresi girin.");
                 return View();
@@ -70,7 +71,9 @@ namespace Eascess.Controllers
             return View();
         }
 
-        private static bool IsSafeUrl(string url)
+        // SSRF koruması: yalnızca http/https kabul edilir; hem doğrudan IP girilen
+        // hem de DNS ile özel/rezerve IP'ye çözümlenen adresler engellenir.
+        private static async Task<bool> IsSafeUrlAsync(string url)
         {
             if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
                 return false;
@@ -78,25 +81,48 @@ namespace Eascess.Controllers
             if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
                 return false;
 
-            // Dahili / özel IP aralıklarını engelle (SSRF koruması)
-            var host = uri.Host;
-            if (host is "localhost" or "127.0.0.1" or "::1" or "0.0.0.0")
+            if (string.Equals(uri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            if (IPAddress.TryParse(host, out var ip))
+            // Doğrudan IP girildiyse çözümlemeye gerek yok
+            if (IPAddress.TryParse(uri.Host.Trim('[', ']'), out var literalIp))
+                return !IsPrivateOrReserved(literalIp);
+
+            try
             {
-                var bytes = ip.GetAddressBytes();
-                // 10.x.x.x
-                if (bytes[0] == 10) return false;
-                // 172.16-31.x.x
-                if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31) return false;
-                // 192.168.x.x
-                if (bytes[0] == 192 && bytes[1] == 168) return false;
-                // 169.254.x.x (link-local)
-                if (bytes[0] == 169 && bytes[1] == 254) return false;
+                var addresses = await Dns.GetHostAddressesAsync(uri.Host);
+                return addresses.Length > 0 && addresses.All(a => !IsPrivateOrReserved(a));
+            }
+            catch (SocketException)
+            {
+                return false; // çözümlenemeyen adres taranmaz
+            }
+        }
+
+        private static bool IsPrivateOrReserved(IPAddress ip)
+        {
+            if (ip.IsIPv4MappedToIPv6)
+                ip = ip.MapToIPv4();
+
+            if (IPAddress.IsLoopback(ip))
+                return true;
+
+            if (ip.AddressFamily == AddressFamily.InterNetwork)
+            {
+                var b = ip.GetAddressBytes();
+                return b[0] == 0                                    // 0.0.0.0/8
+                    || b[0] == 10                                   // 10.0.0.0/8
+                    || (b[0] == 100 && b[1] >= 64 && b[1] <= 127)   // 100.64.0.0/10 (CGNAT)
+                    || (b[0] == 172 && b[1] >= 16 && b[1] <= 31)    // 172.16.0.0/12
+                    || (b[0] == 192 && b[1] == 168)                 // 192.168.0.0/16
+                    || (b[0] == 169 && b[1] == 254);                // 169.254.0.0/16 (link-local)
             }
 
-            return true;
+            // IPv6: link-local (fe80::/10), unique-local (fc00::/7), site-local, ::
+            return ip.IsIPv6LinkLocal
+                || ip.IsIPv6UniqueLocal
+                || ip.IsIPv6SiteLocal
+                || ip.Equals(IPAddress.IPv6Any);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

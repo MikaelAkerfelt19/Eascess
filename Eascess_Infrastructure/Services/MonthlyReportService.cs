@@ -17,6 +17,7 @@ public class MonthlyReportService : IMonthlyReportService
     private readonly IWidgetAnalyticsService _analytics;
     private readonly IEmailService _email;
     private readonly UserManager<AppUser> _users;
+    private readonly IPlanService _planService;
     private readonly ILogger<MonthlyReportService> _logger;
 
     public MonthlyReportService(
@@ -26,15 +27,17 @@ public class MonthlyReportService : IMonthlyReportService
         IWidgetAnalyticsService analytics,
         IEmailService email,
         UserManager<AppUser> users,
+        IPlanService planService,
         ILogger<MonthlyReportService> logger)
     {
-        _domainRepo = domainRepo;
-        _scanRepo   = scanRepo;
-        _detailRepo = detailRepo;
-        _analytics  = analytics;
-        _email      = email;
-        _users      = users;
-        _logger     = logger;
+        _domainRepo  = domainRepo;
+        _scanRepo    = scanRepo;
+        _detailRepo  = detailRepo;
+        _analytics   = analytics;
+        _email       = email;
+        _users       = users;
+        _planService = planService;
+        _logger      = logger;
 
         // QuestPDF community lisansı
         QuestPDF.Settings.License = LicenseType.Community;
@@ -101,9 +104,28 @@ public class MonthlyReportService : IMonthlyReportService
     public async Task GenerateForAllDomainsAsync(int year, int month, CancellationToken ct = default)
     {
         var domains = await _domainRepo.FindAsync(d => d.IsDeleted != true && d.IsVerified == true);
+
+        // E-posta bildirimleri fiyatlandırma vaadine göre yalnızca Ultra ve
+        // Kurumsal planlarda gönderilir. Plan sorgusu kullanıcı başına bir kez yapılır.
+        var emailAllowedByUser = new Dictionary<string, bool>();
+
         foreach (var domain in domains)
         {
             if (ct.IsCancellationRequested) break;
+
+            if (!emailAllowedByUser.TryGetValue(domain.UserId, out var allowed))
+            {
+                var plan = await _planService.GetUserActivePlanAsync(domain.UserId);
+                allowed = plan.HasEmailNotifications;
+                emailAllowedByUser[domain.UserId] = allowed;
+            }
+
+            if (!allowed)
+            {
+                _logger.LogDebug("[Report] Domain {Id} atlandı — plan e-posta bildirimi içermiyor.", domain.Id);
+                continue;
+            }
+
             try { await GenerateAndSendAsync(domain.Id, year, month, ct); }
             catch (Exception ex)
             {

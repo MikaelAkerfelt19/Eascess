@@ -18,6 +18,7 @@ public class WidgetSettingsController : Controller
     private readonly IRepository<Domain> _domainRepo;
     private readonly UserManager<AppUser> _userManager;
     private readonly IWebHostEnvironment _env;
+    private readonly IPlanService _planService;
 
     private static readonly HashSet<string> _allowedMime = new(StringComparer.OrdinalIgnoreCase)
         { "image/png", "image/jpeg", "image/svg+xml", "image/webp" };
@@ -35,18 +36,36 @@ public class WidgetSettingsController : Controller
     private static readonly HashSet<string> _allowedExt = new(StringComparer.OrdinalIgnoreCase)
         { ".png", ".jpg", ".jpeg", ".svg", ".webp" };
 
-    public WidgetSettingsController(IWidgetSettingService widgetSettingService, IRepository<Domain> domainRepo, UserManager<AppUser> userManager, IWebHostEnvironment env)
+    public WidgetSettingsController(IWidgetSettingService widgetSettingService, IRepository<Domain> domainRepo, UserManager<AppUser> userManager, IWebHostEnvironment env, IPlanService planService)
     {
         _widgetSettingService = widgetSettingService;
         _domainRepo = domainRepo;
         _userManager = userManager;
         _env = env;
+        _planService = planService;
+    }
+
+    // Widget özelleştirme Pro ve üzeri planlara özeldir (fiyatlandırma vaadi)
+    private async Task<bool> PlanAllowsCustomizationAsync(string userId)
+    {
+        var plan = await _planService.GetUserActivePlanAsync(userId);
+        return plan.HasWidgetCustomization;
+    }
+
+    private IActionResult RedirectToPlans()
+    {
+        TempData["PlanWarning"] =
+            "Widget özelleştirme (tema, konum, dil, logo) Pro ve üzeri planlarda kullanılabilir. Devam etmek için planınızı yükseltin.";
+        return RedirectToAction("Index", "Subscription");
     }
 
     // GET /WidgetSettings/Index/5
     public async Task<IActionResult> Index(int id)
     {
         var userId = _userManager.GetUserId(User)!;
+
+        if (!await PlanAllowsCustomizationAsync(userId))
+            return RedirectToPlans();
 
         if (id == 0)
         {
@@ -71,6 +90,9 @@ public class WidgetSettingsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UploadLogo(IFormFile file)
     {
+        if (!await PlanAllowsCustomizationAsync(_userManager.GetUserId(User)!))
+            return Json(new { error = "Widget özelleştirme Pro ve üzeri planlarda kullanılabilir." });
+
         if (file is null || file.Length == 0)
             return Json(new { error = "Dosya boş." });
 
@@ -103,6 +125,9 @@ public class WidgetSettingsController : Controller
     public async Task<IActionResult> Update(WidgetSettingDto dto, string? returnUrl = null)
     {
         var userId = _userManager.GetUserId(User)!;
+
+        if (!await PlanAllowsCustomizationAsync(userId))
+            return RedirectToPlans();
 
         if (!ModelState.IsValid)
             return View("Index", dto);

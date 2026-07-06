@@ -102,6 +102,9 @@ builder.Services.AddHostedService<MonthlyReportJob>();
 builder.Services.AddScoped<IPublicScanService, PublicScanService>();
 builder.Services.AddHostedService<TrialReminderJob>();
 builder.Services.AddHostedService<TrialExpiryJob>();
+
+// Pro ve üzeri planlar için otomatik yeniden tarama (fiyatlandırma vaadi)
+builder.Services.AddHostedService<AutoRescanJob>();
 builder.Services.AddMemoryCache();
 
 // Rate limiting — public API endpoint'leri IP bazlı sınırlandırılır.

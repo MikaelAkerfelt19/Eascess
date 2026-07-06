@@ -17,8 +17,9 @@ public class PlanServiceTests
     private readonly Mock<IRepository<Domain>>           _domainRepo = new();
     private readonly PlanService _sut;
 
-    private static readonly Plan FreePlan = new() { Id = 1, Name = "Ücretsiz", MaxDomains = 1, MonthlyAiQuota = 50, MonthlyPrice = 0 };
-    private static readonly Plan ProPlan  = new() { Id = 2, Name = "Pro",      MaxDomains = 10, MonthlyAiQuota = 2000, MonthlyPrice = 499 };
+    private static readonly Plan FreePlan       = new() { Id = 1, Name = "Ücretsiz", MaxDomains = 1,   MonthlyAiQuota = 0,      MonthlyPrice = 0 };
+    private static readonly Plan ProPlan        = new() { Id = 2, Name = "Pro",      MaxDomains = 3,   MonthlyAiQuota = 500,    MonthlyPrice = 600 };
+    private static readonly Plan EnterprisePlan = new() { Id = 3, Name = "Kurumsal", MaxDomains = 999, MonthlyAiQuota = 999999, MonthlyPrice = 0 };
 
     public PlanServiceTests()
     {
@@ -26,7 +27,7 @@ public class PlanServiceTests
         // bellek içi plan listesine uygular.
         _planRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<Plan, bool>>>()))
                  .ReturnsAsync((Expression<Func<Plan, bool>> predicate) =>
-                     new[] { FreePlan, ProPlan }.Where(predicate.Compile()).ToList());
+                     new[] { FreePlan, ProPlan, EnterprisePlan }.Where(predicate.Compile()).ToList());
         _sut = new PlanService(_subRepo.Object, _planRepo.Object, _usageRepo.Object, _domainRepo.Object);
     }
 
@@ -81,6 +82,26 @@ public class PlanServiceTests
         var plan = await _sut.GetUserActivePlanAsync("u1");
 
         Assert.Equal(1, plan.Id);
+    }
+
+    [Fact]
+    public async Task GetUserActivePlan_KurumsalVePro_KurumsalDöner()
+    {
+        // Kurumsal'ın fiyatı 0 (teklif usulü) — fiyata göre sıralansaydı Pro kazanırdı.
+        // TierRank sayesinde Kurumsal en üst kademe olarak seçilmelidir.
+        var now = DateTime.UtcNow;
+        var subs = new[]
+        {
+            new UserSubscription { UserId = "u1", PlanId = 2, IsActive = true, IsDeleted = false, StartDate = now.AddDays(-5), EndDate = now.AddDays(30) },
+            new UserSubscription { UserId = "u1", PlanId = 3, IsActive = true, IsDeleted = false, StartDate = now.AddDays(-5), EndDate = now.AddDays(30) },
+        };
+        _subRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<UserSubscription, bool>>>()))
+                .ReturnsAsync(subs);
+
+        var plan = await _sut.GetUserActivePlanAsync("u1");
+
+        Assert.Equal(3, plan.Id);
+        Assert.Equal("Kurumsal", plan.Name);
     }
 
     [Fact]

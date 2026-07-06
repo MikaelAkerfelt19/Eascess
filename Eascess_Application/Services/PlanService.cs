@@ -1,3 +1,4 @@
+using Eascess_Domain.Constants;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
 
@@ -5,7 +6,7 @@ namespace Eascess_Application.Services;
 
 public class PlanService : IPlanService
 {
-    private const int FreePlanId = 1;
+    private const int FreePlanId = PlanIds.Free;
 
     private readonly IRepository<UserSubscription> _subscriptionRepo;
     private readonly IRepository<Plan> _planRepo;
@@ -29,8 +30,8 @@ public class PlanService : IPlanService
         var now = DateTime.UtcNow;
 
         // Şu an geçerli (başlamış ve bitmemiş) aktif abonelikler içinde en yüksek
-        // kademeyi seç. Kademe, PlanId sırasına değil plan fiyatına göre belirlenir —
-        // PlanId'ye güvenmek, planlar tablosuna farklı sırayla plan eklenirse bozulur.
+        // kademeyi seç. Kademe, Plan.TierRank ile belirlenir — fiyata güvenmek
+        // Kurumsal'da (fiyat=0, teklif usulü) yanlış sonuç verir.
         var subs = await _subscriptionRepo.FindAsync(
             s => s.UserId == userId && s.IsActive && !s.IsDeleted
                  && s.StartDate <= now && s.EndDate >= now);
@@ -41,8 +42,8 @@ public class PlanService : IPlanService
 
         var plans = await _planRepo.FindAsync(p => planIds.Contains(p.Id));
         var plan = plans
-            .OrderByDescending(p => p.MonthlyPrice)
-            .ThenByDescending(p => p.Id)
+            .OrderByDescending(p => p.TierRank)
+            .ThenByDescending(p => p.MonthlyPrice)
             .FirstOrDefault();
 
         // Fallback: plan bulunamazsa (ör. seed eksik) varsayılan değerler döndür

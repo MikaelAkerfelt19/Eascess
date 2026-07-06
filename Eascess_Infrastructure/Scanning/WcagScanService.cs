@@ -35,7 +35,7 @@ public sealed class WcagScanService : IScanService
         _logger = logger;
     }
 
-    public async Task<ScanResultDto> ScanDomainAsync(int domainId, string userId)
+    public async Task<ScanResultDto> ScanDomainAsync(int domainId, string userId, string scanType = "Manual")
     {
         // ── 1. Domain doğrula ─────────────────────────────────────────────
         var domain = await _domainRepo.FirstOrDefaultAsync(
@@ -95,7 +95,7 @@ public sealed class WcagScanService : IScanService
         var report = new ScanReport
         {
             DomainId = domainId,
-            ScanType = "Manual",
+            ScanType = scanType,
             WcagScore = score,
             ErrorCount = errorCount,
             ScanDate = DateTime.UtcNow,

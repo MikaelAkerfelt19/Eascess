@@ -198,3 +198,74 @@ v1–v2'deki 38'lik plan matrisi değişmeden geçmeye devam ediyor.)
 | v1 | 2026-07-06 | 37/38 | BULGU-1: indirgenen kullanıcıda widget özelleştirmesi aktif kalıyordu |
 | v2 | 2026-07-06 | 38/38 (tam paket 104/104) | BULGU-1 düzeltildi: config teslim noktasında plan kontrolü |
 | v3 | 2026-07-06 | 113/113 | 4 ürün kararı uygulandı: downgrade'de domain silme, 60 günlük logo bekleme, gece 00:00 deneme bitişi, yeni plan notu |
+| v4 | 2026-07-06 | 132/132 | Son güvenlik denetimi: SSRF açığı (BULGU-2) kapatıldı, hata mesajı sızıntıları giderildi |
+
+---
+
+## v4 — Son Güvenlik Denetimi (2026-07-06)
+
+Bütün sistem, özellikle **bilgi sızıntısı** ve **sistem çökmesine/iç ağ erişimine**
+yol açabilecek açıklara odaklanarak son kez elden geçirildi. Denetlenen yüzeyler:
+tüm controller'lar, iki middleware (CORS + API hata), giden HTTP istemcileri
+(WCAG tarayıcı, AI görsel indirme, Gemini), dosya yükleme/silme yolları, kimlik
+doğrulama, rate limiting ve abonelik/plan kapıları.
+
+### BULGU-2 (Kritik) — SSRF: `POST /api/scan/alt-text` üzerinden iç ağ erişimi
+
+**Açık:** AI alt-metin ucu yalnızca lisans anahtarıyla korunuyor; lisans anahtarı
+ise müşteri sitelerindeki widget `<script>` etiketinde herkese açık. Bu uç,
+istemcinin verdiği görsel URL'lerini `GeminiAltTextGeneratorService` içinde
+sunucu tarafında **hiçbir IP filtresi olmadan ve yönlendirme açıkken** indiriyordu.
+Saldırgan `http://169.254.169.254/…` (bulut metadata → kimlik bilgisi hırsızlığı)
+veya iç ağ adreslerine istek attırabilir; herkese açık tarama (`TestSite`) için
+konan koruma bu yolda ve kimlik doğrulamalı WCAG tarama yolunda yoktu. Ayrıca
+mevcut ön-kontrol bile bir HTTP yönlendirmesiyle (redirect → iç IP) atlatılabilirdi.
+
+**Kök neden:** Koruma yalnızca isteğin ilk URL'sini kontrol eden bir "önce doğrula,
+sonra bağlan" tasarımıydı; DNS-rebinding ve yönlendirmeleri kapsamıyordu.
+
+**Düzeltme:** Koruma bağlantı katmanına indirildi. Yeni
+`Eascess_Application/Security/PrivateNetworkGuard.cs`, `SocketsHttpHandler.ConnectCallback`
+olarak devreye girer ve **her TCP bağlantısında** (ilk istek + tüm yönlendirmeler)
+hedef IP'yi çözüp doğrular; özel/rezerve/loopback/CGNAT/metadata adreslerine
+bağlanmayı reddeder. Bağlanılan IP, doğrulanan IP'nin ta kendisi olduğu için
+TOCTOU/DNS-rebinding açığı oluşmaz. Tüm giden istemciler bu geçitten geçirildi:
+- `WcagScanner` (herkese açık + kimlik doğrulamalı tarama) → `SocketsHttpHandler` + ConnectCallback.
+- Yeni `AltTextImageDownloader` (AI görsel indirme) → ConnectCallback **+ yönlendirme kapalı**
+  + yalnızca `http/https` şema kabulü (`file://`, `gopher://` reddedilir).
+
+### İkincil düzeltmeler
+
+- **Bilgi sızıntısı — hata mesajları:** `PublicScanService` ve `WcagScanService`,
+  yakalanan istisnanın `ex.Message` değerini doğrudan kullanıcıya döndürüyordu
+  (iç ağ adı/altyapı detayı sızdırabilir). Artık ayrıntı yalnızca loglanır;
+  kullanıcıya genel bir mesaj döner.
+- **Tek kaynak:** `HomeController` içindeki kopya IP-kontrol mantığı kaldırılıp
+  paylaşılan `PrivateNetworkGuard`'a bağlandı; kapsam da genişledi (127/8 tamamı,
+  multicast/rezerve 224+, 192.0.0.0/24).
+
+### Denetlenip **temiz** bulunanlar (düzeltme gerekmedi)
+
+- **Yetkilendirme/IDOR:** Tüm MVC controller'lar `[Authorize]`; kaynak sorguları
+  `userId` ile filtreleniyor (`Domain`, `Report`, `WidgetSetting`). Sahiplik kontrolü
+  `Delete`/`Script`/`Analytics`/`Detail` uçlarında mevcut.
+- **Dosya yükleme:** MIME beyaz listesi + boyut limiti + uzantının **MIME'den**
+  türetilmesi (stored-XSS'e karşı `.html` gibi uzantılar engelli). Logo silmede
+  path-traversal guard'ı (`logosRoot` prefix kontrolü) hem controller'da hem
+  temizlik servisinde mevcut.
+- **Kimlik:** Brute-force kilidi (5 deneme/5 dk), açık redirect'e karşı
+  `Url.IsLocalUrl` kontrolü, tüm POST'larda `[ValidateAntiForgeryToken]`.
+- **Rate limiting:** IP bazlı partitioned policy'ler (`ai-scan` 10/dk, `public-api` 60/dk).
+- **CORS:** `DynamicCorsMiddleware` yalnızca kayıtlı domainlere izin, `Vary: Origin`
+  ile cache zehirlenmesine karşı korumalı.
+- **Güvenlik başlıkları:** HSTS, X-Frame-Options, X-Content-Type-Options, CSP,
+  Referrer-Policy, Permissions-Policy `Program.cs`'te ekli.
+
+### v4 çalıştırma çıktısı
+
+```
+Başarılı!  - Başarısız: 0, Başarılı: 132, Atlanan: 0, Toplam: 132, Süre: 3 s
+```
+
+(132 = v3'teki 113 test + `PrivateNetworkGuardTests`'ten 19 SSRF senaryosu —
+metadata/loopback/özel ağ/CGNAT/multicast/IPv6 blok + genel adres geçiş doğrulaması.)

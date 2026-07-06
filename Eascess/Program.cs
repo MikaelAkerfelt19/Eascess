@@ -1,6 +1,7 @@
 using System.Threading.RateLimiting;
 using Eascess.Middleware;
 using Eascess_Application.Options;
+using Eascess_Application.Security;
 using Eascess_Application.Services;
 using Eascess_Domain.Entities;
 using Eascess_Domain.Interfaces;
@@ -53,7 +54,9 @@ builder.Services.AddScoped<IWidgetSettingService, WidgetSettingService>();
 builder.Services.AddScoped<IScanService, WcagScanService>();
 builder.Services.AddScoped<ILicenseValidationService, LicenseValidationService>();
 
-// HttpClient — WCAG tarayıcı için
+// HttpClient — WCAG tarayıcı için.
+// SSRF koruması: ConnectCallback her TCP bağlantısında (yönlendirmeler dahil)
+// hedef IP'yi doğrular; özel/rezerve ağlara bağlanmayı engeller.
 builder.Services.AddHttpClient("WcagScanner", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(15);
@@ -62,16 +65,30 @@ builder.Services.AddHttpClient("WcagScanner", client =>
 })
 .ConfigurePrimaryHttpMessageHandler(() =>
 {
-    var handler = new HttpClientHandler
+    var handler = new SocketsHttpHandler
     {
         AllowAutoRedirect = true,
         MaxAutomaticRedirections = 5,
+        ConnectCallback = PrivateNetworkGuard.SafeConnectAsync,
     };
     // SSL doğrulamayı yalnızca geliştirme ortamında devre dışı bırak
     if (builder.Environment.IsDevelopment())
-        handler.ServerCertificateCustomValidationCallback =
-            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+        handler.SslOptions.RemoteCertificateValidationCallback = (_, _, _, _) => true;
     return handler;
+});
+
+// AI görsel indirme istemcisi — kullanıcı tarafından verilen görsel URL'leri
+// buradan indirilir; SSRF için en kritik yüzey. Yönlendirme kapalı (görsel
+// indirmede gerekmez) + ConnectCallback ile IP doğrulaması.
+builder.Services.AddHttpClient("AltTextImageDownloader", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(10);
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("Eascess-AltText/1.0");
+})
+.ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+{
+    AllowAutoRedirect = false,
+    ConnectCallback = PrivateNetworkGuard.SafeConnectAsync,
 });
 
 // AI Alt-Text — Gemini

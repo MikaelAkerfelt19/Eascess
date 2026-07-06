@@ -37,8 +37,9 @@ public sealed class PublicScanService : IPublicScanService
         }
         catch (Exception ex)
         {
+            // Hata ayrıntısı yalnızca loglanır; istemciye iç ağ/istisna detayı sızdırılmaz
             _logger.LogWarning(ex, "Public scan fetch failed: {Url}", url);
-            return Fail($"Sayfa erişilemedi: {ex.Message}");
+            return Fail("Sayfaya erişilemedi. Adresin herkese açık ve doğru olduğundan emin olun.");
         }
 
         var doc = new HtmlDocument();

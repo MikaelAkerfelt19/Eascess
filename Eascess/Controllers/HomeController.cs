@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using Eascess.Models;
+using Eascess_Application.Security;
 using Eascess_Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -86,43 +87,18 @@ namespace Eascess.Controllers
 
             // Doğrudan IP girildiyse çözümlemeye gerek yok
             if (IPAddress.TryParse(uri.Host.Trim('[', ']'), out var literalIp))
-                return !IsPrivateOrReserved(literalIp);
+                return !PrivateNetworkGuard.IsPrivateOrReserved(literalIp);
 
             try
             {
                 var addresses = await Dns.GetHostAddressesAsync(uri.Host);
-                return addresses.Length > 0 && addresses.All(a => !IsPrivateOrReserved(a));
+                return addresses.Length > 0
+                    && addresses.All(a => !PrivateNetworkGuard.IsPrivateOrReserved(a));
             }
             catch (SocketException)
             {
                 return false; // çözümlenemeyen adres taranmaz
             }
-        }
-
-        private static bool IsPrivateOrReserved(IPAddress ip)
-        {
-            if (ip.IsIPv4MappedToIPv6)
-                ip = ip.MapToIPv4();
-
-            if (IPAddress.IsLoopback(ip))
-                return true;
-
-            if (ip.AddressFamily == AddressFamily.InterNetwork)
-            {
-                var b = ip.GetAddressBytes();
-                return b[0] == 0                                    // 0.0.0.0/8
-                    || b[0] == 10                                   // 10.0.0.0/8
-                    || (b[0] == 100 && b[1] >= 64 && b[1] <= 127)   // 100.64.0.0/10 (CGNAT)
-                    || (b[0] == 172 && b[1] >= 16 && b[1] <= 31)    // 172.16.0.0/12
-                    || (b[0] == 192 && b[1] == 168)                 // 192.168.0.0/16
-                    || (b[0] == 169 && b[1] == 254);                // 169.254.0.0/16 (link-local)
-            }
-
-            // IPv6: link-local (fe80::/10), unique-local (fc00::/7), site-local, ::
-            return ip.IsIPv6LinkLocal
-                || ip.IsIPv6UniqueLocal
-                || ip.IsIPv6SiteLocal
-                || ip.Equals(IPAddress.IPv6Any);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

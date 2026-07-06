@@ -75,12 +75,21 @@ public class GeminiAltTextGeneratorService : IAltTextGeneratorService
     private async Task<(byte[]? Bytes, string? MimeType)> DownloadImageAsync(
         string imageUrl, CancellationToken ct)
     {
+        // Yalnızca http/https — file://, gopher:// gibi şemaları en baştan reddet
+        if (!Uri.TryCreate(imageUrl, UriKind.Absolute, out var uri)
+            || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            _logger.LogWarning("Rejected non-http(s) image URL: {Url}", imageUrl);
+            return (null, null);
+        }
+
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         cts.CancelAfter(TimeSpan.FromSeconds(5)); // görsel indirme için 5 sn limit
 
-        using var downloadClient = _httpClientFactory.CreateClient();
+        // SSRF koruması: "AltTextImageDownloader" istemcisi ConnectCallback ile
+        // özel/rezerve IP'lere bağlanmayı engeller ve yönlendirmeleri kapatır.
+        using var downloadClient = _httpClientFactory.CreateClient("AltTextImageDownloader");
         using var request = new HttpRequestMessage(HttpMethod.Get, imageUrl);
-        request.Headers.UserAgent.ParseAdd("Eascess-AltText/1.0");
 
         using var response = await downloadClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 

@@ -55,8 +55,9 @@ public sealed class WcagScanService : IScanService
         }
         catch (Exception ex)
         {
+            // İstisna ayrıntısı loglanır; kullanıcıya iç ağ/istisna detayı yansıtılmaz
             _logger.LogWarning(ex, "Tarama sırasında sayfa çekilemedi: {Url}", pageUrl);
-            return Fail(domainId, $"Sayfa erişilemedi: {ex.Message}");
+            return Fail(domainId, "Sayfaya erişilemedi. Domain'in yayında ve erişilebilir olduğundan emin olun.");
         }
 
         // ── 3. HTML parse & analiz ─────────────────────────────────────────

@@ -120,7 +120,7 @@ public class AccountController : Controller
                 await _subscriptionRepo.AddAsync(new UserSubscription
                 {
                     UserId = user.Id,
-                    PlanId = PlanIds.Pro, // 14 günlük deneme — 14. günün sonunda 00:00 UTC'de biter
+                    PlanId = TrialPolicy.TrialPlanId, // 14. günün sonunda 00:00 UTC'de biter
                     StartDate = now,
                     EndDate = trialEnd,
                     IsActive = true,

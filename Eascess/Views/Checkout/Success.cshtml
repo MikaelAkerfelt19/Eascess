@@ -1,0 +1,187 @@
+@model Eascess.Models.CheckoutResultViewModel
+@{
+    ViewData["Title"] = "Ödeme Başarılı";
+    Layout = "~/Views/Shared/_CheckoutLayout.cshtml";
+
+    // Tanıtım penceresi yalnızca planın değiştiği anda (TempData bir kez taşınır)
+    // gösterilir; sayfa yeniden ziyaret edilirse tekrar açılmaz.
+    var introPlanId = TempData["ShowPlanIntro"] as int?;
+    var perks = introPlanId.HasValue ? PlanHighlights.PerksFor(introPlanId.Value) : null;
+    var showIntro = perks is { Count: > 0 };
+}
+
+<!-- Adım göstergesi: üç adım da tamamlandı -->
+<nav class="ea-stepper" aria-label="Ödeme adımları" style="max-width:520px">
+    <div class="ea-step">
+        <div class="ea-step-num done" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <span class="ea-step-label done">Plan seçimi</span>
+    </div>
+    <div class="ea-step-line done" aria-hidden="true"></div>
+    <div class="ea-step">
+        <div class="ea-step-num done" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <span class="ea-step-label done">Fatura bilgileri</span>
+    </div>
+    <div class="ea-step-line done" aria-hidden="true"></div>
+    <div class="ea-step">
+        <div class="ea-step-num done" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <span class="ea-step-label done">Ödeme</span>
+    </div>
+</nav>
+
+<div class="ea-checkout-result">
+
+    @* Sonuç sayfaya girer girmez duyurulur — ekran okuyucu kullanıcısı
+       başlığa ulaşmayı beklemeden ödemenin başarılı olduğunu öğrenir. *@
+    <div role="status" aria-live="polite" class="ea-sr-only">
+        Ödemeniz başarıyla tamamlandı. @Model.PlanName planı aktif.
+    </div>
+
+    <div class="ea-result-icon ea-result-icon--ok" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L9 17l-5-5"/>
+        </svg>
+    </div>
+
+    <h1 class="ea-result-title">Ödemeniz alındı</h1>
+    <p class="ea-result-desc">
+        <strong>@Model.PlanName</strong> planınız aktif edildi.
+        Fatura ve ödeme onayı e-posta adresinize gönderildi.
+    </p>
+
+    <div class="ea-card" style="padding:22px">
+        <div class="ea-result-meta">
+            <div class="ea-summary-row">
+                <span class="ea-summary-row__label">Sipariş numarası</span>
+                <span class="ea-summary-row__value ea-mono">@Model.OrderReference</span>
+            </div>
+            <div class="ea-summary-row">
+                <span class="ea-summary-row__label">Plan</span>
+                <span class="ea-summary-row__value">@Model.PlanName · @Model.BillingPeriodLabel</span>
+            </div>
+            @if (Model.CompletedAt.HasValue)
+            {
+                <div class="ea-summary-row">
+                    <span class="ea-summary-row__label">Ödeme tarihi</span>
+                    <span class="ea-summary-row__value">@Model.CompletedAt.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                </div>
+            }
+            @if (Model.AccessUntil.HasValue)
+            {
+                <div class="ea-summary-row">
+                    <span class="ea-summary-row__label">Geçerlilik</span>
+                    <span class="ea-summary-row__value">@Model.AccessUntil.Value.ToLocalTime().ToString("dd.MM.yyyy") tarihine kadar</span>
+                </div>
+            }
+            <div class="ea-summary-row ea-summary-row--total">
+                <span class="ea-summary-row__label">Ödenen tutar</span>
+                <span class="ea-summary-row__value">@Money.Format(Model.Total, Model.Currency)</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+        <a asp-controller="Dashboard" asp-action="Index" class="ea-btn ea-btn-brand">Panele Git</a>
+        <a asp-controller="Subscription" asp-action="Index" class="ea-btn ea-btn-ghost">Aboneliğimi Görüntüle</a>
+    </div>
+
+    <p style="font-size:12px;color:var(--ink-500);margin-top:20px;line-height:1.6">
+        Sipariş numaranızı destek taleplerinde belirtirseniz daha hızlı yardımcı olabiliriz.
+    </p>
+
+</div>
+
+@if (showIntro)
+{
+    @* Yeni planın ayrıcalıklarını anlatan tanıtım penceresi.
+       role="dialog" + aria-modal ile ekran okuyucuya modal olduğu bildirilir;
+       odak açılışta pencereye alınır ve içeride tutulur. *@
+    <div class="ea-modal-backdrop" id="ea-plan-intro" role="dialog" aria-modal="true"
+         aria-labelledby="ea-plan-intro-title" aria-describedby="ea-plan-intro-desc">
+        <div class="ea-modal">
+
+            <div class="ea-modal__eyebrow">Planınız güncellendi</div>
+            <h2 class="ea-modal__title" id="ea-plan-intro-title">@PlanHighlights.TitleFor(introPlanId!.Value)</h2>
+            <p class="ea-modal__desc" id="ea-plan-intro-desc">@PlanHighlights.LeadFor(introPlanId.Value)</p>
+
+            <ul class="ea-modal__perks">
+                @foreach (var perk in perks!)
+                {
+                    <li class="ea-modal__perk">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M20 6L9 17l-5-5"/>
+                        </svg>
+                        <span>
+                            <span class="ea-modal__perk-title">@perk.Title</span>
+                            <span class="ea-modal__perk-desc">@perk.Description</span>
+                        </span>
+                    </li>
+                }
+            </ul>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button type="button" class="ea-btn ea-btn-brand" id="ea-plan-intro-close" style="flex:1;justify-content:center">
+                    Harika, başlayalım
+                </button>
+                <a asp-controller="Home" asp-action="Docs" target="_blank" class="ea-btn ea-btn-ghost">Belgeler</a>
+            </div>
+
+        </div>
+    </div>
+}
+
+@* Razor'da section'lar koşul bloğu İÇİNDE tanımlanamaz; section her zaman
+   tanımlanır, içeriği koşullu üretilir. *@
+@section Scripts {
+    @if (showIntro)
+    {
+        <script>
+            // Tanıtım penceresi: odak tuzağı, Esc ile kapatma ve kapanışta
+            // odağın sayfaya geri verilmesi. Küçük olduğu için ayrı dosyaya taşınmadı.
+            (function () {
+                var modal = document.getElementById('ea-plan-intro');
+                if (!modal) return;
+
+                var panel = modal.querySelector('.ea-modal');
+                var closeButton = document.getElementById('ea-plan-intro-close');
+                var focusables = panel.querySelectorAll('button, a[href]');
+                var first = focusables[0];
+                var last = focusables[focusables.length - 1];
+
+                function close() {
+                    modal.hidden = true;
+                    // Pencere kapanınca odak, sayfadaki ilk anlamlı eyleme döner.
+                    var fallback = document.querySelector('.ea-checkout-result .ea-btn');
+                    if (fallback) fallback.focus();
+                }
+
+                closeButton.addEventListener('click', close);
+
+                // Arka plana tıklamak kapatır; panelin içine tıklamak kapatmaz.
+                modal.addEventListener('mousedown', function (e) {
+                    if (e.target === modal) close();
+                });
+
+                modal.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') { close(); return; }
+                    if (e.key !== 'Tab') return;
+
+                    // Odak tuzağı: sekme, pencerenin dışına çıkmaz.
+                    if (e.shiftKey && document.activeElement === first) {
+                        e.preventDefault(); last.focus();
+                    } else if (!e.shiftKey && document.activeElement === last) {
+                        e.preventDefault(); first.focus();
+                    }
+                });
+
+                if (first) first.focus();
+            })();
+        </script>
+    }
+}
+

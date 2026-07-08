@@ -1,0 +1,69 @@
+@{
+    ViewData["Title"] = "Ödeme Sayfasına Yönlendiriliyorsunuz";
+    Layout = "~/Views/Shared/_CheckoutLayout.cshtml";
+
+    // Sağlayıcının döndürdüğü içerik (ör. 3D Secure formu). Yalnızca
+    // IPaymentProvider.CreatePaymentAsync sonucundan gelir; kullanıcı girdisi
+    // buraya asla ulaşmaz. İçerik sağlayıcının kendi formu olduğu için
+    // olduğu gibi basılmak ZORUNDADIR — kodlanırsa akış çalışmaz.
+    var providerHtml = ViewData["ProviderHtml"] as string;
+}
+
+<div class="ea-checkout-result">
+
+    @* Bekleme durumu duyurulur — ekranda dönen simge ekran okuyucuda görünmez *@
+    <div role="status" aria-live="polite" class="ea-sr-only">
+        Ödeme sağlayıcısına yönlendiriliyorsunuz. Lütfen bu sayfayı kapatmayın.
+    </div>
+
+    <div class="ea-result-icon" style="background:var(--cream-200)" aria-hidden="true">
+        <span class="ea-spinner" style="width:26px;height:26px;border-width:3px;border-color:var(--cream-300);border-top-color:var(--indigo-700)"></span>
+    </div>
+
+    <h1 class="ea-result-title">Yönlendiriliyorsunuz</h1>
+    <p class="ea-result-desc">
+        Ödemeniz sağlayıcının güvenli sayfasında tamamlanacak.
+        <strong>Lütfen bu sayfayı kapatmayın veya geri tuşuna basmayın.</strong>
+    </p>
+
+    @if (!string.IsNullOrWhiteSpace(providerHtml))
+    {
+        <div id="ea-provider-form" style="display:none" aria-hidden="true">
+            @Html.Raw(providerHtml)
+        </div>
+
+        <script>
+            // Sağlayıcının formu otomatik gönderilir. JavaScript kapalıysa
+            // aşağıdaki yedek düğme aynı işi kullanıcı eliyle yapar.
+            (function () {
+                var container = document.getElementById('ea-provider-form');
+                var form = container ? container.querySelector('form') : null;
+                if (form) { form.submit(); }
+            })();
+        </script>
+
+        <noscript>
+            <p class="ea-alert ea-alert--danger" style="text-align:left">
+                Devam etmek için JavaScript gereklidir. Lütfen tarayıcınızda JavaScript'i
+                etkinleştirip tekrar deneyin.
+            </p>
+        </noscript>
+    }
+    else
+    {
+        <div class="ea-card" style="padding:22px">
+            <p style="font-size:14px;color:var(--ink-700);margin:0">
+                Ödemeniz sağlayıcı tarafından işleniyor. Sonuç birkaç saniye içinde
+                bu sayfaya iletilecek. İşlem tamamlanmazsa aşağıdaki bağlantıdan
+                abonelik sayfanıza dönüp durumu kontrol edebilirsiniz.
+            </p>
+        </div>
+
+        <div style="margin-top:20px">
+            <a asp-controller="Subscription" asp-action="Index" class="ea-btn ea-btn-ghost">
+                Abonelik Sayfasına Dön
+            </a>
+        </div>
+    }
+
+</div>

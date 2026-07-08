@@ -1,0 +1,72 @@
+@model Eascess.Models.CheckoutResultViewModel
+@{
+    ViewData["Title"] = "Ödeme Tamamlanamadı";
+    Layout = "~/Views/Shared/_CheckoutLayout.cshtml";
+
+    var canRetry = Model.PlanId > 0;
+}
+
+<div class="ea-checkout-result">
+
+    @* Hata sonucu anında duyurulur. role="alert" kesintili duyuru sağlar. *@
+    <div role="alert" class="ea-sr-only">
+        Ödeme tamamlanamadı. @Model.ErrorMessage
+    </div>
+
+    <div class="ea-result-icon ea-result-icon--fail" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/>
+        </svg>
+    </div>
+
+    <h1 class="ea-result-title">Ödeme tamamlanamadı</h1>
+    <p class="ea-result-desc">
+        @Model.ErrorMessage
+        <br />
+        Kartınızdan herhangi bir tutar çekilmedi. Dilerseniz tekrar deneyebilirsiniz.
+    </p>
+
+    @if (!string.IsNullOrWhiteSpace(Model.OrderReference))
+    {
+        <div class="ea-card" style="padding:22px">
+            <div class="ea-result-meta">
+                <div class="ea-summary-row">
+                    <span class="ea-summary-row__label">Sipariş numarası</span>
+                    <span class="ea-summary-row__value ea-mono">@Model.OrderReference</span>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.PlanName))
+                {
+                    <div class="ea-summary-row">
+                        <span class="ea-summary-row__label">Plan</span>
+                        <span class="ea-summary-row__value">@Model.PlanName · @Model.BillingPeriodLabel</span>
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.ErrorCode))
+                {
+                    <div class="ea-summary-row">
+                        <span class="ea-summary-row__label">Hata kodu</span>
+                        <span class="ea-summary-row__value ea-mono">@Model.ErrorCode</span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+        @if (canRetry)
+        {
+            @* Yeni bir deneme yeni bir sipariş açar — başarısız sipariş
+               yeniden kullanılmaz, durumu terminaldir. *@
+            <a asp-action="Index" asp-route-planId="@Model.PlanId" asp-route-period="@Model.BillingPeriod"
+               class="ea-btn ea-btn-brand">Tekrar Dene</a>
+        }
+        <a asp-controller="Subscription" asp-action="Index" class="ea-btn ea-btn-ghost">Planlara Dön</a>
+        <a asp-controller="Support" asp-action="Create" class="ea-btn ea-btn-ghost">Destek Talebi Aç</a>
+    </div>
+
+    <p style="font-size:12px;color:var(--ink-500);margin-top:20px;line-height:1.6">
+        Sorun devam ederse sipariş numaranızla birlikte destek talebi açın;
+        ödeme kaydınızı sizin adınıza kontrol edelim.
+    </p>
+
+</div>

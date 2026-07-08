@@ -39,7 +39,12 @@ public class SubscriptionController : Controller
         ViewBag.AiUsed = aiUsed;
         ViewBag.DomainCount = domains.Count();
         ViewBag.PlanName = currentPlan.Name;
-        ViewBag.TrialEndsAt = user?.IsTrialActive == true ? user.TrialEndsAt : null;
+        // Bir plana geçen kullanıcıda ücretsiz deneme kalkar: ödeme
+        // tamamlandığında CheckoutService TrialEndsAt'i kapatır, böylece
+        // IsTrialActive false olur ve şerit bir daha görünmez.
+        ViewBag.TrialEndsAt = user?.IsTrialActive == true && !currentPlan.IsAboveTrialTier
+            ? user.TrialEndsAt
+            : null;
 
         return View();
     }

@@ -28,34 +28,34 @@
     <div class="ea-alert ea-alert--success">✓ @successMsg</div>
 }
 
-<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:18px;align-items:start">
+<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:start">
 
     <!-- Adım kartları -->
-    <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;flex-direction:column;gap:16px">
 
         <!-- Adım 1 -->
-        <div class="ea-card" style="padding:22px">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div class="ea-card" style="padding:24px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
                 <span class="ea-step-num active">1</span>
-                <span style="font-size:14px;font-weight:600;color:var(--ink-900)">Kodu kopyalayın</span>
+                <span style="font-size:var(--fs-sm);font-weight:600;color:var(--ink-900)">Kodu kopyalayın</span>
             </div>
             <div class="ea-code-block" style="position:relative;padding-right:80px">
-                <code id="script-code" style="background:none;padding:0;color:var(--cream-100);word-break:break-all;font-size:12px">@Model.ScriptTag</code>
+                <code id="script-code" style="background:none;padding:0;color:var(--cream-100);word-break:break-all;font-size:var(--fs-xs)">@Model.ScriptTag</code>
                 <button id="copy-btn" onclick="copyScript()" type="button"
                         class="ea-btn ea-btn-ghost"
-                        style="position:absolute;top:10px;right:10px;padding:5px 10px;min-height:28px;font-size:12px;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:white">
+                        style="position:absolute;top:10px;right:10px;padding:4px 12px;font-size:var(--fs-xs);background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:white">
                     Kopyala
                 </button>
             </div>
         </div>
 
         <!-- Adım 2 -->
-        <div class="ea-card" style="padding:22px">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div class="ea-card" style="padding:24px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
                 <span class="ea-step-num">2</span>
-                <span style="font-size:14px;font-weight:600;color:var(--ink-900)"><code>&lt;/body&gt;</code> etiketinden önce yapıştırın</span>
+                <span style="font-size:var(--fs-sm);font-weight:600;color:var(--ink-900)"><code>&lt;/body&gt;</code> etiketinden önce yapıştırın</span>
             </div>
-            <div class="ea-code-block" style="font-size:12px">
+            <div class="ea-code-block" style="font-size:var(--fs-xs)">
                 <pre style="margin:0;color:var(--ink-400);font-family:inherit">&lt;html&gt;
   &lt;head&gt;...&lt;/head&gt;
   &lt;body&gt;
@@ -67,39 +67,39 @@
         </div>
 
         <!-- Adım 3 -->
-        <div class="ea-card" style="padding:22px">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div class="ea-card" style="padding:24px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
                 <span class="ea-step-num">3</span>
-                <span style="font-size:14px;font-weight:600;color:var(--ink-900)">Sitenizi ziyaret edin</span>
+                <span style="font-size:var(--fs-sm);font-weight:600;color:var(--ink-900)">Sitenizi ziyaret edin</span>
             </div>
-            <p style="font-size:14px;color:var(--ink-600);margin:0 0 0 42px;line-height:1.55">
+            <p style="font-size:var(--fs-sm);color:var(--ink-600);margin:0 0 0 42px;line-height:1.55">
                 Script yüklendikten sonra Eascess lisans anahtarınızı doğrular ve erişilebilirlik widget'ı sitenizde otomatik olarak görünür.
             </p>
         </div>
 
         <div style="display:flex;gap:8px">
             <a asp-controller="WidgetSettings" asp-action="Index" asp-route-id="@Model.Id"
-               class="ea-btn ea-btn-brand" style="font-size:13px;min-height:38px;padding:9px 14px">
+               class="ea-btn ea-btn-brand" style="font-size:var(--fs-sm);padding:8px 16px">
                 Widget Ayarları
             </a>
             <a asp-controller="Reports" asp-action="Domain" asp-route-id="@Model.Id"
-               class="ea-btn ea-btn-ghost" style="font-size:13px;min-height:38px;padding:9px 14px">
+               class="ea-btn ea-btn-ghost" style="font-size:var(--fs-sm);padding:8px 16px">
                 Raporları Görüntüle
             </a>
         </div>
     </div>
 
     <!-- Sağ sütun -->
-    <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;flex-direction:column;gap:16px">
 
         <!-- Detay kartı -->
-        <div class="ea-card" style="padding:22px">
-            <div style="font-size:13px;font-weight:600;color:var(--ink-700);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px">Detaylar</div>
-            <dl style="display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0;font-size:13px">
+        <div class="ea-card" style="padding:24px">
+            <div style="font-size:var(--fs-sm);font-weight:600;color:var(--ink-700);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px">Detaylar</div>
+            <dl style="display:grid;grid-template-columns:auto 1fr;gap:12px 16px;margin:0;font-size:var(--fs-sm)">
                 <dt style="color:var(--ink-500);font-weight:600">Domain</dt>
                 <dd style="color:var(--ink-900);margin:0;font-weight:500">@Model.DomainUrl</dd>
                 <dt style="color:var(--ink-500);font-weight:600">Lisans Anahtarı</dt>
-                <dd style="margin:0"><code style="font-size:11px">@Model.LicenseKey</code></dd>
+                <dd style="margin:0"><code style="font-size:var(--fs-xs)">@Model.LicenseKey</code></dd>
                 <dt style="color:var(--ink-500);font-weight:600">Eklenme</dt>
                 <dd style="color:var(--ink-700);margin:0">@Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</dd>
             </dl>
@@ -112,21 +112,21 @@
         @if (ws != null)
         {
             <div class="ea-card" style="padding:0;overflow:hidden">
-                <div style="padding:14px 18px;border-bottom:1px solid var(--cream-300);display:flex;justify-content:space-between;align-items:center">
-                    <div style="font-size:13px;font-weight:600;color:var(--ink-900)">Widget Önizleme</div>
+                <div style="padding:16px 20px;border-bottom:1px solid var(--cream-300);display:flex;justify-content:space-between;align-items:center">
+                    <div style="font-size:var(--fs-sm);font-weight:600;color:var(--ink-900)">Widget Önizleme</div>
                     <a asp-controller="WidgetSettings" asp-action="Index" asp-route-id="@Model.Id"
-                       style="font-size:12px;font-weight:600;color:var(--indigo-700);text-decoration:none">Tüm Ayarlar →</a>
+                       style="font-size:var(--fs-xs);font-weight:600;color:var(--indigo-700);text-decoration:none">Tüm Ayarlar →</a>
                 </div>
 
                 <!-- Mini preview iframe -->
                 <div style="position:relative;border-bottom:1px solid var(--cream-300)">
-                    <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--cream-100)">
+                    <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--cream-100)">
                         <div style="display:flex;gap:3px">
                             <span style="width:8px;height:8px;border-radius:50%;background:#fc615d;display:block"></span>
                             <span style="width:8px;height:8px;border-radius:50%;background:#fdbc40;display:block"></span>
                             <span style="width:8px;height:8px;border-radius:50%;background:#34c749;display:block"></span>
                         </div>
-                        <div style="flex:1;text-align:center;font-size:10px;color:var(--ink-500);background:white;border:1px solid var(--cream-300);border-radius:3px;padding:2px 6px">@Model.DomainUrl</div>
+                        <div style="flex:1;text-align:center;font-size:var(--fs-xs);color:var(--ink-500);background:white;border:1px solid var(--cream-300);border-radius:3px;padding:2px 8px">@Model.DomainUrl</div>
                     </div>
                     <iframe id="script-preview-iframe"
                             src="/widget-demo.html"
@@ -136,7 +136,7 @@
                 </div>
 
                 <!-- Hızlı ayarlar formu -->
-                <form asp-controller="WidgetSettings" asp-action="Update" method="post" style="padding:14px 18px">
+                <form asp-controller="WidgetSettings" asp-action="Update" method="post" style="padding:16px 20px">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="returnUrl" value="/Domains/Script/@Model.Id" />
                     <input type="hidden" name="Id" value="@ws.Id" />
@@ -149,13 +149,13 @@
                     <input type="hidden" name="WidgetTitle" value="@ws.WidgetTitle" />
 
                     <!-- Tema rengi -->
-                    <div style="margin-bottom:14px">
-                        <label class="ea-label" style="font-size:12px;margin-bottom:6px">Tema Rengi</label>
-                        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+                    <div style="margin-bottom:16px">
+                        <label class="ea-label" style="font-size:var(--fs-xs);margin-bottom:8px">Tema Rengi</label>
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                             <input type="color" id="script-color-input" name="ThemeColor" value="@ws.ThemeColor"
                                    style="width:36px;height:36px;border:1px solid var(--cream-300);border-radius:var(--r-sm);background:white;cursor:pointer;padding:3px" />
                             <input type="text" id="script-color-text" value="@ws.ThemeColor"
-                                   class="ea-input" style="width:90px;min-height:36px;padding:7px 9px;font-size:12px"
+                                   class="ea-input" style="width:104px;padding:8px 12px"
                                    oninput="scriptSyncColor(this.value)" />
                             <div style="display:flex;gap:4px;flex-wrap:wrap">
                                 @foreach (var c in new[] { "#38bdf8", "#818cf8", "#c084fc", "#22d3ee", "#4ade80", "#fb923c", "#f87171", "#facc15" })
@@ -170,8 +170,8 @@
                     </div>
 
                     <!-- Konum -->
-                    <div style="margin-bottom:14px">
-                        <label class="ea-label" style="font-size:12px;margin-bottom:6px">Widget Konumu</label>
+                    <div style="margin-bottom:16px">
+                        <label class="ea-label" style="font-size:var(--fs-xs);margin-bottom:8px">Widget Konumu</label>
                         <div style="position:relative;width:130px;height:82px;background:var(--cream-100);border:1px solid var(--cream-300);border-radius:var(--r-sm);overflow:hidden">
                             <div style="position:absolute;inset:5px;border:1px dashed var(--cream-300);border-radius:3px;pointer-events:none"></div>
                             @foreach (var pos in new[] {
@@ -193,7 +193,7 @@
                                 </label>
                             }
                         </div>
-                        <div id="script-pos-label" style="font-size:11px;color:var(--ink-500);margin-top:4px">
+                        <div id="script-pos-label" style="font-size:var(--fs-xs);color:var(--ink-500);margin-top:4px">
                             @(ws.Position switch {
                                 "bottom-right" => "Sağ Alt",
                                 "bottom-left"  => "Sol Alt",
@@ -204,7 +204,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="ea-btn ea-btn-brand" style="width:100%;justify-content:center;font-size:13px;min-height:38px">
+                    <button type="submit" class="ea-btn ea-btn-brand" style="width:100%;justify-content:center;font-size:var(--fs-sm)">
                         Kaydet
                     </button>
                 </form>

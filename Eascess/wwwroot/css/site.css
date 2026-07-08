@@ -34,6 +34,13 @@
   --warning-deep: oklch(42% 0.12 75);
   --danger-deep:  oklch(42% 0.16 27);
 
+  /* Yaldız — yalnızca Kurumsal kademesinde kullanılır (siyah zemin üstünde).
+     Krem/beyaz zeminde kontrast yetmez; başka yerde kullanmayın. */
+  --gold-300: oklch(92% 0.07 94);
+  --gold-400: oklch(84% 0.11 91);
+  --gold-500: oklch(76% 0.13 88);
+  --gold-600: oklch(63% 0.11 86);
+
   /* Radii */
   --r-xs: 6px;
   --r-sm: 10px;
@@ -50,6 +57,19 @@
   /* Gradients */
   --brand-grad: linear-gradient(135deg, var(--teal-500) 0%, var(--indigo-700) 100%);
   --brand-grad-soft: linear-gradient(135deg, oklch(72% 0.11 190 / 0.12), oklch(42% 0.15 270 / 0.12));
+
+  /* Tipografi ölçeği — 1.25x majör üçlü, 16px tabanlı, panel
+     yoğunluğunu koruyacak biçimde yuvarlanmış (2026-08-11 kararı).
+     Panelde ölçek DIŞI punto kullanılmaz; ara değer gerekiyorsa
+     ölçek genişletilir, tek seferlik sayı yazılmaz. */
+  --fs-xs:   12px;  /* rozet, üst etiket, yardımcı metin */
+  --fs-sm:   14px;  /* panel gövde metni, tablo hücresi, buton */
+  --fs-base: 16px;  /* form girdisi (iOS zoom eşiği), öne çıkan metin */
+  --fs-lg:   20px;  /* kart başlığı */
+  --fs-xl:   25px;  /* bölüm başlığı */
+  --fs-2xl:  31px;  /* sayfa içi büyük değer */
+  --fs-3xl:  39px;  /* sayfa başlığı (h1) */
+  --fs-4xl:  49px;  /* istatistik kartındaki ana sayı */
 
   /* Fonts */
   --font-display: "Instrument Serif", "Times New Roman", Georgia, serif;
@@ -162,7 +182,7 @@ a { color: inherit; text-decoration: none; }
 
 .ea-brand-name {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: var(--fs-lg);
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 1;
@@ -170,7 +190,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .ea-brand-meta {
-  font-size: 10px;
+  font-size: var(--fs-xs);
   color: var(--ink-500);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -250,12 +270,12 @@ a { color: inherit; text-decoration: none; }
   place-items: center;
   color: white;
   font-weight: 600;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   flex-shrink: 0;
 }
 
 .ea-user-name {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--ink-900);
   line-height: 1.2;
@@ -265,7 +285,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .ea-user-meta {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--ink-500);
   line-height: 1.2;
   margin-top: 2px;
@@ -288,7 +308,7 @@ a { color: inherit; text-decoration: none; }
 
 .ea-topbar-title {
   font-family: var(--font-display);
-  font-size: 38px;
+  font-size: var(--fs-3xl);
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 1;
@@ -504,7 +524,7 @@ a { color: inherit; text-decoration: none; }
 
 /* Size modifiers */
 .ea-btn--sm { padding: 7px 12px; font-size: 12px; min-height: 32px; }
-.ea-btn--lg { padding: 14px 22px; font-size: 15px; min-height: 52px; }
+.ea-btn--lg { padding: 14px 22px; font-size: var(--fs-base); min-height: 52px; }
 
 .ea-btn--white { background: white; color: var(--ink-900); }
 .ea-btn--white:hover { transform: translateY(-1px); box-shadow: var(--sh-md); }
@@ -534,14 +554,14 @@ a { color: inherit; text-decoration: none; }
 }
 
 .ea-card-title, .ea-section-title {
-  font-size: 15px;
+  font-size: var(--fs-base);
   font-weight: 600;
   color: var(--ink-900);
   letter-spacing: -0.01em;
 }
 
 .ea-card-sub, .ea-section-sub {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--ink-500);
   margin-top: 2px;
 }
@@ -558,10 +578,9 @@ a { color: inherit; text-decoration: none; }
   background: white;
   border: 1px solid var(--cream-300);
   border-radius: var(--r-md);
-  padding: 20px 22px;
+  padding: 20px 24px;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--sh-sm);
 }
 
 .ea-stat-label {
@@ -578,7 +597,7 @@ a { color: inherit; text-decoration: none; }
 
 .ea-stat-value {
   font-family: var(--font-display);
-  font-size: 44px;
+  font-size: var(--fs-4xl);
   font-weight: 400;
   line-height: 1;
   letter-spacing: -0.03em;
@@ -588,7 +607,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .ea-stat-delta {
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 500;
   color: var(--ink-600);
 }
@@ -634,7 +653,7 @@ a { color: inherit; text-decoration: none; }
 .ea-table thead th {
   text-align: left;
   padding: 10px 16px;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 600;
   color: var(--ink-500);
   text-transform: uppercase;
@@ -654,6 +673,32 @@ a { color: inherit; text-decoration: none; }
 .ea-table tr:hover td { background: var(--cream-100); }
 .ea-table tbody tr:last-child td,
 .ea-table tr:last-child td { border-bottom: none; }
+
+/* Satır içi eylem düğmeleri (Tara / Raporlar / Script · Sil).
+   Bir düğme <form> içinde, diğerleri <a>. Form blok kutusu olduğu için
+   içindeki düğme satır kutusuna oturuyor, taban çizgisi altındaki iniş
+   boşluğu formu birkaç piksel uzatıyordu: düğmeler kayık görünüyordu.
+   Formu da esnek kap yapıp payını sıfırlayınca üçü aynı hatta oturur. */
+.ea-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.ea-row-actions > form { display: flex; margin: 0; }
+
+.ea-row-actions .ea-btn {
+  padding: 8px 12px;
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+
+/* Dar ekranda taşmak yerine sarar; sardığında da sağa hizalı kalır. */
+@media (max-width: 900px) {
+  .ea-row-actions { flex-wrap: wrap; row-gap: 8px; }
+}
 
 /* ── Badges ─────────────────────────────────────────────────────── */
 .ea-badge {
@@ -678,7 +723,7 @@ a { color: inherit; text-decoration: none; }
 /* ── Forms ──────────────────────────────────────────────────────── */
 .ea-label, .form-label {
   display: block;
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--ink-800);
   margin-bottom: 6px;
@@ -686,8 +731,10 @@ a { color: inherit; text-decoration: none; }
 
 .ea-input, .ea-select, .ea-textarea, .form-control {
   width: 100%;
-  padding: 12px 14px;
-  font-size: 14px;
+  padding: 12px 16px;
+  /* 16px ALT SINIRDIR: daha küçük punto iOS Safari'de odaklanınca
+     sayfayı zorla yakınlaştırır ve kullanıcıyı düzenden koparır. */
+  font-size: var(--fs-base);
   font-family: var(--font-sans);
   color: var(--ink-900);
   background: white;
@@ -714,7 +761,7 @@ a { color: inherit; text-decoration: none; }
   width: 32px; height: 32px;
   border-radius: 999px;
   display: grid; place-items: center;
-  font-weight: 600; font-size: 13px; flex-shrink: 0;
+  font-weight: 600; font-size: var(--fs-sm); flex-shrink: 0;
   background: var(--cream-200); color: var(--ink-500);
 }
 .ea-step-num.done   { background: var(--success);  color: white; }
@@ -733,7 +780,7 @@ code { font-family: var(--font-mono); font-size: 13px; background: var(--cream-2
   border-radius: var(--r-md);
   padding: 18px;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   color: var(--cream-100);
   line-height: 1.6;
   position: relative;
@@ -768,7 +815,7 @@ code { font-family: var(--font-mono); font-size: 13px; background: var(--cream-2
 /* ── Empty state ────────────────────────────────────────────────── */
 .ea-empty { text-align: center; padding: 4rem 2rem; }
 .ea-empty__icon  { font-size: 2.5rem; margin-bottom: 1rem; }
-.ea-empty__title { font-size: 15px; font-weight: 600; color: var(--ink-900); margin: 0 0 6px; }
+.ea-empty__title { font-size: var(--fs-base); font-weight: 600; color: var(--ink-900); margin: 0 0 6px; }
 .ea-empty__desc  { font-size: 14px; color: var(--ink-500); margin: 0 0 1.5rem; }
 
 /* ── Score ──────────────────────────────────────────────────────── */
@@ -1441,7 +1488,7 @@ code { font-family: var(--font-mono); font-size: 13px; background: var(--cream-2
 .auth-footer-text a { color: var(--indigo-700); font-weight: 600; text-decoration: none; }
 
 /* ── Breadcrumb ─────────────────────────────────────────────────── */
-.ea-breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-500); margin-bottom: 20px; }
+.ea-breadcrumb { display: flex; align-items: center; gap: 6px; font-size: var(--fs-sm); color: var(--ink-500); margin-bottom: 20px; }
 .ea-breadcrumb a { color: var(--ink-500); text-decoration: none; }
 .ea-breadcrumb a:hover { color: var(--teal-600); }
 .ea-breadcrumb__sep { color: var(--ink-400); }
@@ -1676,6 +1723,131 @@ code { font-family: var(--font-mono); font-size: 13px; background: var(--cream-2
   margin-left: 8px; vertical-align: middle;
 }
 
+/* ── Kurumsal paneli ─────────────────────────────────────────────
+   Abonelik sayfasının EN SONUNDA duran, satın alma içermeyen bilgi +
+   iletişim bloğu. Metin solda, çağrı sağda. Siyah zemin ve altın
+   yaldız kenar işlemesi bu kademeyi diğer plan kartlarından ayırır —
+   kasıtlı olarak sayfanın en ağır görsel öğesidir. */
+.ea-ent {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 32px;
+  margin-top: 24px;
+  padding: 32px 40px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--gold-600);
+  /* Düz panel kararı: düşen gölge ve iç parlama yok. Zemin gradienti
+     VURGU olarak kalır (derinlik taklidi değil, yüzey rengi);
+     premium his artık yaldız kenar işlemesi ve tipografiyle taşınır. */
+  background: linear-gradient(152deg, oklch(19% 0.012 260) 0%, oklch(12% 0.008 260) 100%);
+}
+
+/* İç yaldız hattı — klasik çerçeve işlemesi: dış kenardan 6px içeride
+   ince, soluk bir altın çizgi. Tamamen dekoratif, tıklamayı engellemez. */
+.ea-ent::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid oklch(80% 0.1 91 / 0.32);
+  border-radius: calc(var(--r-lg) - 6px);
+  pointer-events: none;
+}
+
+/* NOT: üst kenardaki "ışık parlaması" düz panel kararıyla kaldırıldı —
+   fiziksel ışığı taklit ediyordu. Yaldız artık yalnızca gerçek
+   kenarlıklar ve tipografiyle taşınıyor. */
+
+.ea-ent__body, .ea-ent__aside { position: relative; z-index: 1; }
+
+.ea-ent__eyebrow {
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--gold-400);
+  margin-bottom: 12px;
+}
+
+/* Serif başlık — panelin "premium" tonunu taşıyan asıl öğe. */
+.ea-ent__title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.4vw, 34px);
+  font-weight: 400;
+  line-height: 1.14;
+  letter-spacing: 0.004em;
+  margin: 0 0 12px;
+  color: oklch(94% 0.06 93);
+}
+
+/* Yaldız dökümü yalnızca background-clip destekleyen tarayıcıda; aksi
+   halde yukarıdaki düz altın renk geçerli kalır (metin kaybolmaz). */
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .ea-ent__title {
+    background: linear-gradient(100deg,
+      oklch(97% 0.04 95) 0%, var(--gold-400) 36%,
+      oklch(97% 0.04 95) 62%, var(--gold-500) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+.ea-ent__text {
+  margin: 0;
+  max-width: 64ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: oklch(85% 0.012 260);
+}
+
+.ea-ent__meta {
+  margin-top: 14px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: oklch(74% 0.035 90);
+}
+
+.ea-ent__aside {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+}
+
+.ea-ent__cta {
+  display: inline-flex; align-items: center; justify-content: center;
+  white-space: nowrap;
+  padding: 13px 30px;
+  border-radius: 999px;
+  font-size: 14px; font-weight: 700; letter-spacing: 0.02em;
+  text-decoration: none;
+  color: oklch(20% 0.03 85);
+  /* Düz: yaldız dolgu vurgudur, altında gölge yoktur. */
+  background: linear-gradient(135deg, oklch(88% 0.1 95), oklch(76% 0.13 88) 50%, oklch(68% 0.12 84));
+  border: 1px solid oklch(67% 0.11 86);
+  transition: background var(--dur-fast) var(--ease-out-expo),
+              border-color var(--dur-fast) var(--ease-out-expo);
+}
+/* Geri bildirim yükselmeyle değil, yaldızın koyulaşmasıyla verilir. */
+.ea-ent__cta:hover {
+  background: linear-gradient(135deg, oklch(82% 0.11 94), oklch(70% 0.13 87) 50%, oklch(61% 0.11 83));
+  border-color: oklch(58% 0.1 85);
+}
+.ea-ent__cta:focus-visible { outline: 2px solid var(--gold-300); outline-offset: 3px; }
+
+.ea-ent__mail {
+  font-size: 12px; letter-spacing: 0.02em;
+  color: oklch(82% 0.05 90);
+  text-decoration: none;
+}
+.ea-ent__mail:hover { color: var(--gold-300); text-decoration: underline; }
+.ea-ent__mail:focus-visible { outline: 2px solid var(--gold-300); outline-offset: 3px; border-radius: 4px; }
+
+@media (max-width: 860px) {
+  .ea-ent { grid-template-columns: 1fr; gap: 24px; padding: 28px 24px; }
+  .ea-ent__cta { width: 100%; }
+}
+
 /* Ekran okuyucuya özel metin */
 .ea-sr-only {
   position: absolute; width: 1px; height: 1px;
@@ -1875,7 +2047,7 @@ code { font-family: var(--font-mono); font-size: 13px; background: var(--cream-2
 .ea-test-form-card:focus-within { box-shadow: var(--sh-lg); }
 
 .ea-test-form { display: flex; gap: 10px; flex-wrap: wrap; }
-.ea-test-form .ea-input { flex: 1; min-width: 240px; font-family: var(--font-mono); font-size: 13.5px; }
+.ea-test-form .ea-input { flex: 1; min-width: 240px; font-family: var(--font-mono); font-size: var(--fs-base); }
 
 .ea-test-meta {
   font-size: 12.5px;
@@ -1946,7 +2118,7 @@ code { font-family: var(--font-mono); font-size: 13px; background: var(--cream-2
 
 .ea-score-ring__value {
   font-family: var(--font-display);
-  font-size: 42px;
+  font-size: var(--fs-3xl);
   line-height: 1;
   letter-spacing: -0.02em;
   color: var(--ink-900);
@@ -1954,7 +2126,7 @@ code { font-family: var(--font-mono); font-size: 13px; background: var(--cream-2
 }
 
 .ea-score-ring__label {
-  font-size: 10px;
+  font-size: var(--fs-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -2353,6 +2525,404 @@ html.ea-mkt {
   scroll-behavior: smooth;
 }
 
+/* ── Checkout (ödeme akışı) ─────────────────────────────────────── */
+/* Dikkat dağıtmayan kabuk: yan menü ve pazarlama gezinmesi yoktur; yalnızca
+   marka, güvenlik rozeti ve geri dönüş bağlantısı bulunur. Tüm değerler
+   mevcut tasarım jetonlarından gelir — yeni renk/font/ölçek tanımlanmaz. */
+.ea-checkout-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(ellipse 50% 50% at 20% 80%, oklch(94% 0.03 190 / 0.4), transparent),
+    radial-gradient(ellipse 40% 60% at 80% 20%, oklch(94% 0.035 270 / 0.3), transparent),
+    var(--cream-50);
+}
+
+.ea-checkout-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: var(--nav-h);
+  padding: 8px var(--mkt-pad-x);
+  border-bottom: 1px solid var(--cream-200);
+}
+
+/* Güvenli ödeme rozeti — .ea-mkt-eyebrow-pill diliyle, gölgesiz */
+.ea-checkout-secure {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-600);
+}
+.ea-checkout-secure svg { color: var(--success-deep); flex-shrink: 0; }
+
+.ea-checkout-shell {
+  flex: 1;
+  width: 100%;
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: clamp(24px, 4vh, 44px) var(--mkt-pad-x) 48px;
+}
+
+.ea-checkout-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 372px);
+  gap: clamp(20px, 3vw, 36px);
+  align-items: start;
+}
+
+/* Sipariş özeti uzun formda görünür kalır */
+.ea-checkout-summary { position: sticky; top: 24px; }
+
+.ea-checkout-section + .ea-checkout-section { margin-top: 16px; }
+
+.ea-checkout-legend {
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--ink-900);
+  letter-spacing: -0.01em;
+  margin: 0 0 16px;
+  padding: 0;
+  border: 0;
+}
+
+/* İki sütunlu alan ızgarası; tek alanlar --full ile satırı kaplar */
+.ea-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+}
+.ea-field-grid__full { grid-column: 1 / -1; }
+
+/* Alan altı hata mesajı — .text-danger rengini kullanır, boşken yer kaplamaz */
+.ea-field-error {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  color: oklch(42% 0.16 27);
+}
+.ea-field-error:empty { display: none; }
+
+/* Faturalama dönemi seçimi — radyo grubu, kart görünümlü */
+.ea-period-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.ea-period-option {
+  position: relative;
+  display: block;
+  padding: 14px 16px;
+  border: 1px solid var(--cream-300);
+  border-radius: var(--r-sm);
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.ea-period-option:hover { border-color: var(--teal-600); }
+.ea-period-option input { position: absolute; opacity: 0; pointer-events: none; }
+.ea-period-option:has(input:checked) {
+  border-color: var(--indigo-700);
+  box-shadow: 0 0 0 3px oklch(42% 0.15 270 / 0.14);
+}
+/* Klavye odağı görünür kalmalı — gizli radyo, etiketi işaretler */
+.ea-period-option:has(input:focus-visible) {
+  outline: 3px solid var(--teal-500);
+  outline-offset: 2px;
+}
+.ea-period-option__name { font-size: 14px; font-weight: 600; color: var(--ink-900); }
+.ea-period-option__meta { font-size: 12px; color: var(--ink-500); margin-top: 3px; }
+
+/* Ön ekli alan (telefon ülke kodu) — ön ek alanın içindeymiş gibi görünür */
+.ea-input-prefixed { display: flex; align-items: stretch; }
+
+.ea-input-prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-600);
+  background: var(--cream-100);
+  border: 1px solid var(--cream-300);
+  border-right: none;
+  border-radius: var(--r-sm) 0 0 var(--r-sm);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ea-input-prefixed .ea-input { border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+/* Odak halkası ön ekle birlikte hareket etsin */
+.ea-input-prefixed:focus-within .ea-input-prefix { border-color: var(--teal-600); }
+
+/* Kupon satırı: alan + uygula düğmesi */
+.ea-coupon-row { display: flex; gap: 8px; align-items: flex-start; }
+.ea-coupon-row .ea-input { flex: 1; min-width: 0; }
+
+/* Sipariş özeti satırları */
+.ea-summary-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ink-700);
+  padding: 7px 0;
+}
+.ea-summary-row__label { color: var(--ink-600); }
+.ea-summary-row__value { font-weight: 600; color: var(--ink-800); white-space: nowrap; }
+.ea-summary-row--discount .ea-summary-row__value { color: var(--success-deep); }
+
+.ea-summary-row--total {
+  font-size: 15px;
+  color: var(--ink-900);
+  padding-top: 14px;
+  border-top: 1px solid var(--cream-300);
+  margin-top: 8px;
+}
+.ea-summary-row--total .ea-summary-row__label { font-weight: 600; color: var(--ink-900); }
+.ea-summary-row--total .ea-summary-row__value { font-size: 22px; font-weight: 700; color: var(--ink-900); }
+
+/* Yükleniyor durumundaki düğme — devre dışı görünüm tüm .ea-btn türleri için */
+.ea-btn[disabled], .ea-btn[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.ea-spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid oklch(100% 0 0 / 0.45);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: ea-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes ea-spin { to { transform: rotate(360deg); } }
+
+.ea-checkout-legal {
+  padding: 20px var(--mkt-pad-x) 28px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-500);
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Sonuç (başarı / hata) sayfaları — tek sütun, ortalanmış */
+.ea-checkout-result { max-width: 560px; margin: 0 auto; text-align: center; }
+
+.ea-result-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 20px;
+}
+.ea-result-icon--ok   { background: oklch(85% 0.12 155 / 0.3); color: var(--success-deep); }
+.ea-result-icon--fail { background: oklch(88% 0.1 27 / 0.3);   color: var(--danger-deep); }
+
+.ea-result-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  font-weight: 400;
+  color: var(--ink-900);
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+.ea-result-desc { font-size: 14px; color: var(--ink-600); line-height: 1.6; margin: 0 0 24px; }
+
+/* Sipariş künyesi — etiket/değer çiftleri */
+.ea-result-meta { text-align: left; display: flex; flex-direction: column; gap: 2px; }
+
+/* ── Plan tanıtım penceresi ─────────────────────────────────────── */
+/* Plan değiştikten sonra bir kez gösterilir; yeni planın ayrıcalıklarını anlatır. */
+.ea-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: oklch(18% 0.012 260 / 0.5);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  overflow-y: auto;
+  animation: ea-modal-in var(--dur-fast) var(--ease-out-quart);
+}
+.ea-modal-backdrop[hidden] { display: none; }
+
+.ea-modal {
+  background: white;
+  border: 1px solid var(--cream-300);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-xl);
+  width: 100%;
+  max-width: 520px;
+  padding: 28px;
+  text-align: left;
+  animation: ea-modal-rise var(--dur-normal) var(--ease-out-expo);
+}
+
+@keyframes ea-modal-in   { from { opacity: 0; } }
+@keyframes ea-modal-rise { from { opacity: 0; transform: translateY(12px); } }
+
+.ea-modal__eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--teal-600);
+  margin-bottom: 8px;
+}
+.ea-modal__title {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 400;
+  color: var(--ink-900);
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+.ea-modal__desc { font-size: 14px; color: var(--ink-600); line-height: 1.6; margin: 0 0 20px; }
+
+.ea-modal__perks { list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 12px; }
+.ea-modal__perk  { display: flex; gap: 11px; align-items: flex-start; font-size: 14px; color: var(--ink-800); }
+.ea-modal__perk svg { flex-shrink: 0; margin-top: 2px; color: var(--indigo-700); }
+.ea-modal__perk-title { font-weight: 600; color: var(--ink-900); display: block; }
+.ea-modal__perk-desc  { font-size: 13px; color: var(--ink-600); }
+
+/* ── Öncelikli destek rozeti (Ultra ve Kurumsal) ─────────────────── */
+/* "Hafif parlak" vurgu: markanın kendi degradesi + yumuşak dış parıltı.
+   Dikkat çeker ama panelin sakin diline sadık kalır. */
+.ea-priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .01em;
+  color: white;
+  background: var(--brand-grad);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22),
+              0 0 14px oklch(62% 0.12 200 / 0.45),
+              0 2px 6px oklch(42% 0.15 270 / 0.25);
+  position: relative;
+  overflow: hidden;
+}
+/* Yavaş geçen ışık huzmesi — parlaklığı "hafif" tutan tek hareket */
+.ea-priority-badge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.42) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: ea-sheen 4.5s var(--ease-out-quart) infinite;
+}
+@keyframes ea-sheen {
+  0%, 62% { transform: translateX(-120%); }
+  100%    { transform: translateX(120%); }
+}
+.ea-priority-badge svg { width: 13px; height: 13px; }
+
+/* Öncelikli destek panelinin kendisi */
+.ea-priority-panel {
+  border: 1px solid oklch(72% 0.11 190 / 0.45);
+  background:
+    linear-gradient(135deg, oklch(72% 0.11 190 / 0.09), oklch(42% 0.15 270 / 0.09)),
+    white;
+}
+
+/* Hareketi kapatanlarda parıltı durur, rozet düz kalır */
+@media (prefers-reduced-motion: reduce) {
+  .ea-priority-badge::after { animation: none; display: none; }
+}
+
+/* ================================================================
+   DÜZ PANEL KATMANI
+   ================================================================
+   Ürün kararı (2026-08-11, bencium-controlled-ux-designer):
+   panel "tam düz geçiş" yapar. Yükseklik/gölge ile hiyerarşi
+   kurulmaz; hiyerarşi 1px kenarlık, zemin farkı, tipografi ölçeği
+   ve boşlukla kurulur ("material honesty" + "functional layering").
+
+   Kapsam BİLEREK .ea-app ve .ea-checkout-shell ile sınırlıdır —
+   pazarlama sayfaları kendi görsel dilini korur. Bu yüzden ortak
+   ilkeller (.ea-card, .ea-btn) burada eziliyor, tanımları
+   değiştirilmiyor.
+
+   İSTİSNA: focus halkaları ve gerçek katman öğeleri (modal,
+   dropdown) dokunulmaz — onlar derinlik değil, işlev taşır.
+   ================================================================ */
+
+/* Yüzeyler: gölge yok, ayrım kenarlıkla. */
+.ea-app .ea-card,
+.ea-checkout-shell .ea-card {
+  box-shadow: none;
+}
+
+/* Etkileşimli kart: yükselme yerine kenarlık + zemin değişimi. */
+.ea-app .ea-card--hover:hover,
+.ea-checkout-shell .ea-card--hover:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--ink-400);
+  background: var(--cream-50);
+}
+
+/* Butonlar: marka gradienti VURGU olarak kalır (skill gradienti
+   vurgu/zemin için serbest bırakır), düşen gölge ve iç parlama
+   kalkar. Geri bildirim renk koyulaşmasıyla verilir. */
+.ea-app .ea-btn,
+.ea-checkout-shell .ea-btn {
+  box-shadow: none;
+}
+.ea-app .ea-btn:hover,
+.ea-app .ea-btn:active,
+.ea-checkout-shell .ea-btn:hover,
+.ea-checkout-shell .ea-btn:active {
+  transform: none;
+  box-shadow: none;
+}
+.ea-app .ea-btn-brand:hover,
+.ea-app .ea-btn--primary:hover,
+.ea-checkout-shell .ea-btn-brand:hover,
+.ea-checkout-shell .ea-btn--primary:hover {
+  background: var(--indigo-800);
+}
+.ea-app .ea-btn-primary:hover,
+.ea-checkout-shell .ea-btn-primary:hover {
+  background: var(--ink-700);
+}
+
+/* Focus göstergesi gölge DEĞİL erişilebilirlik aracıdır — korunur
+   ve panelde her etkileşimli öğeye genişletilir. Panelde daha önce
+   yalnızca .ea-btn ve .ea-input'ta görünür focus vardı. */
+.ea-app a:focus-visible,
+.ea-app button:focus-visible,
+.ea-app [tabindex]:focus-visible,
+.ea-app summary:focus-visible,
+.ea-checkout-shell a:focus-visible,
+.ea-checkout-shell button:focus-visible,
+.ea-checkout-shell [tabindex]:focus-visible {
+  outline: 3px solid var(--teal-500);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+}
+
+/* Dokunma hedefi: WCAG 2.5.5 / skill kuralı 44×44px. .ea-btn tabanı
+   zaten 44px; panelde inline stille 30px'e indirilen satır içi eylem
+   butonlarındaki ezmeler view'lardan kaldırıldı. Bu kural, ileride
+   yeniden ezilmesin diye tabanı panel kapsamında sabitler. */
+.ea-app .ea-btn,
+.ea-checkout-shell .ea-btn {
+  min-height: 44px;
+}
+
 /* ── Responsive ─────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .ea-hero { grid-template-columns: 1fr; gap: 32px; }
@@ -2377,6 +2947,11 @@ html.ea-mkt {
   .ea-demo__iframe { height: 560px; }
   .ea-ai-cta__layout { grid-template-columns: 1fr; gap: 40px; }
   .ea-ai-cta__panel-wrap { justify-content: flex-start; }
+
+  /* Ödeme: tek sütun. Özet forma göre önce gelir — kullanıcı ne ödeyeceğini
+     formu doldurmadan görür. Tek sütunda yapışkanlık anlamsızdır. */
+  .ea-checkout-layout { grid-template-columns: 1fr; }
+  .ea-checkout-summary { position: static; order: -1; }
 }
 
 @media (max-width: 768px) {
@@ -2402,6 +2977,12 @@ html.ea-mkt {
   .ea-demo__iframe { height: 480px; }
   .ea-demo__url-bar { display: none; }
   .ea-ai-mock-panel { width: 100%; }
+
+  /* Ödeme formu dar ekranda tek sütuna iner; kupon alanı alt alta sarar */
+  .ea-field-grid { grid-template-columns: 1fr; }
+  .ea-period-toggle { grid-template-columns: 1fr; }
+  .ea-coupon-row { flex-wrap: wrap; }
+  .ea-coupon-row .ea-btn { width: 100%; justify-content: center; }
 }
 
 /* ── Reduced motion ─────────────────────────────────────────────── */

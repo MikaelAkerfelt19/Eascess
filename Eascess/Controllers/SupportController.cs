@@ -17,6 +17,7 @@ public class SupportController : Controller
     private readonly IUnitOfWork _unitOfWork;
     private readonly UserManager<AppUser> _userManager;
     private readonly IEmailService _emailService;
+    private readonly IPlanService _planService;
     private readonly ILogger<SupportController> _logger;
 
     public SupportController(
@@ -25,6 +26,7 @@ public class SupportController : Controller
         IUnitOfWork unitOfWork,
         UserManager<AppUser> userManager,
         IEmailService emailService,
+        IPlanService planService,
         ILogger<SupportController> logger)
     {
         _ticketRepo = ticketRepo;
@@ -32,6 +34,7 @@ public class SupportController : Controller
         _unitOfWork = unitOfWork;
         _userManager = userManager;
         _emailService = emailService;
+        _planService = planService;
         _logger = logger;
     }
 
@@ -40,6 +43,7 @@ public class SupportController : Controller
     {
         ViewData["Active"] = "support";
         var userId = _userManager.GetUserId(User)!;
+        await SetPrioritySupportFlagAsync(userId);
         var tickets = await _ticketRepo.FindAsync(t => t.UserId == userId);
         return View(tickets.OrderByDescending(t => t.CreatedAt).ToList());
     }
@@ -50,6 +54,7 @@ public class SupportController : Controller
     {
         ViewData["Active"] = "support";
         var userId = _userManager.GetUserId(User)!;
+        await SetPrioritySupportFlagAsync(userId);
         await PopulateDomainSelectAsync(userId, domainId);
         return View(new SupportTicketFormModel { DomainId = domainId });
     }
@@ -61,6 +66,8 @@ public class SupportController : Controller
     {
         ViewData["Active"] = "support";
         var userId = _userManager.GetUserId(User)!;
+
+        var isPriority = await SetPrioritySupportFlagAsync(userId);
 
         if (!ModelState.IsValid)
         {
@@ -95,8 +102,26 @@ public class SupportController : Controller
             catch (Exception ex) { _logger.LogWarning(ex, "Destek talebi e-postası gönderilemedi. UserId={UserId}", user.Id); }
         }
 
-        TempData["Success"] = "Talebiniz alındı. Ekibimiz en kısa sürede yanıt verecek.";
+        TempData["Success"] = isPriority
+            ? "Talebiniz alındı ve öncelikli sıraya eklendi. Ekibimiz en kısa sürede yanıt verecek."
+            : "Talebiniz alındı. Ekibimiz en kısa sürede yanıt verecek.";
+
         return RedirectToAction(nameof(Index));
+    }
+
+    /// <summary>
+    /// Kullanıcının planı öncelikli destek içeriyor mu (Ultra / Kurumsal).
+    /// Görünümler bu bayrağa göre öncelik rozetini gösterir.
+    /// </summary>
+    private async Task<bool> SetPrioritySupportFlagAsync(string userId)
+    {
+        var plan = await _planService.GetUserActivePlanAsync(userId);
+        var isPriority = plan.HasPrioritySupport;
+
+        ViewBag.HasPrioritySupport = isPriority;
+        ViewBag.PlanName = plan.Name;
+
+        return isPriority;
     }
 
     private async Task PopulateDomainSelectAsync(string userId, int? selectedId)

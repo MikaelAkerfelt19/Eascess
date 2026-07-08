@@ -60,7 +60,10 @@ public class DashboardController : Controller
             ViewBag.QuickWidgetSettings = await _widgetSettingService.GetByDomainAsync(domainList.First().Id, userId);
 
         var appUser = await _userManager.GetUserAsync(User);
-        if (appUser?.TrialEndsAt.HasValue == true && appUser.IsTrialActive)
+        // Deneme sayacı yalnızca denemesi HÂLÂ süren kullanıcıya gösterilir.
+        // Bir plana geçildiğinde CheckoutService denemeyi kapattığı için
+        // IsTrialActive false olur; üst kademeye elle taşınanlar da elenir.
+        if (appUser?.IsTrialActive == true && !plan.IsAboveTrialTier)
         {
             var daysLeft = (int)Math.Ceiling((appUser.TrialEndsAt.Value - DateTime.UtcNow).TotalDays);
             ViewBag.TrialDaysLeft = Math.Max(0, daysLeft);

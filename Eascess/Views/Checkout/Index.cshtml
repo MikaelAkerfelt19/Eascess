@@ -1,0 +1,408 @@
+@using Eascess_Domain.Constants
+@model Eascess.Models.CheckoutViewModel
+@{
+    ViewData["Title"] = "Ödeme";
+    Layout = "~/Views/Shared/_CheckoutLayout.cshtml";
+
+    var q = Model.Quote;
+    var form = Model.Form;
+
+    // Alan bazlı hata durumu — aria-invalid ve mesaj bağlaması için.
+    bool HasError(string name) =>
+        ViewData.ModelState.TryGetValue(name, out var entry) && entry.Errors.Count > 0;
+
+    string ErrorText(string name) =>
+        ViewData.ModelState.TryGetValue(name, out var entry) && entry.Errors.Count > 0
+            ? entry.Errors[0].ErrorMessage
+            : "";
+
+    var isYearly = q.BillingPeriod == BillingPeriods.Yearly;
+    var monthlyTotalForYear = Model.Plan.MonthlyPrice * BillingPolicy.YearlyAccessMonths;
+
+    var selectedCountry = Countries.Find(form.Country) ?? Countries.Default;
+    var isTurkey = selectedCountry.Code == Countries.DefaultCode;
+}
+
+<!-- Adım göstergesi: kullanıcı akışın neresinde olduğunu görür -->
+<nav class="ea-stepper" aria-label="Ödeme adımları" style="max-width:520px">
+    <div class="ea-step">
+        <div class="ea-step-num done" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <span class="ea-step-label done">Plan seçimi</span>
+    </div>
+    <div class="ea-step-line done" aria-hidden="true"></div>
+    <div class="ea-step">
+        <div class="ea-step-num active" aria-hidden="true">2</div>
+        <span class="ea-step-label active" aria-current="step">Fatura bilgileri</span>
+    </div>
+    <div class="ea-step-line" aria-hidden="true"></div>
+    <div class="ea-step">
+        <div class="ea-step-num" aria-hidden="true">3</div>
+        <span class="ea-step-label">Ödeme</span>
+    </div>
+</nav>
+
+@* Ekran okuyucu duyuruları: kupon sonucu, gönderim durumu ve hatalar buraya yazılır *@
+<div id="ea-checkout-status" role="status" aria-live="polite" class="ea-sr-only"></div>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    @* Özet hata kutusu — alan bazlı mesajlar ayrıca her alanın altında gösterilir *@
+    <div class="ea-alert ea-alert--danger" role="alert" tabindex="-1" id="ea-checkout-errors">
+        <strong>Formda eksik veya hatalı alanlar var.</strong>
+        <span>Aşağıda işaretlenen alanları kontrol edip tekrar deneyin.</span>
+    </div>
+}
+
+@if (Model.CouponError is not null)
+{
+    <div class="ea-alert ea-alert--danger" role="alert">@Model.CouponError</div>
+}
+
+<form asp-action="Start" method="post" novalidate id="ea-checkout-form"
+      data-quote-url="@Url.Action("Quote", "Checkout")">
+    @Html.AntiForgeryToken()
+
+    @* Sunucu bu alanlardan yalnızca PLAN ve DÖNEM bilgisini kullanır;
+       tutarı her seferinde Plans tablosundan yeniden hesaplar. *@
+    <input type="hidden" name="PlanId" value="@form.PlanId" />
+    <input type="hidden" name="ClientToken" value="@form.ClientToken" />
+
+    <div class="ea-checkout-layout">
+
+        <!-- ══ Sol sütun: fatura bilgileri ══ -->
+        <div>
+
+            <div class="ea-card ea-checkout-section" style="padding:24px">
+                <fieldset style="border:0;padding:0;margin:0">
+                    <legend class="ea-checkout-legend">Fatura bilgileri</legend>
+
+                    <div class="ea-field-grid">
+                        <div class="ea-field-grid__full">
+                            <label class="ea-label" for="FullName">Ad Soyad</label>
+                            <input type="text" id="FullName" name="FullName" value="@form.FullName"
+                                   class="ea-input @(HasError("FullName") ? "is-invalid" : "")"
+                                   autocomplete="name" maxlength="200" required
+                                   aria-invalid="@(HasError("FullName") ? "true" : "false")"
+                                   aria-describedby="FullName-error" />
+                            <span class="ea-field-error" id="FullName-error">@ErrorText("FullName")</span>
+                        </div>
+
+                        <div>
+                            <label class="ea-label" for="Email">E-posta</label>
+                            <input type="email" id="Email" name="Email" value="@form.Email"
+                                   class="ea-input @(HasError("Email") ? "is-invalid" : "")"
+                                   autocomplete="email" maxlength="256" required
+                                   aria-invalid="@(HasError("Email") ? "true" : "false")"
+                                   aria-describedby="Email-hint Email-error" />
+                            <span class="ea-sr-only" id="Email-hint">Fatura ve ödeme bildirimi bu adrese gönderilir.</span>
+                            <span class="ea-field-error" id="Email-error">@ErrorText("Email")</span>
+                        </div>
+
+                        @* Ülke önce gelir: telefon ön eki, il listesi ve KDV oranı buna bağlıdır *@
+                        <div>
+                            <label class="ea-label" for="Country">Ülke</label>
+                            <select id="Country" name="Country"
+                                    class="ea-input @(HasError("Country") ? "is-invalid" : "")"
+                                    autocomplete="country" required
+                                    aria-invalid="@(HasError("Country") ? "true" : "false")"
+                                    aria-describedby="Country-hint Country-error">
+                                @foreach (var c in Countries.All)
+                                {
+                                    @* KDV oranı bilerek yazılmaz: tutarın tek kaynağı sunucudur,
+                                       ülke değişince özet /Checkout/Quote ile yenilenir. *@
+                                    <option value="@c.Code" selected="@(c.Code == selectedCountry.Code)"
+                                            data-dial="@c.DialCode" data-digits="@c.PhoneDigits">
+                                        @c.Name
+                                    </option>
+                                }
+                            </select>
+                            <span class="ea-sr-only" id="Country-hint">Fatura ülkeniz; KDV oranı ve telefon kodu buna göre belirlenir.</span>
+                            <span class="ea-field-error" id="Country-error">@ErrorText("Country")</span>
+                        </div>
+
+                        <div>
+                            <label class="ea-label" for="Phone">Telefon</label>
+                            @* Ülke kodu ayrı bir ön ek olarak gösterilir; kullanıcı yalnızca
+                               ulusal numarayı yazar. Ön ek ülke seçimiyle güncellenir. *@
+                            <div class="ea-input-prefixed">
+                                <span class="ea-input-prefix" id="ea-dial-code" aria-hidden="true">+@selectedCountry.DialCode</span>
+                                <input type="tel" id="Phone" name="Phone" value="@form.Phone"
+                                       class="ea-input @(HasError("Phone") ? "is-invalid" : "")"
+                                       autocomplete="tel-national" maxlength="40" inputmode="tel" required
+                                       data-phone-digits="@selectedCountry.PhoneDigits"
+                                       aria-invalid="@(HasError("Phone") ? "true" : "false")"
+                                       aria-describedby="Phone-hint Phone-error" />
+                            </div>
+                            <span class="ea-sr-only" id="Phone-hint">
+                                Ülke kodu <span id="ea-dial-code-sr">+@selectedCountry.DialCode</span> olarak otomatik eklenir.
+                                Yalnızca ülke kodundan sonraki numarayı girin.
+                            </span>
+                            <span class="ea-field-error" id="Phone-error">@ErrorText("Phone")</span>
+                        </div>
+
+                        <div class="ea-field-grid__full">
+                            <label class="ea-label" for="City">@(isTurkey ? "İl" : "Şehir")</label>
+
+                            @* Türkiye'de il, 81 il listesinden seçilir; diğer ülkelerde
+                               şehir serbest metindir. İkisi de "City" adıyla gönderilir,
+                               yalnızca biri etkin olur. *@
+                            <select id="City" name="City"
+                                    class="ea-input @(HasError("City") ? "is-invalid" : "")"
+                                    autocomplete="address-level1"
+                                    data-city-select
+                                    required="@isTurkey"
+                                    disabled="@(!isTurkey)"
+                                    style="@(isTurkey ? "" : "display:none")"
+                                    aria-invalid="@(HasError("City") ? "true" : "false")"
+                                    aria-describedby="City-error">
+                                <option value="">— İl seçin —</option>
+                                @foreach (var il in TurkeyProvinces.Alphabetical)
+                                {
+                                    <option value="@il" selected="@(form.City == il)">@il</option>
+                                }
+                            </select>
+
+                            <input type="text" id="CityFree" name="City" value="@(isTurkey ? "" : form.City)"
+                                   class="ea-input @(HasError("City") ? "is-invalid" : "")"
+                                   autocomplete="address-level2" maxlength="100"
+                                   data-city-input
+                                   required="@(!isTurkey)"
+                                   disabled="@isTurkey"
+                                   style="@(isTurkey ? "display:none" : "")"
+                                   aria-invalid="@(HasError("City") ? "true" : "false")"
+                                   aria-describedby="City-error" />
+
+                            <span class="ea-field-error" id="City-error">@ErrorText("City")</span>
+                        </div>
+
+                        <div class="ea-field-grid__full">
+                            <label class="ea-label" for="Address">Adres</label>
+                            <textarea id="Address" name="Address" rows="3"
+                                      class="ea-input @(HasError("Address") ? "is-invalid" : "")"
+                                      autocomplete="street-address" maxlength="500" required
+                                      style="resize:vertical"
+                                      aria-invalid="@(HasError("Address") ? "true" : "false")"
+                                      aria-describedby="Address-error">@form.Address</textarea>
+                            <span class="ea-field-error" id="Address-error">@ErrorText("Address")</span>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- Kurumsal fatura — onay kutusuyla açılır -->
+            <div class="ea-card ea-checkout-section" style="padding:24px">
+                <label class="check-label" style="font-size:14px;font-weight:600;color:var(--ink-900)">
+                    <input type="checkbox" id="IsCompany" name="IsCompany" value="true"
+                           @(form.IsCompany ? "checked" : "")
+                           aria-controls="ea-company-fields"
+                           aria-expanded="@(form.IsCompany ? "true" : "false")" />
+                    Şirket adına fatura istiyorum
+                </label>
+                @* Onay kutusu için gizli false — işaretlenmediğinde de değer gider *@
+                <input type="hidden" name="IsCompany" value="false" />
+
+                <div id="ea-company-fields" style="margin-top:18px;@(form.IsCompany ? "" : "display:none")">
+                    <div class="ea-field-grid">
+                        <div class="ea-field-grid__full">
+                            <label class="ea-label" for="CompanyName">Şirket Unvanı</label>
+                            <input type="text" id="CompanyName" name="CompanyName" value="@form.CompanyName"
+                                   class="ea-input @(HasError("CompanyName") ? "is-invalid" : "")"
+                                   autocomplete="organization" maxlength="200"
+                                   aria-invalid="@(HasError("CompanyName") ? "true" : "false")"
+                                   aria-describedby="CompanyName-error" />
+                            <span class="ea-field-error" id="CompanyName-error">@ErrorText("CompanyName")</span>
+                        </div>
+
+                        <div>
+                            <label class="ea-label" for="TaxOffice">Vergi Dairesi</label>
+                            <input type="text" id="TaxOffice" name="TaxOffice" value="@form.TaxOffice"
+                                   class="ea-input @(HasError("TaxOffice") ? "is-invalid" : "")"
+                                   maxlength="100"
+                                   aria-invalid="@(HasError("TaxOffice") ? "true" : "false")"
+                                   aria-describedby="TaxOffice-error" />
+                            <span class="ea-field-error" id="TaxOffice-error">@ErrorText("TaxOffice")</span>
+                        </div>
+
+                        <div>
+                            <label class="ea-label" for="TaxNumber">Vergi / TC Kimlik No</label>
+                            <input type="text" id="TaxNumber" name="TaxNumber" value="@form.TaxNumber"
+                                   class="ea-input @(HasError("TaxNumber") ? "is-invalid" : "")"
+                                   inputmode="numeric" maxlength="11"
+                                   aria-invalid="@(HasError("TaxNumber") ? "true" : "false")"
+                                   aria-describedby="TaxNumber-hint TaxNumber-error" />
+                            <span class="ea-sr-only" id="TaxNumber-hint">Vergi numarası 10, TC kimlik numarası 11 hanelidir.</span>
+                            <span class="ea-field-error" id="TaxNumber-error">@ErrorText("TaxNumber")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ══ Sağ sütun: sipariş özeti ══ -->
+        <aside class="ea-checkout-summary" aria-labelledby="ea-summary-heading">
+            <div class="ea-card" style="padding:24px">
+
+                <div class="ea-card-head" style="margin-bottom:14px">
+                    <div>
+                        <h2 class="ea-card-title" id="ea-summary-heading">Sipariş Özeti</h2>
+                        <div class="ea-card-sub">
+                            @Model.Plan.Name planı
+                            @if (Model.CurrentPlanName != Model.Plan.Name)
+                            {
+                                <text>· şu an @Model.CurrentPlanName</text>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Faturalama dönemi -->
+                <fieldset style="border:0;padding:0;margin:0 0 18px">
+                    <legend class="ea-label" style="margin-bottom:8px">Faturalama dönemi</legend>
+                    <div class="ea-period-toggle">
+                        <label class="ea-period-option">
+                            <input type="radio" name="BillingPeriod" value="@BillingPeriods.Monthly"
+                                   @(isYearly ? "" : "checked") data-period-radio />
+                            <span class="ea-period-option__name">Aylık</span>
+                            <span class="ea-period-option__meta">@Money.Format(Model.Plan.MonthlyPrice) / ay</span>
+                        </label>
+                        <label class="ea-period-option">
+                            <input type="radio" name="BillingPeriod" value="@BillingPeriods.Yearly"
+                                   @(isYearly ? "checked" : "") data-period-radio />
+                            <span class="ea-period-option__name">Yıllık</span>
+                            <span class="ea-period-option__meta">2 ay hediye</span>
+                        </label>
+                    </div>
+                    @* JavaScript kapalıyken dönem değişimi bu düğmeyle sunucuya iletilir.
+                       JS varsa seçim anında yeniden hesaplanır ve bu düğme hiç görünmez. *@
+                    <noscript>
+                        <button type="submit" name="intent" value="recalc"
+                                class="ea-btn ea-btn-ghost ea-btn--sm" style="margin-top:10px">
+                            Dönemi güncelle
+                        </button>
+                    </noscript>
+                </fieldset>
+
+                <!-- Kupon kodu -->
+                <div style="margin-bottom:18px">
+                    <label class="ea-label" for="CouponCode">İndirim kodu</label>
+                    <div class="ea-coupon-row">
+                        <input type="text" id="CouponCode" name="CouponCode" value="@form.CouponCode"
+                               class="ea-input" maxlength="40"
+                               autocomplete="off" spellcheck="false"
+                               style="text-transform:uppercase"
+                               aria-describedby="CouponCode-status" />
+                        @* JS yoksa da çalışır: sunucuya gönderilir, sayfa kuponla yeniden çizilir *@
+                        <button type="submit" name="intent" value="recalc"
+                                class="ea-btn ea-btn-ghost" id="ea-coupon-apply">Uygula</button>
+                    </div>
+                    <span class="ea-field-error" id="CouponCode-status"
+                          style="@(Model.CouponApplied ? "color:var(--success-deep)" : "")">
+                        @(Model.CouponApplied ? q.DiscountLabel : "")
+                    </span>
+                </div>
+
+                <hr class="ea-divider" style="margin:0 0 6px" />
+
+                <!-- Fiyat kırılımı — tüm değerler sunucuda hesaplandı -->
+                <div id="ea-summary-rows">
+                    <div class="ea-summary-row">
+                        <span class="ea-summary-row__label">
+                            @Model.Plan.Name · @(isYearly ? "yıllık" : "aylık")
+                            @if (isYearly)
+                            {
+                                <text>(@q.BilledMonths ay ödeme)</text>
+                            }
+                        </span>
+                        <span class="ea-summary-row__value" data-summary="subtotal">@Money.Format(q.Subtotal, q.Currency)</span>
+                    </div>
+
+                    <div class="ea-summary-row ea-summary-row--discount"
+                         data-summary-row="discount"
+                         style="@(q.DiscountAmount > 0 ? "" : "display:none")">
+                        <span class="ea-summary-row__label">İndirim @(q.CouponCode is not null ? $"({q.CouponCode})" : "")</span>
+                        <span class="ea-summary-row__value" data-summary="discount">−@Money.Format(q.DiscountAmount, q.Currency)</span>
+                    </div>
+
+                    @* KDV oranı fatura ülkesine göre değişir — oran ve ülke birlikte gösterilir *@
+                    <div class="ea-summary-row">
+                        <span class="ea-summary-row__label" data-summary="taxLabel">
+                            KDV (%@((q.TaxRate * 100).ToString("0.##"))) · @q.CountryName
+                        </span>
+                        <span class="ea-summary-row__value" data-summary="tax">@Money.Format(q.TaxAmount, q.Currency)</span>
+                    </div>
+
+                    <div class="ea-summary-row ea-summary-row--total">
+                        <span class="ea-summary-row__label">Toplam</span>
+                        <span class="ea-summary-row__value" data-summary="total">@Money.Format(q.Total, q.Currency)</span>
+                    </div>
+                </div>
+
+                @if (isYearly && q.YearlySavings > 0)
+                {
+                    <div style="margin-top:10px;font-size:12px;color:var(--success-deep);font-weight:600">
+                        Aylık ödemeye göre @Money.Format(q.YearlySavings, q.Currency) tasarruf
+                        (@Money.Format(monthlyTotalForYear, q.Currency) yerine).
+                    </div>
+                }
+
+                <div style="margin-top:12px;font-size:12px;color:var(--ink-500)">
+                    @if (isYearly)
+                    {
+                        <text>12 ay boyunca geçerlidir; 10 ay ücretlendirilir.</text>
+                    }
+                    else
+                    {
+                        <text>1 ay boyunca geçerlidir, dönem sonunda yenilenir.</text>
+                    }
+                </div>
+
+                <hr class="ea-divider" />
+
+                <!-- Sözleşme onayı -->
+                <div>
+                    <label class="check-label" style="align-items:flex-start;gap:10px">
+                        <input type="checkbox" id="AcceptTerms" name="AcceptTerms" value="true"
+                               @(form.AcceptTerms ? "checked" : "")
+                               style="margin-top:2px;flex-shrink:0"
+                               aria-invalid="@(HasError("AcceptTerms") ? "true" : "false")"
+                               aria-describedby="AcceptTerms-error" />
+                        <span>
+                            <a asp-controller="Home" asp-action="Privacy" target="_blank"
+                               style="color:var(--indigo-700);font-weight:600;text-decoration:underline;text-underline-offset:2px">Mesafeli satış sözleşmesini</a>
+                            ve ön bilgilendirme formunu okudum, onaylıyorum.
+                        </span>
+                    </label>
+                    <input type="hidden" name="AcceptTerms" value="false" />
+                    <span class="ea-field-error" id="AcceptTerms-error">@ErrorText("AcceptTerms")</span>
+                </div>
+
+                <button type="submit" name="intent" value="pay"
+                        class="ea-btn ea-btn-brand ea-btn--lg" id="ea-checkout-submit"
+                        style="width:100%;justify-content:center;margin-top:18px">
+                    <span data-submit-label>@Money.Format(q.Total, q.Currency) Öde</span>
+                </button>
+
+                <p style="font-size:12px;color:var(--ink-500);margin:12px 0 0;text-align:center;line-height:1.55">
+                    Ödeme sağlayıcının güvenli sayfasında tamamlanır.
+                    Kart bilgileriniz Eascess sunucularına hiçbir zaman ulaşmaz.
+                </p>
+
+                <div style="margin-top:14px;text-align:center">
+                    <a asp-controller="Subscription" asp-action="Index"
+                       style="font-size:13px;color:var(--ink-500);text-decoration:underline;text-underline-offset:3px">
+                        Vazgeç, planlara dön
+                    </a>
+                </div>
+
+            </div>
+        </aside>
+
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/js/checkout.js" asp-append-version="true" defer></script>
+}

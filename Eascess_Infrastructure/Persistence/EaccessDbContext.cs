@@ -1,4 +1,5 @@
-﻿using Eascess_Domain.Entities;
+﻿using Eascess_Domain.Constants;
+using Eascess_Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ public partial class EaccessDbContext : IdentityDbContext<AppUser>
     public virtual DbSet<Invoice> Invoices { get; set; }
     public virtual DbSet<Page> Pages { get; set; }
     public virtual DbSet<Payment> Payments { get; set; }
+    public virtual DbSet<PaymentOrder> PaymentOrders { get; set; }
     public virtual DbSet<Plan> Plans { get; set; }
     public virtual DbSet<PlanFeature> PlanFeatures { get; set; }
     public virtual DbSet<ScanReport> ScanReports { get; set; }
@@ -108,6 +110,27 @@ public partial class EaccessDbContext : IdentityDbContext<AppUser>
             entity.HasOne(d => d.User).WithMany(p => p.Payments)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Payments_Users");
+        });
+
+        modelBuilder.Entity<PaymentOrder>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.Currency).HasDefaultValue("TRY");
+            entity.Property(e => e.Status).HasDefaultValue(PaymentOrderStatus.Draft);
+            entity.Property(e => e.IsCompany).HasDefaultValue(false);
+
+            // Ters navigasyon koleksiyonu eklenmedi — Plan ve AppUser entity'lerine
+            // dokunmadan ilişki kurulur. Silme davranışı NoAction: ödeme geçmişi
+            // kullanıcı/plan kaydına bağlı olarak silinmez.
+            entity.HasOne(d => d.Plan).WithMany()
+                .HasForeignKey(d => d.PlanId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_PaymentOrders_Plans");
+            entity.HasOne(d => d.User).WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_PaymentOrders_Users");
         });
 
         modelBuilder.Entity<Plan>(entity =>

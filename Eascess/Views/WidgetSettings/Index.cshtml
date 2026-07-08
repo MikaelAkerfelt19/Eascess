@@ -21,7 +21,7 @@
     <div class="ea-alert ea-alert--success">✓ @msg</div>
 }
 
-<div style="display:grid;grid-template-columns:1fr 1.2fr;gap:18px;align-items:start">
+<div style="display:grid;grid-template-columns:1fr 1.2fr;gap:20px;align-items:start">
 
     <!-- Ayarlar formu -->
     <div class="ea-card" style="padding:24px">
@@ -34,13 +34,13 @@
             <!-- Tema rengi -->
             <div style="margin-bottom:20px">
                 <label class="ea-label">Tema Rengi</label>
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
                     <input type="color" asp-for="ThemeColor" id="color-input"
                            style="width:44px;height:44px;border:1px solid var(--cream-300);border-radius:var(--r-sm);background:white;cursor:pointer;padding:3px" />
                     <input type="text" id="color-text" value="@Model.ThemeColor"
                            class="ea-input" style="width:120px"
                            oninput="syncColor(this.value)" placeholder="#38bdf8" />
-                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
                         @foreach (var c in new[] { "#38bdf8", "#818cf8", "#c084fc", "#22d3ee", "#4ade80", "#fb923c", "#f87171", "#facc15" })
                         {
                             <button type="button" onclick="setColor('@c')"
@@ -50,13 +50,13 @@
                         }
                     </div>
                 </div>
-                <p style="font-size:12px;color:var(--ink-500);margin:6px 0 0">Widget butonunun arka plan rengi</p>
+                <p style="font-size:var(--fs-xs);color:var(--ink-500);margin:8px 0 0">Widget butonunun arka plan rengi</p>
             </div>
 
             <!-- Konum -->
             <div style="margin-bottom:20px">
                 <label class="ea-label">Konum</label>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:300px">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:300px">
                     @foreach (var pos in new[] {
                         ("bottom-right", "Sağ Alt"),
                         ("bottom-left",  "Sol Alt"),
@@ -64,7 +64,7 @@
                         ("top-left",     "Sol Üst"),
                     })
                     {
-                        <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--cream-300);border-radius:var(--r-sm);cursor:pointer;font-size:13px;transition:border-color .15s,background .15s;@(Model.Position == pos.Item1 ? "border-color:var(--teal-600);background:oklch(96% 0.04 190)" : "background:white")">
+                        <label style="display:flex;align-items:center;gap:8px;padding:12px 12px;border:1px solid var(--cream-300);border-radius:var(--r-sm);cursor:pointer;font-size:var(--fs-sm);transition:border-color .15s,background .15s;@(Model.Position == pos.Item1 ? "border-color:var(--teal-600);background:oklch(96% 0.04 190)" : "background:white")">
                             <input type="radio" name="Position" value="@pos.Item1"
                                    @(Model.Position == pos.Item1 ? "checked" : "")
                                    style="accent-color:var(--teal-600)"
@@ -86,15 +86,15 @@
 
             <!-- Marka özelleştirme -->
             <div style="margin-bottom:20px;padding:16px;background:var(--cream-50,#fafaf9);border:1px solid var(--cream-300);border-radius:var(--r-md)">
-                <div style="font-size:13px;font-weight:600;color:var(--ink-700);margin-bottom:12px">Marka Özelleştirme</div>
+                <div style="font-size:var(--fs-sm);font-weight:600;color:var(--ink-700);margin-bottom:12px">Marka Özelleştirme</div>
 
                 <div style="margin-bottom:12px">
                     <label class="ea-label">FAB Butonu İkonu</label>
 
                     <!-- Radio: Varsayılan / Özel -->
-                    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+                    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
                         <label id="logo-opt-default-wrap"
-                               style="display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--teal-600);border-radius:var(--r-sm);cursor:pointer;font-size:13px;background:oklch(96% 0.04 190);transition:all .15s">
+                               style="display:flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--teal-600);border-radius:var(--r-sm);cursor:pointer;font-size:var(--fs-sm);background:oklch(96% 0.04 190);transition:all .15s">
                             <input type="radio" name="logoMode" value="default" id="logo-opt-default"
                                    style="accent-color:var(--teal-600)"
                                    @(string.IsNullOrEmpty(Model.LogoUrl) ? "checked" : "")
@@ -102,7 +102,7 @@
                             Varsayılan İkon
                         </label>
                         <label id="logo-opt-custom-wrap"
-                               style="display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid @(!string.IsNullOrEmpty(Model.LogoUrl) ? "var(--teal-600)" : "var(--cream-300)");border-radius:var(--r-sm);cursor:pointer;font-size:13px;background:@(!string.IsNullOrEmpty(Model.LogoUrl) ? "oklch(96% 0.04 190)" : "white");transition:all .15s">
+                               style="display:flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid @(!string.IsNullOrEmpty(Model.LogoUrl) ? "var(--teal-600)" : "var(--cream-300)");border-radius:var(--r-sm);cursor:pointer;font-size:var(--fs-sm);background:@(!string.IsNullOrEmpty(Model.LogoUrl) ? "oklch(96% 0.04 190)" : "white");transition:all .15s">
                             <input type="radio" name="logoMode" value="custom" id="logo-opt-custom"
                                    style="accent-color:var(--teal-600)"
                                    @(!string.IsNullOrEmpty(Model.LogoUrl) ? "checked" : "")
@@ -115,15 +115,15 @@
                     <input type="hidden" asp-for="LogoUrl" id="LogoUrl" />
 
                     <!-- Özel logo paneli -->
-                    <div id="logo-custom-panel" style="display:@(!string.IsNullOrEmpty(Model.LogoUrl) ? "block" : "none");border:1px solid var(--cream-300);border-radius:var(--r-sm);padding:12px;background:white;margin-bottom:10px">
+                    <div id="logo-custom-panel" style="display:@(!string.IsNullOrEmpty(Model.LogoUrl) ? "block" : "none");border:1px solid var(--cream-300);border-radius:var(--r-sm);padding:12px;background:white;margin-bottom:12px">
                         <!-- Sekme seçici -->
                         <div style="display:flex;gap:0;margin-bottom:8px;border:1px solid var(--cream-300);border-radius:var(--r-sm);overflow:hidden;width:fit-content">
                             <button type="button" id="logo-tab-url" onclick="switchLogoTab('url')"
-                                    style="padding:5px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:var(--ink-900);color:white">
+                                    style="padding:4px 16px;font-size:var(--fs-xs);font-weight:600;border:none;cursor:pointer;background:var(--ink-900);color:white">
                                 URL
                             </button>
                             <button type="button" id="logo-tab-file" onclick="switchLogoTab('file')"
-                                    style="padding:5px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:white;color:var(--ink-600)">
+                                    style="padding:4px 16px;font-size:var(--fs-xs);font-weight:600;border:none;cursor:pointer;background:white;color:var(--ink-600)">
                                 Dosyadan Yükle
                             </button>
                         </div>
@@ -144,42 +144,42 @@
                                  ondragover="event.preventDefault();this.style.borderColor='var(--teal-500)'"
                                  ondragleave="this.style.borderColor='var(--cream-300)'"
                                  ondrop="handleLogoDrop(event)">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink-400)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                                <div style="font-size:13px;color:var(--ink-600)">Dosya seçin veya sürükleyin</div>
-                                <div style="font-size:11px;color:var(--ink-400);margin-top:2px">PNG, JPG, SVG — maks. 2 MB</div>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ink-400)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:8px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <div style="font-size:var(--fs-sm);color:var(--ink-600)">Dosya seçin veya sürükleyin</div>
+                                <div style="font-size:var(--fs-xs);color:var(--ink-400);margin-top:2px">PNG, JPG, SVG — maks. 2 MB</div>
                             </div>
                             <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/svg+xml,image/webp"
                                    style="display:none" onchange="uploadLogoFile(this)" />
-                            <div id="logo-upload-status" style="font-size:12px;margin-top:6px;display:none"></div>
+                            <div id="logo-upload-status" style="font-size:var(--fs-xs);margin-top:8px;display:none"></div>
                         </div>
                     </div>
 
                     <!-- FAB Önizleme + Logoyu Kaldır -->
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
-                        <span style="font-size:12px;color:var(--ink-500)">Önizleme:</span>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                        <span style="font-size:var(--fs-xs);color:var(--ink-500)">Önizleme:</span>
                         <div id="fab-preview"
                              style="width:52px;height:52px;border-radius:50%;background:@Model.ThemeColor;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -6px rgba(15,23,42,.38),0 4px 8px -4px rgba(15,23,42,.2),inset 0 0 0 1px rgba(255,255,255,.18);flex-shrink:0;overflow:hidden;transition:background .2s,box-shadow .2s">
                         </div>
                         <button type="button" id="logo-clear-btn" onclick="clearLogo()"
-                                style="font-size:12px;color:var(--danger);background:none;border:none;cursor:pointer;display:@(!string.IsNullOrEmpty(Model.LogoUrl) ? "inline" : "none")">
+                                style="font-size:var(--fs-xs);color:var(--danger);background:none;border:none;cursor:pointer;display:@(!string.IsNullOrEmpty(Model.LogoUrl) ? "inline" : "none")">
                             Logoyu Kaldır
                         </button>
                     </div>
 
-                    <p style="font-size:12px;color:var(--ink-500);margin:0">Varsayılan: beyaz soru işareti ikonu. Önerilen: kare veya yuvarlak, şeffaf PNG.</p>
+                    <p style="font-size:var(--fs-xs);color:var(--ink-500);margin:0">Varsayılan: beyaz soru işareti ikonu. Önerilen: kare veya yuvarlak, şeffaf PNG.</p>
                 </div>
 
                 <div style="margin-bottom:12px">
                     <label class="ea-label" asp-for="WidgetTitle">Başlık Metni <span style="font-weight:400;color:var(--ink-500)">(isteğe bağlı)</span></label>
                     <input type="text" asp-for="WidgetTitle" class="ea-input" placeholder="Erişilebilirlik Araçları" maxlength="30"
                            oninput="updateBrandPreview()" />
-                    <p style="font-size:12px;color:var(--ink-500);margin:4px 0 0">Boş bırakılırsa varsayılan dil metni kullanılır.</p>
+                    <p style="font-size:var(--fs-xs);color:var(--ink-500);margin:4px 0 0">Boş bırakılırsa varsayılan dil metni kullanılır.</p>
                 </div>
 
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
                     <div>
-                        <div style="font-size:13px;font-weight:500;color:var(--ink-800)">"Eascess ile güçlendirildi" Göster</div>
-                        <div style="font-size:12px;color:var(--ink-500)">Widget altında marka ataması</div>
+                        <div style="font-size:var(--fs-sm);font-weight:500;color:var(--ink-800)">"Eascess ile güçlendirildi" Göster</div>
+                        <div style="font-size:var(--fs-xs);color:var(--ink-500)">Widget altında marka ataması</div>
                     </div>
                     <label style="position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0">
                         <input type="checkbox" asp-for="PoweredByVisible"
@@ -196,8 +196,8 @@
             <!-- Yapay zeka alt metin -->
             <div style="margin-bottom:24px;padding:16px;background:var(--cream-100);border:1px solid var(--cream-300);border-radius:var(--r-md);display:flex;align-items:center;justify-content:space-between;gap:16px">
                 <div>
-                    <div style="font-size:14px;font-weight:600;color:var(--ink-900)">Yapay Zeka Alt Metin</div>
-                    <div style="font-size:12px;color:var(--ink-500);margin-top:2px">Gemini 2.5 ile eksik alt metinleri otomatik oluştur</div>
+                    <div style="font-size:var(--fs-sm);font-weight:600;color:var(--ink-900)">Yapay Zeka Alt Metin</div>
+                    <div style="font-size:var(--fs-xs);color:var(--ink-500);margin-top:2px">Gemini 2.5 ile eksik alt metinleri otomatik oluştur</div>
                 </div>
                 <label style="position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0">
                     <input type="checkbox" asp-for="IsAiEnabled"
@@ -219,7 +219,7 @@
 
     <!-- Canlı önizleme -->
     <div class="ea-card" style="padding:20px">
-        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500);margin-bottom:14px">Canlı Önizleme</div>
+        <div style="font-size:var(--fs-xs);font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500);margin-bottom:16px">Canlı Önizleme</div>
         <div style="border:1px solid var(--cream-300);border-radius:var(--r-md);overflow:hidden">
             <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--cream-100);border-bottom:1px solid var(--cream-300)">
                 <div style="display:flex;gap:4px">
@@ -227,7 +227,7 @@
                     <span style="width:9px;height:9px;border-radius:50%;background:#fdbc40;display:block"></span>
                     <span style="width:9px;height:9px;border-radius:50%;background:#34c749;display:block"></span>
                 </div>
-                <div style="flex:1;text-align:center;font-size:11px;color:var(--ink-500);font-family:var(--font-mono);background:white;border:1px solid var(--cream-300);border-radius:4px;padding:3px 8px">orneksite.com</div>
+                <div style="flex:1;text-align:center;font-size:var(--fs-xs);color:var(--ink-500);font-family:var(--font-mono);background:white;border:1px solid var(--cream-300);border-radius:4px;padding:3px 8px">orneksite.com</div>
             </div>
             <iframe id="preview-iframe"
                     src="/widget-demo.html"
@@ -235,7 +235,7 @@
                     sandbox="allow-scripts allow-same-origin"
                     style="width:100%;height:560px;border:none;display:block"></iframe>
         </div>
-        <p style="font-size:12px;color:var(--ink-500);margin:8px 0 0">Gerçek widget Shadow DOM içinde izole çalışır. Değişiklikler anında yansır.</p>
+        <p style="font-size:var(--fs-xs);color:var(--ink-500);margin:8px 0 0">Gerçek widget Shadow DOM içinde izole çalışır. Değişiklikler anında yansır.</p>
     </div>
 
 </div>

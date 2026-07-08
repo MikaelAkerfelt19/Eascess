@@ -1,0 +1,76 @@
+@{
+    ViewData["Title"] = "Ödeme Onayı";
+    Layout = "~/Views/Shared/_CheckoutLayout.cshtml";
+
+    // GELİŞTİRİCİ NOTU (ekranda görünmez): bu sayfa, gerçek sağlayıcının KENDİ
+    // sitesinde göstereceği barındırılan ödeme sayfasının yerine geçer. Gerçek
+    // sağlayıcı bağlandığında hiç açılmaz — kullanıcı doğrudan sağlayıcının
+    // alan adına gider. Kullanıcıya dönük hiçbir "test/sahte" ifadesi
+    // içermemelidir; ekran gerçek akışla aynı dili konuşur.
+    //
+    // Kart alanı bilerek YOKTUR: akış hosted/redirect olarak kurgulandığı için
+    // kart verisi hiçbir aşamada Eascess'e girmez.
+    var callbackUrl = ViewData["CallbackUrl"] as string;
+}
+
+<div class="ea-checkout-result">
+
+    <div class="ea-result-icon" style="background:var(--cream-200)" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--indigo-700)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+    </div>
+
+    <h1 class="ea-result-title">Ödemeyi onaylayın</h1>
+    <p class="ea-result-desc">
+        Aşağıdaki tutarın tahsil edilmesini onaylayın. İşlemi bu adımda
+        iptal edebilirsiniz; onaylamadığınız sürece hesabınızdan tahsilat yapılmaz.
+    </p>
+
+    <div class="ea-card" style="padding:22px">
+        <div class="ea-result-meta">
+            <div class="ea-summary-row">
+                <span class="ea-summary-row__label">Sipariş numarası</span>
+                <span class="ea-summary-row__value ea-mono">@ViewData["OrderReference"]</span>
+            </div>
+            <div class="ea-summary-row">
+                <span class="ea-summary-row__label">İşlem numarası</span>
+                <span class="ea-summary-row__value ea-mono">@ViewData["TransactionId"]</span>
+            </div>
+            <div class="ea-summary-row ea-summary-row--total">
+                <span class="ea-summary-row__label">Tahsil edilecek</span>
+                <span class="ea-summary-row__value">@ViewData["Amount"] @ViewData["Currency"]</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+
+        @* Her iki form da imzalı alanlarla callback'e döner — imza sağlayıcı
+           tarafında üretildi, doğrulaması VerifyCallbackAsync içinde yapılır. *@
+        <form method="post" action="@callbackUrl">
+            <input type="hidden" name="orderReference" value="@ViewData["OrderReference"]" />
+            <input type="hidden" name="transactionId" value="@ViewData["TransactionId"]" />
+            <input type="hidden" name="amount" value="@ViewData["Amount"]" />
+            <input type="hidden" name="status" value="success" />
+            <input type="hidden" name="signature" value="@ViewData["SuccessSignature"]" />
+            <button type="submit" class="ea-btn ea-btn-brand ea-btn--lg">Ödemeyi Onayla</button>
+        </form>
+
+        <form method="post" action="@callbackUrl">
+            <input type="hidden" name="orderReference" value="@ViewData["OrderReference"]" />
+            <input type="hidden" name="transactionId" value="@ViewData["TransactionId"]" />
+            <input type="hidden" name="amount" value="@ViewData["Amount"]" />
+            <input type="hidden" name="status" value="failure" />
+            <input type="hidden" name="signature" value="@ViewData["FailureSignature"]" />
+            <button type="submit" class="ea-btn ea-btn-ghost ea-btn--lg">Vazgeç</button>
+        </form>
+
+    </div>
+
+    <p style="font-size:12px;color:var(--ink-500);margin-top:20px;line-height:1.6">
+        Bu adım güvenli ödeme sayfasıdır. Kart bilgileriniz Eascess sunucularında
+        saklanmaz ve işlem sonucu imzalı olarak doğrulanır.
+    </p>
+
+</div>

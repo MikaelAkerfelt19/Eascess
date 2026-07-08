@@ -43,6 +43,7 @@ public sealed class TrialReminderJob : BackgroundService
         using var scope = _services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
         var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+        var planService = scope.ServiceProvider.GetRequiredService<IPlanService>();
 
         var targetDate = DateTime.UtcNow.Date.AddDays(3); // 3 gün sonra sona erenler
 
@@ -55,6 +56,13 @@ public sealed class TrialReminderJob : BackgroundService
         foreach (var user in usersToRemind)
         {
             if (user.Email is null) continue;
+
+            // Ödeme yapan kullanıcının TrialEndsAt'i kapatıldığı için zaten bu
+            // listeye düşmez. Burada yalnızca deneme kademesinin ÜSTÜNE elle
+            // taşınmış kullanıcılar elenir — onlara yükseltme çağrısı anlamsız.
+            var plan = await planService.GetUserActivePlanAsync(user.Id);
+            if (plan.IsAboveTrialTier) continue;
+
             var html = $"""
                 <p>Merhaba {user.FullName ?? user.UserName},</p>
                 <p>14 günlük ücretsiz Pro denemenizin bitmesine <strong>3 gün</strong> kaldı.</p>

@@ -9,6 +9,7 @@ using Eascess_Infrastructure.Persistence;
 using Eascess_Infrastructure.Repositories;
 using Eascess_Infrastructure.Scanning;
 using Eascess_Infrastructure.Services;
+using Eascess_Infrastructure.Services.Payments;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -127,6 +128,34 @@ builder.Services.AddHostedService<DowngradeCleanupJob>();
 // Pro ve üzeri planlar için otomatik yeniden tarama (fiyatlandırma vaadi)
 builder.Services.AddHostedService<AutoRescanJob>();
 builder.Services.AddMemoryCache();
+
+// ── Ödeme (Checkout) ───────────────────────────────────────────────
+// Anahtarlar YALNIZCA yapılandırmadan okunur; appsettings.json'daki
+// karşılıkları boştur. Ayrıntı: PAYMENT_INTEGRATION.md
+builder.Services.Configure<PaymentOptions>(
+    builder.Configuration.GetSection(PaymentOptions.SectionName));
+
+builder.Services.AddScoped<ICouponService, StubCouponService>();
+builder.Services.AddScoped<ICheckoutService, CheckoutService>();
+
+// Gerçek sağlayıcı HTTP istemcisi — adaptör doldurulduğunda hazır bekler.
+builder.Services.AddHttpClient<LivePaymentProvider>(client =>
+{
+    var timeout = builder.Configuration.GetValue("Payments:TimeoutSeconds", 20);
+    client.Timeout = TimeSpan.FromSeconds(timeout);
+});
+
+// SAĞLAYICI SEÇİMİ — gerçek ödemeye geçiş burada TEK SATIRDIR.
+// Payments:Provider değeri "Sandbox" dışında bir şeyse LivePaymentProvider
+// devreye girer; başka hiçbir yerde değişiklik gerekmez.
+builder.Services.AddScoped<IPaymentProvider>(sp =>
+{
+    var provider = builder.Configuration.GetValue("Payments:Provider", "Sandbox");
+
+    return string.Equals(provider, "Sandbox", StringComparison.OrdinalIgnoreCase)
+        ? ActivatorUtilities.CreateInstance<SandboxPaymentProvider>(sp)
+        : sp.GetRequiredService<LivePaymentProvider>();
+});
 
 // Rate limiting — public API endpoint'leri IP bazlı sınırlandırılır.
 // Not: AddFixedWindowLimiter tüm istemcilerin paylaştığı TEK limit oluşturur;

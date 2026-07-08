@@ -25,36 +25,36 @@
 }
 
 <!-- Özet kartı -->
-<div class="ea-card" style="padding:24px;margin-bottom:14px">
+<div class="ea-card" style="padding:24px;margin-bottom:16px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:20px">
         <div>
-            <div style="font-size:13px;color:var(--ink-500);margin-bottom:12px">
+            <div style="font-size:var(--fs-sm);color:var(--ink-500);margin-bottom:12px">
                 @Model.ScanDate.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
                 &nbsp;·&nbsp;
                 <span class="ea-badge ea-badge-neutral">@Model.ScanType</span>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px">
-                <div style="text-align:center;padding:14px;background:var(--cream-100);border-radius:var(--r-sm);border:1px solid var(--cream-300)">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px">
+                <div style="text-align:center;padding:16px;background:var(--cream-100);border-radius:var(--r-sm);border:1px solid var(--cream-300)">
                     <div style="font-size:1.4rem;font-weight:700;color:var(--danger)">@Model.ErrorCount</div>
-                    <div style="font-size:11px;color:var(--ink-500);font-weight:600">Toplam Hata</div>
+                    <div style="font-size:var(--fs-xs);color:var(--ink-500);font-weight:600">Toplam Hata</div>
                 </div>
-                <div style="text-align:center;padding:14px;background:var(--cream-100);border-radius:var(--r-sm);border:1px solid var(--cream-300)">
+                <div style="text-align:center;padding:16px;background:var(--cream-100);border-radius:var(--r-sm);border:1px solid var(--cream-300)">
                     <div style="font-size:1.4rem;font-weight:700;color:oklch(55% 0.18 27)">@Model.Issues.Count(i => i.Severity == "Critical")</div>
-                    <div style="font-size:11px;color:var(--ink-500);font-weight:600">Kritik</div>
+                    <div style="font-size:var(--fs-xs);color:var(--ink-500);font-weight:600">Kritik</div>
                 </div>
-                <div style="text-align:center;padding:14px;background:var(--cream-100);border-radius:var(--r-sm);border:1px solid var(--cream-300)">
+                <div style="text-align:center;padding:16px;background:var(--cream-100);border-radius:var(--r-sm);border:1px solid var(--cream-300)">
                     <div style="font-size:1.4rem;font-weight:700;color:var(--warning)">@Model.Issues.Count(i => i.Severity == "Warning")</div>
-                    <div style="font-size:11px;color:var(--ink-500);font-weight:600">Uyarı</div>
+                    <div style="font-size:var(--fs-xs);color:var(--ink-500);font-weight:600">Uyarı</div>
                 </div>
-                <div style="text-align:center;padding:14px;background:var(--cream-100);border-radius:var(--r-sm);border:1px solid var(--cream-300)">
+                <div style="text-align:center;padding:16px;background:var(--cream-100);border-radius:var(--r-sm);border:1px solid var(--cream-300)">
                     <div style="font-size:1.4rem;font-weight:700;color:var(--teal-600)">@Model.Issues.Select(i => i.PageUrl).Distinct().Count()</div>
-                    <div style="font-size:11px;color:var(--ink-500);font-weight:600">Etkilenen Sayfa</div>
+                    <div style="font-size:var(--fs-xs);color:var(--ink-500);font-weight:600">Etkilenen Sayfa</div>
                 </div>
             </div>
         </div>
         <div style="text-align:center;padding:20px 28px;background:var(--cream-100);border:1px solid var(--cream-300);border-radius:var(--r-md)">
             <div style="font-family:var(--font-display);font-size:3.5rem;font-weight:400;color:@scoreColor;line-height:1;letter-spacing:-0.03em">@Model.WcagScore</div>
-            <div style="font-size:11px;color:var(--ink-500);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">WCAG Skoru / 100</div>
+            <div style="font-size:var(--fs-xs);color:var(--ink-500);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">WCAG Skoru / 100</div>
         </div>
     </div>
 </div>
@@ -62,12 +62,12 @@
 <!-- WCAG seviye dağılımı -->
 @if (Model.Issues.Any())
 {
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
         @foreach (var g in Model.Issues.GroupBy(i => i.WcagLevel).OrderBy(g => g.Key))
         {
-            <div class="ea-card" style="padding:10px 16px;display:flex;align-items:center;gap:10px">
+            <div class="ea-card" style="padding:12px 16px;display:flex;align-items:center;gap:12px">
                 <span class="ea-badge ea-badge--sky">WCAG @g.Key</span>
-                <span style="font-size:13px;font-weight:600;color:var(--ink-900)">@g.Count() sorun</span>
+                <span style="font-size:var(--fs-sm);font-weight:600;color:var(--ink-900)">@g.Count() sorun</span>
             </div>
         }
     </div>
@@ -75,9 +75,9 @@
 
 <!-- Sorun listesi -->
 <div class="ea-card" style="padding:20px">
-    <div style="font-size:15px;font-weight:600;color:var(--ink-900);margin-bottom:16px">
+    <div style="font-size:var(--fs-base);font-weight:600;color:var(--ink-900);margin-bottom:16px">
         Tespit Edilen Sorunlar
-        <span style="font-size:13px;font-weight:400;color:var(--ink-500);margin-left:6px">(@Model.Issues.Count)</span>
+        <span style="font-size:var(--fs-sm);font-weight:400;color:var(--ink-500);margin-left:8px">(@Model.Issues.Count)</span>
     </div>
 
     @if (!Model.Issues.Any())
@@ -103,17 +103,17 @@
                 <button class="ea-accordion-trigger" onclick="toggleIssue('@itemId', this)"
                         aria-expanded="false" aria-controls="@itemId">
                     <span class="ea-badge @sevBadge">@sevLabel</span>
-                    <span class="ea-badge ea-badge--sky" style="font-size:11px">@issue.WcagLevel</span>
+                    <span class="ea-badge ea-badge--sky" style="font-size:var(--fs-xs)">@issue.WcagLevel</span>
                     <span style="font-weight:600;color:var(--ink-900);flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                         @issue.ErrorCode
                     </span>
-                    <span style="font-size:12px;color:var(--ink-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">
+                    <span style="font-size:var(--fs-xs);color:var(--ink-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">
                         @issue.PageUrl
                     </span>
                     <svg class="issue-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;color:var(--ink-400);transition:transform 0.2s cubic-bezier(0.25,1,0.5,1);margin-left:4px"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="ea-accordion-body" id="@itemId">
-                    <dl style="display:grid;grid-template-columns:130px 1fr;gap:6px 12px;margin:0;font-size:13px">
+                    <dl style="display:grid;grid-template-columns:130px 1fr;gap:8px 12px;margin:0;font-size:var(--fs-sm)">
                         <dt style="color:var(--ink-500);font-weight:600">Sayfa</dt>
                         <dd style="color:var(--ink-800);word-break:break-all;margin:0">@issue.PageUrl</dd>
                         <dt style="color:var(--ink-500);font-weight:600">Element</dt>

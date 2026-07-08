@@ -93,10 +93,10 @@ else
                                 @r.DomainUrl
                             </a>
                         </td>
-                        <td style="color:var(--ink-500);font-size:13px">@r.ScanDate.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
+                        <td style="color:var(--ink-500);font-size:var(--fs-sm)">@r.ScanDate.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
                         <td><span class="ea-badge ea-badge-neutral">@r.ScanType</span></td>
                         <td>
-                            <span class="ea-score @sc">@r.WcagScore<span style="font-size:11px;font-weight:400;opacity:.6">/100</span></span>
+                            <span class="ea-score @sc">@r.WcagScore<span style="font-size:var(--fs-xs);font-weight:400;opacity:.6">/100</span></span>
                         </td>
                         <td>
                             @if (r.ErrorCount > 0)
@@ -110,7 +110,7 @@ else
                         </td>
                         <td style="text-align:right">
                             <a asp-controller="Reports" asp-action="Detail" asp-route-id="@r.Id"
-                               class="ea-btn ea-btn-ghost" style="padding:6px 10px;min-height:32px;font-size:12px">Detay</a>
+                               class="ea-btn ea-btn-ghost" style="padding:8px 12px;font-size:var(--fs-xs)">Detay</a>
                         </td>
                     </tr>
                 }

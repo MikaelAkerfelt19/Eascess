@@ -13,7 +13,7 @@
     </div>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
 
     <div class="ea-card" style="padding:28px">
         @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
@@ -34,7 +34,7 @@
                        autocomplete="off"
                        autofocus />
                 <span asp-validation-for="DomainUrl" class="text-danger"></span>
-                <p style="font-size:12px;color:var(--ink-500);margin:6px 0 0">Protokolsüz (https://) de girebilirsiniz. Örn: <strong>siteniz.com</strong></p>
+                <p style="font-size:var(--fs-xs);color:var(--ink-500);margin:8px 0 0">Protokolsüz (https://) de girebilirsiniz. Örn: <strong>siteniz.com</strong></p>
             </div>
 
             <div style="display:flex;gap:8px">
@@ -45,12 +45,12 @@
     </div>
 
     <div class="ea-card" style="padding:24px">
-        <div style="font-size:13px;font-weight:600;color:var(--ink-700);margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em">Nasıl Çalışır?</div>
-        <ol style="margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:10px">
-            <li style="font-size:14px;color:var(--ink-600);line-height:1.5">Domaininizi buraya ekleyin</li>
-            <li style="font-size:14px;color:var(--ink-600);line-height:1.5">Oluşturulan <code>&lt;script&gt;</code> etiketini kopyalayın</li>
-            <li style="font-size:14px;color:var(--ink-600);line-height:1.5">Sitenizin kapanış <code>&lt;/body&gt;</code> etiketinden önce yapıştırın</li>
-            <li style="font-size:14px;color:var(--ink-600);line-height:1.5">Eascess widget'ı sitenizde otomatik olarak görünür</li>
+        <div style="font-size:var(--fs-sm);font-weight:600;color:var(--ink-700);margin-bottom:16px;text-transform:uppercase;letter-spacing:.06em">Nasıl Çalışır?</div>
+        <ol style="margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:12px">
+            <li style="font-size:var(--fs-sm);color:var(--ink-600);line-height:1.5">Domaininizi buraya ekleyin</li>
+            <li style="font-size:var(--fs-sm);color:var(--ink-600);line-height:1.5">Oluşturulan <code>&lt;script&gt;</code> etiketini kopyalayın</li>
+            <li style="font-size:var(--fs-sm);color:var(--ink-600);line-height:1.5">Sitenizin kapanış <code>&lt;/body&gt;</code> etiketinden önce yapıştırın</li>
+            <li style="font-size:var(--fs-sm);color:var(--ink-600);line-height:1.5">Eascess widget'ı sitenizde otomatik olarak görünür</li>
         </ol>
     </div>
 

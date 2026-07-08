@@ -43,6 +43,32 @@ public class PlanCapabilitiesTests
     public void EmailNotifications_YalnizcaUltraVeKurumsal(int planId, bool expected)
         => Assert.Equal(expected, PlanWithId(planId).HasEmailNotifications);
 
+    [Theory]
+    [InlineData(PlanIds.Free,       false)]
+    [InlineData(PlanIds.Pro,        false)]
+    [InlineData(PlanIds.Ultra,      true)]
+    [InlineData(PlanIds.Enterprise, true)]
+    public void PrioritySupport_YalnizcaUltraVeKurumsal(int planId, bool expected)
+        => Assert.Equal(expected, PlanWithId(planId).HasPrioritySupport);
+
+    /// <summary>
+    /// Deneme kullanıcısı deneme planında (Pro) görünür. Bu yüzden deneme
+    /// şeridini kapatan kapı "plan ücretli mi" DEĞİL, "denemenin verdiğinden
+    /// üst kademede mi" olmalıdır — aksi halde her deneme kullanıcısında
+    /// şerit gizlenir ve hatırlatma e-postası hiç gönderilmez.
+    /// </summary>
+    [Theory]
+    [InlineData(PlanIds.Free,       false)]
+    [InlineData(PlanIds.Pro,        false)] // deneme kademesi — şerit görünmeli
+    [InlineData(PlanIds.Ultra,      true)]
+    [InlineData(PlanIds.Enterprise, true)]
+    public void IsAboveTrialTier_YalnizcaDenemeKademesininUstu(int planId, bool expected)
+        => Assert.Equal(expected, PlanWithId(planId).IsAboveTrialTier);
+
+    [Fact]
+    public void DenemePlani_DenemeKademesininUstunde_Sayilmaz()
+        => Assert.False(PlanWithId(TrialPolicy.TrialPlanId).IsAboveTrialTier);
+
     [Fact]
     public void TierRank_KademeSirasi_KurumsalEnUstte()
     {

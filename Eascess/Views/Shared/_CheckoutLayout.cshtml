@@ -1,0 +1,60 @@
+@*
+    Ödeme akışının dikkat dağıtmayan kabuğu.
+
+    _AppLayout'un yan menüsü ve _Layout'un pazarlama gezinmesi bilerek yoktur:
+    ödeme ekranında kullanıcıyı akıştan çıkaracak bağlantı, kampanya veya
+    ek satış (upsell) bulunmaz. Yalnızca marka, güvenlik bilgisi, geri dönüş
+    bağlantısı ve yasal bağlantılar gösterilir.
+
+    Yapı ve sınıflar _AuthLayout ile aynı dili konuşur.
+*@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] · Eascess</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+
+<a href="#ea-main-content" class="ea-skip-link">İçeriğe geç</a>
+
+<div class="ea-checkout-wrapper">
+
+    <header class="ea-checkout-topbar">
+        <a class="ea-navbar__brand" asp-controller="Dashboard" asp-action="Index" aria-label="Eascess paneline dön">
+            <div class="ea-navbar__logo">
+                <img src="~/image/Eascess_logo.png" alt="" />
+            </div>
+            <span class="ea-navbar__brand-name">Eascess</span>
+        </a>
+
+        <div class="ea-checkout-secure">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <span>Güvenli ödeme · 256-bit SSL</span>
+        </div>
+    </header>
+
+    <main class="ea-checkout-shell" id="ea-main-content">
+        @RenderBody()
+    </main>
+
+    <footer class="ea-checkout-legal">
+        <span>&copy; 2026 Eascess</span>
+        <a asp-controller="Home" asp-action="Privacy" style="color:var(--ink-600);text-decoration:underline;text-underline-offset:3px">Gizlilik Politikası</a>
+        <span>Tüm fiyatlara KDV dahil edilerek tahsil edilir.</span>
+    </footer>
+
+</div>
+
+<script src="~/js/site.js" asp-append-version="true" defer></script>
+@await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

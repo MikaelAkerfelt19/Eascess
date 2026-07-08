@@ -1,3 +1,4 @@
+@using Eascess_Domain.Constants
 @{
     ViewData["Title"] = "Fiyatlandırma";
 }
@@ -85,7 +86,9 @@
             </div>
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <a asp-controller="Subscription" asp-action="Index" class="ea-btn ea-btn-ghost ea-pricing-cta">Aboneliğimi Görüntüle</a>
+                <a asp-controller="Checkout" asp-action="Index"
+                   asp-route-planId="@PlanIds.Pro" asp-route-period="@BillingPeriods.Monthly"
+                   class="ea-btn ea-btn-ghost ea-pricing-cta">Pro'ya Geç</a>
             }
             else
             {
@@ -119,7 +122,9 @@
             </div>
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <a asp-controller="Subscription" asp-action="Index" class="ea-btn ea-btn-brand ea-pricing-cta">Planımı Yönet</a>
+                <a asp-controller="Checkout" asp-action="Index"
+                   asp-route-planId="@PlanIds.Ultra" asp-route-period="@BillingPeriods.Monthly"
+                   class="ea-btn ea-btn-brand ea-pricing-cta">Ultra'ya Geç</a>
             }
             else
             {
@@ -179,7 +184,9 @@
                 </div>
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <a asp-controller="Subscription" asp-action="Index" class="ea-btn ea-btn-ghost ea-pricing-cta">Yıllığa Geç</a>
+                    <a asp-controller="Checkout" asp-action="Index"
+                       asp-route-planId="@PlanIds.Pro" asp-route-period="@BillingPeriods.Yearly"
+                       class="ea-btn ea-btn-ghost ea-pricing-cta">Yıllığa Geç</a>
                 }
                 else
                 {
@@ -204,7 +211,9 @@
                 </div>
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <a asp-controller="Subscription" asp-action="Index" class="ea-btn ea-btn-brand ea-pricing-cta">Yıllığa Geç</a>
+                    <a asp-controller="Checkout" asp-action="Index"
+                       asp-route-planId="@PlanIds.Ultra" asp-route-period="@BillingPeriods.Yearly"
+                       class="ea-btn ea-btn-brand ea-pricing-cta">Yıllığa Geç</a>
                 }
                 else
                 {
